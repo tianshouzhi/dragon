@@ -14,16 +14,16 @@ public enum SqlType {
     DUMP("\\s*DUMP.+"),
 
     INSERT("\\s*INSERT.+"),
-    UPDATE("\\s*EXECUTE_UPDATE.+"),
+    UPDATE("\\s*UPDATE.+"),
     DELETE("\\s*DELETE.+"),
     REPLACE("\\s*REPLACE.+"),
     TRUNCATE("\\s*TRUNCATE.+"),
-    CREATE("\\s*TRUNCATE.+"),
-    DROP("\\s*TRUNCATE.+"),
-    LOAD("\\s*TRUNCATE.+"),
-    MERGE("\\s*TRUNCATE.+"),
-    ALTER("\\s*TRUNCATE.+"),
-    RENAME("\\s*TRUNCATE.+"),
+    CREATE("\\s*CREATE.+"),
+    DROP("\\s*DROP.+"),
+    LOAD("\\s*LOAD.+"),
+    MERGE("\\s*MERGE.+"),
+    ALTER("\\s*ALTER.+"),
+    RENAME("\\s*RENAME.+"),
     CALL("\\s*CALL.+");//存储过程
 
     Pattern pattern;

@@ -48,13 +48,11 @@ public class SqlTypeUtil {
             case RENAME:
             case CALL:
                 return false;
-            default:
-                throw new SQLException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
-
         }
+        return false;
     }
 
-    public static SqlType parseSqlType(String sql) {
+    public static SqlType parseSqlType(String sql) throws SQLException {
         //parse sql
         SqlType[] values = SqlType.values();
         for (SqlType current : values) {
@@ -64,6 +62,6 @@ public class SqlTypeUtil {
                 return current;
             }
         }
-        return null;
+        throw new UnsupportedOperationException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
     }
 }

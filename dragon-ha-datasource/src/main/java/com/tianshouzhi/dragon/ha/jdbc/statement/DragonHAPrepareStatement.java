@@ -12,7 +12,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.BatchType.PREPARESTATEMENT;
+import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.BatchType.STATEMENT;
 import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.ParamType.*;
+import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE;
+import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE_QUERY;
+import static com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE_UPDATE;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/4.
@@ -79,7 +83,19 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Prepa
             break;
         }
         setStatementParams();
-        if(batchInfoList==null)return;
+    }
+
+    @Override
+    protected void setStatementParams() throws SQLException {
+        super.setStatementParams();
+        PreparedStatement ps= (PreparedStatement) realStatement;
+        for (ParamSetting param : params) {
+            int parameterIndex = param.parameterIndex;
+            Object[] values = param.values;
+            ParamType paramType = param.paramType;
+            setPrepareStatementParams(ps, parameterIndex, values, paramType);
+        }
+        if(executeType!=ExecuteType.EXECUTE_BATCH||batchInfoList==null)return;
         for (BatchInfo batchInfo : batchInfoList) {
             switch (batchInfo.batchType) {
                 case STATEMENT:
@@ -93,18 +109,6 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Prepa
                     ((PreparedStatement) realStatement).addBatch();
                     break;
             }
-        }
-    }
-
-    @Override
-    protected void setStatementParams() throws SQLException {
-        super.setStatementParams();
-        PreparedStatement ps= (PreparedStatement) realStatement;
-        for (ParamSetting param : params) {
-            int parameterIndex = param.parameterIndex;
-            Object[] values = param.values;
-            ParamType paramType = param.paramType;
-            setPrepareStatementParams(ps, parameterIndex, values, paramType);
         }
     }
 
@@ -256,6 +260,48 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Prepa
         ,setBinaryStream2,setObject2, setObject,setCharacterStream2,setRef,setBlob,setClob,setArray,setDate2,setTime2
         ,setTimestamp2,setNull2,setURL,setRowId,setNString,setNCharacterStream, setCharacterStream, setBinaryStream, setAsciiStream, setObject3, setSQLXML, setNClob2, setBlob2, setClob2, setNCharacterStream2, setNClob
     }
+
+    protected static enum PrepareExecuteType{
+        PREPARE_EXECUTE, PREPARE_EXECUTE_UPDATE,PREPARE_EXECUTE_QUERY
+    }
+    PrepareExecuteType prepareExcuteType;
+    public ResultSet executeQuery() throws SQLException {
+        prepareExcuteType=PREPARE_EXECUTE_QUERY;
+        doExecute();
+        return this.resultSet;
+    }
+    public int executeUpdate() throws SQLException {
+        prepareExcuteType=PREPARE_EXECUTE_UPDATE;
+        doExecute();
+        return this.updateCount;
+    }
+    public boolean execute() throws SQLException {
+        prepareExcuteType=PREPARE_EXECUTE;
+        return doExecute();
+    }
+
+    @Override
+    protected boolean doExecuteByType() throws SQLException {
+        boolean isResultSet=false;
+        if(prepareExcuteType!=null){
+            switch (prepareExcuteType) {
+                case PREPARE_EXECUTE:
+                    isResultSet=((PreparedStatement)realStatement).execute();
+                    break;
+                case PREPARE_EXECUTE_UPDATE:
+                    ((PreparedStatement)realStatement).executeUpdate();
+                    break;
+                case PREPARE_EXECUTE_QUERY:
+                    ((PreparedStatement)realStatement).executeQuery();
+                    isResultSet=true;
+                    break;
+            }
+            setExecuteResult();
+            return isResultSet;
+        }
+        return super.doExecuteByType();
+    }
+
     @Override
     public void clearParameters() throws SQLException {
         params.clear();
@@ -285,7 +331,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Prepa
             batchInfoList=new ArrayList<BatchInfo>();
         }
         batchInfoList.add(new BatchInfo(PREPARESTATEMENT, params));
-        params.clear();
+        params=new ArrayList<ParamSetting>();
     }
 
     @Override
@@ -293,7 +339,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Prepa
         if(batchInfoList==null){
             batchInfoList=new ArrayList<BatchInfo>();
         }
-        batchInfoList.add(new BatchInfo(PREPARESTATEMENT, sql));
+        batchInfoList.add(new BatchInfo(STATEMENT, sql));
     }
 
     @Override

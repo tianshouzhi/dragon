@@ -20,9 +20,7 @@ public class DBIndex {
 
     @Override
     public String toString() {
-        return "DBIndex{" +
-                "indexStr='" + indexStr + '\'' +
-                '}';
+        return indexStr;
     }
 
     @Override

@@ -80,16 +80,16 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
         //1、判断有没有ThreadLocal hint
         List<DBIndex> hintDBIndexes = ThreadLocalHintUtil.getHintDBIndexes();
         if(hintDBIndexes!=null&&hintDBIndexes.size()>0){
-            LOGGER.debug("get connection by thread local hint,sql={},hintDBIndexes={}",sql,hintDBIndexes);
-            buildNewConnection(hintDBIndexes);
+            LOGGER.debug("get connection by thread local hint,sql:{}",sql);
+            buildNewConnectionByHint(hintDBIndexes);
             return realConnection;
         }
 
         //2、sql中有hint
         hintDBIndexes = SqlHintUtil.getSQLHintDBIndex(sql);
         if(hintDBIndexes!=null){
-            LOGGER.debug("get connection by sql hint,sql={},hint DBIndexes={}",sql,hintDBIndexes);
-            buildNewConnection(hintDBIndexes);
+            LOGGER.debug("get connection by sql hint,sql:{}",sql);
+            buildNewConnectionByHint(hintDBIndexes);
             return realConnection;
         }
         //3、没有hint且没有开启事务
@@ -132,7 +132,11 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
         }
     }
 
-    private void buildNewConnection(List<DBIndex> dbIndexes) throws SQLException {
+    private void buildNewConnectionByHint(List<DBIndex> dbIndexes) throws SQLException {
+        if(dbIndexes.contains(dbIndex)){
+            LOGGER.debug("current connection's dbIndex is {}, return current",dbIndex);
+            return;
+        }
         if(realConnection!=null){
             realConnection.close();
         }
@@ -430,7 +434,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
         return realConnection.createSQLXML();
     }
 
-    public void changeToWtiteConnectionIfNeed() throws SQLException {
+    public Connection changeToWtiteConnectionIfNeed() throws SQLException {
         if(realConnection==null){
             buildNewWriteConnection();
         }else{
@@ -439,6 +443,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
                 buildNewWriteConnection();
             }
         }
+        return realConnection;
     }
 
     protected void setRealConnectionParams() throws SQLException {

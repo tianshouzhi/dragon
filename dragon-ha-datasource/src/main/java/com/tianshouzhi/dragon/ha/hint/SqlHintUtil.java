@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class SqlHintUtil {
 
     //匹配hint前缀:/*DRAGON_DYNAMIC(
-    private static final String SQL_HINT_PREFIX_GROUP="(/\\*\\s*DRAGON_DYNAMIC\\s*\\()";
+    private static final String SQL_HINT_PREFIX_GROUP="(/\\*\\s*DRAGON_HA\\s*\\()";
     //匹配hint中的DBIDEX标识
     private static final String SQL_HINT_DBIDEX_GROUP="(\\s*DBINDEXES\\s*=)\\s*";
     //匹配出的DBIndex
@@ -46,7 +46,7 @@ public class SqlHintUtil {
     }
 
     public static void main(String[] args) {
-        Matcher matcher = hintParttern.matcher("/*DRAGON_DYNAMIC ( DBINDEXES = db1,db2 )*/ SELECT * FROM");
+        Matcher matcher = hintParttern.matcher("/*DRAGON_HA ( DBINDEXES = db1,db2 )*/ SELECT * FROM");
         if(matcher.matches()){
             int i = matcher.groupCount();
             for (int j = 0; j <i; j++) {
