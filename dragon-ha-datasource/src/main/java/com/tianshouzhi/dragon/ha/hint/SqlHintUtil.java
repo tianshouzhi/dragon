@@ -46,7 +46,7 @@ public class SqlHintUtil {
     }
 
     public static void main(String[] args) {
-        Matcher matcher = hintParttern.matcher("/*DRAGON_HA ( DBINDEXES = db1,db2 )*/ SELECT * FROM");
+        Matcher matcher = hintParttern.matcher("/*DRAGON_HA ( DBINDEXES = yourDbIndex[,...] )*/ SELECT * FROM user");
         if(matcher.matches()){
             int i = matcher.groupCount();
             for (int j = 0; j <i; j++) {

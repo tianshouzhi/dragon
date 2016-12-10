@@ -23,4 +23,8 @@ public class ThreadLocalHintUtil {
     public static List<DBIndex> getHintDBIndexes(){
         return hint.get();
     }
+
+    public static void remove(){
+        hint.remove();
+    }
 }
