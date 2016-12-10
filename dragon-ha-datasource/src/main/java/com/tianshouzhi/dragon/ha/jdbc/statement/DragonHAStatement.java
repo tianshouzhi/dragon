@@ -179,6 +179,9 @@ public class DragonHAStatement extends WrapperAdapter implements Statement {
 
     //只有单条sql的时候，应该调用这个方法，batch和callablestatemnt自行处理
     public boolean doExecute() throws SQLException {
+        if(resultSet!=null){//jdbc规范规定，每次执行的时候，如果当前ResultSet不为空，需要显示关闭，因此最好一个Statement执行一个sql
+            resultSet.close();
+        }
         int errorCount = 0;
         boolean isResultSet = false;
         int maxRetryTimes = 3;
@@ -245,7 +248,7 @@ public class DragonHAStatement extends WrapperAdapter implements Statement {
     protected boolean failRetry() throws SQLException {
         return dragonHAConnection.getCurrentRealConnection().getAutoCommit() == true
                 &&executeType!=EXECUTE_BATCH //batchexecute的情况下，不判断sql
-               && SqlTypeUtil.isQuery(sql);
+               && SqlTypeUtil.isQuery(sql,useSqlTypeCache());
     }
 
     protected void setExecuteResult() throws SQLException {
@@ -353,14 +356,88 @@ public class DragonHAStatement extends WrapperAdapter implements Statement {
         }
     }
 
+    /**
+     * JDBC规范规定，关闭statement的时候，需要关闭当前resultSet
+     * @throws SQLException
+     */
     @Override
     public void close() throws SQLException {
+        if(resultSet!=null){
+            resultSet.close();
+            resultSet=null;
+        }
         if(realStatement!=null){
             realStatement.close();
+            realStatement=null;
         }
         isClosed = true;
     }
 
+    @Override
+    public ResultSet getResultSet() throws SQLException {
+        return this.resultSet;
+    }
+
+    @Override
+    public int getUpdateCount() throws SQLException {
+        return this.updateCount;
+    }
+
+    /**
+     * 如果执行的是存储过程的话，并且其中有多个查询语句，那么可能会返回多个ResultSet，JDBC规范规定，默认只需要返回第一个
+     * 如果需要获取更多的ResultSet，通过getMoreResults来判断
+     * @return
+     * @throws SQLException
+     */
+    @Override
+    public boolean getMoreResults() throws SQLException {
+        return realStatement.getMoreResults();
+    }
+    @Override
+    public boolean getMoreResults(int current) throws SQLException {
+        return realStatement.getMoreResults(current);
+    }
+
+    @Override
+    public void setFetchDirection(int direction) throws SQLException {
+        this.fetchDirection=direction;
+    }
+
+    @Override
+    public int getFetchDirection() throws SQLException {
+        return this.fetchDirection;
+    }
+
+    @Override
+    public void setFetchSize(int rows) throws SQLException {
+        this.fetchSize=rows;
+    }
+
+    @Override
+    public int getFetchSize() throws SQLException {
+        return fetchSize;
+    }
+
+    @Override
+    public int getResultSetConcurrency() throws SQLException {
+        return this.resultSetConcurrency;
+    }
+
+    @Override
+    public int getResultSetType() throws SQLException {
+        return resultSetType;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dragonHAConnection;
+    }
+
+
+    @Override
+    public ResultSet getGeneratedKeys() throws SQLException {
+        return generatedKeys;
+    }
     @Override
     public int getMaxFieldSize() throws SQLException {
         return maxFieldSize;
@@ -417,67 +494,6 @@ public class DragonHAStatement extends WrapperAdapter implements Statement {
     public void setCursorName(String name) throws SQLException {
         realStatement.setCursorName(name);
     }
-
-    @Override
-    public ResultSet getResultSet() throws SQLException {
-        return this.resultSet;
-    }
-
-    @Override
-    public int getUpdateCount() throws SQLException {
-        return this.updateCount;
-    }
-
-    @Override
-    public boolean getMoreResults() throws SQLException {
-        return realStatement.getMoreResults();
-    }
-
-    @Override
-    public void setFetchDirection(int direction) throws SQLException {
-        this.fetchDirection=direction;
-    }
-
-    @Override
-    public int getFetchDirection() throws SQLException {
-        return this.fetchDirection;
-    }
-
-    @Override
-    public void setFetchSize(int rows) throws SQLException {
-        this.fetchSize=rows;
-    }
-
-    @Override
-    public int getFetchSize() throws SQLException {
-        return fetchSize;
-    }
-
-    @Override
-    public int getResultSetConcurrency() throws SQLException {
-        return this.resultSetConcurrency;
-    }
-
-    @Override
-    public int getResultSetType() throws SQLException {
-        return resultSetType;
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException {
-        return dragonHAConnection;
-    }
-
-    @Override
-    public boolean getMoreResults(int current) throws SQLException {
-        return realStatement.getMoreResults(current);
-    }
-
-    @Override
-    public ResultSet getGeneratedKeys() throws SQLException {
-        return generatedKeys;
-    }
-
 
     @Override
     public int getResultSetHoldability() throws SQLException {

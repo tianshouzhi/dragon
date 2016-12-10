@@ -187,14 +187,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
         return null;
     }
 
-    @Override
-    public void close() throws SQLException {
-        if (realConnection != null) {
-            realConnection.close();
-            realConnection=null;
-        }
-        isClosed = true;
-    }
+
 
 
     @Override
