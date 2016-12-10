@@ -53,7 +53,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
      * @return
      * @throws SQLException
      */
-    public Connection getRealConnection(String sql) throws SQLException {
+    public Connection getRealConnection(String sql,boolean useSqlTypeCache) throws SQLException {
 
         //如果已经开启了事务
         if (autoCommit == false) {
@@ -93,7 +93,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
             return realConnection;
         }
         //3、没有hint且没有开启事务
-        boolean sqlIsQuery = SqlTypeUtil.isQuery(sql);
+        boolean sqlIsQuery = SqlTypeUtil.isQuery(sql,useSqlTypeCache);
         if (realConnection == null) {
             if (sqlIsQuery) {
                 LOGGER.debug("current real connection is null,sql:({}) is query,get a new read connection",sql);
@@ -204,6 +204,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
+//        checkClosed();
         if (realConnection != null) {
             realConnection.getMetaData();
         }
@@ -227,6 +228,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public void commit() throws SQLException {
+//        checkClosed();
         if (realConnection != null) {
             realConnection.commit();
         }
@@ -237,6 +239,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
      */
     @Override
     public void rollback() throws SQLException {
+//        checkClosed();
         if(realConnection!=null){
             realConnection.rollback();
         }
@@ -244,6 +247,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
+//        checkClosed();
         if (realConnection != null) {
             realConnection.rollback(savepoint);
         }
@@ -251,6 +255,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
+//        checkClosed();
         Savepoint savepoint=null;
         if(realConnection!=null){
            return realConnection.setSavepoint();
@@ -260,6 +265,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
+//        checkClosed();
         Savepoint savepoint=null;
         if(realConnection!=null){
             return realConnection.setSavepoint(name);
@@ -338,6 +344,7 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
 
     @Override
     public void clearWarnings() throws SQLException {
+//        checkClosed();
         if (realConnection != null) {
             realConnection.clearWarnings();
         }
@@ -478,5 +485,9 @@ public abstract class HAConnectionAdapter extends WrapperAdapter implements Conn
         return realConnection;
     }
 
-
+  /*  protected void checkClosed() throws SQLException {
+        if (isClosed) {
+            throw new SQLException("No operations allowed after connection closed.");
+        }
+    }*/
 }

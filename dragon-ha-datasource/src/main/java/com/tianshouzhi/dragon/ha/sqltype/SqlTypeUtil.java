@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public class SqlTypeUtil {
     private static final Logger LOGGER= LoggerFactory.getLogger(SqlTypeUtil.class);
-    private static SqlTypeCache sqlTypeCache=new SqlTypeCache();
+    private static Map<String,Boolean> sqlTypeCache=new ConcurrentHashMap<String, Boolean>();
 
     /**
      * 传入的应该是一条sql，不应该将多条sql放在一起传入，且SQL前面不能包含任何形式的注释，包括hint
@@ -20,12 +22,17 @@ public class SqlTypeUtil {
      * @return
      * @throws SQLException
      */
-    public static boolean isQuery(String sql) throws SQLException {
-        /*Boolean isQuery = sqlTypeCache.get(sql);
-        if(isQuery!=null){
+    public static boolean isQuery(String sql,boolean useCache) throws SQLException {
+        Boolean isQuery=null;
+        if(useCache){
+            isQuery = sqlTypeCache.get(sql);
+        }
+        if(isQuery!=null){//命中了cache
             LOGGER.debug("hit cache,sql:{} is {}",sql,isQuery);
             return isQuery;
-        }*/
+        }
+
+        //如果不需要使用cache或者没有命中cache
         SqlType sqlType = parseSqlType(sql);
         switch (sqlType) {
 //            case SELECT_FOR_UPDATE:
@@ -34,7 +41,8 @@ public class SqlTypeUtil {
             case DEBUG:
             case EXPLAIN:
             case DUMP:
-                return true;
+                isQuery= true;
+                break;
             case INSERT:
             case UPDATE:
             case DELETE:
@@ -47,9 +55,13 @@ public class SqlTypeUtil {
             case ALTER:
             case RENAME:
             case CALL:
-                return false;
+                isQuery= false;
+                break;
         }
-        return false;
+        if(useCache){
+            sqlTypeCache.put(sql,isQuery);
+        }
+        return isQuery;
     }
 
     public static SqlType parseSqlType(String sql) throws SQLException {
