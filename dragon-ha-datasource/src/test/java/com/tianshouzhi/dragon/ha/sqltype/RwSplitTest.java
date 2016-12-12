@@ -50,7 +50,7 @@ public class RwSplitTest {
             String tag_name = resultSet.getString("username");
             System.out.println("user_id:"+id+",username:"+tag_name);
         }
-        PreparedStatement insert = connection.prepareStatement("INSERT into user(user_id,username) VALUES (1007,'wangxiaoxiao')");
+        PreparedStatement insert = connection.prepareStatement("INSERT into user(user_id,username) VALUES (1012,'wangxiaoxiao')");
         int i = insert.executeUpdate();
         preparedStatement = connection.prepareStatement("SELECT * FROM user ");
         resultSet = preparedStatement.executeQuery();

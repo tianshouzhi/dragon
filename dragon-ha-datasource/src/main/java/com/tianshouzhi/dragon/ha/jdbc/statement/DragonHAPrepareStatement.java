@@ -8,8 +8,9 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.tianshouzhi.dragon.common.jdbc.DragonPrepareStatement.ParamType.*;
 import static com.tianshouzhi.dragon.common.jdbc.DragonPrepareStatement.PrepareCreateType.*;
@@ -22,7 +23,6 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
     protected Map<Integer,DragonPrepareStatement.ParamSetting> params=new LinkedHashMap<Integer, DragonPrepareStatement.ParamSetting>();
     protected DragonPrepareStatement.PrepareExecuteType prepareExcuteType;
     protected DragonPrepareStatement.PrepareCreateType prepareCreateType;
-    protected List<DragonPrepareStatement.BatchExecuteInfo> batchExecuteInfoList =null;
     public DragonHAPrepareStatement(String sql, DragonHAConnection dragonHAConnection) throws SQLException {
         super(dragonHAConnection);
         this.prepareCreateType= SQL;
@@ -85,9 +85,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
                 realStatement = realConnection.prepareStatement(sql,resultSetType, resultSetConcurrency, resultSetHoldability);
                 break;
         }
-
         setStatementParams(realStatement);
-
     }
     public ResultSet executeQuery() throws SQLException {
         prepareExcuteType=PREPARE_EXECUTE_QUERY;
@@ -128,7 +126,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
                     isResultSet=true;
                     break;
             }
-            setExecuteResult();
+            setExecuteResult(isResultSet);
             return isResultSet;
         }
         //如果走到这一步，说明调用的是父类Statement的执行方法
@@ -154,7 +152,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
     public ParameterMetaData getParameterMetaData() throws SQLException {
         throw new UnsupportedOperationException("getMetaData");
     }
-    
+
     /**
      * 优点：能够预处理，执行效率高；参数不同的同一条sql语句执行简便
      缺点：只能批处理参数不同的同一条sql语句
@@ -162,54 +160,42 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
      */
     @Override
     public void addBatch() throws SQLException {
-        if(batchExecuteInfoList ==null){
-            batchExecuteInfoList =new ArrayList<DragonPrepareStatement.BatchExecuteInfo>();
-        }
-        batchExecuteInfoList.add(new DragonPrepareStatement.BatchExecuteInfo(DragonPrepareStatement.BatchType.PREPARESTATEMENT, params));
+        batchExecuteInfoList.add(params);
         params=new LinkedHashMap<Integer, DragonPrepareStatement.ParamSetting>();
     }
 
     @Override
-    public void addBatch(String sql) throws SQLException {
-        if(batchExecuteInfoList ==null){
-            batchExecuteInfoList =new ArrayList<DragonPrepareStatement.BatchExecuteInfo>();
+    protected void setStatementParams(Statement realStatement) throws SQLException {
+                PreparedStatement ps= (PreparedStatement) realStatement;
+        if(executeType!=ExecuteType.EXECUTE_BATCH){
+            for (Map.Entry<Integer, DragonPrepareStatement.ParamSetting> entry: params.entrySet()) {
+                int parameterIndex = entry.getKey();
+                Object[] values = entry.getValue().values;
+                DragonPrepareStatement.ParamType paramType = entry.getValue().paramType;
+                setPrepareStatementParams(ps, parameterIndex, values, paramType);
+            }
         }
-        batchExecuteInfoList.add(new DragonPrepareStatement.BatchExecuteInfo(DragonPrepareStatement.BatchType.STATEMENT, sql));
+        super.setStatementParams(realStatement);
     }
 
-    @Override
-    protected void setStatementParams(Statement realStatement) throws SQLException {
-        super.setStatementParams(realStatement);
-        PreparedStatement ps= (PreparedStatement) realStatement;
-        for (Map.Entry<Integer, DragonPrepareStatement.ParamSetting> entry: params.entrySet()) {
-            int parameterIndex = entry.getKey();
-            Object[] values = entry.getValue().values;
-            DragonPrepareStatement.ParamType paramType = entry.getValue().paramType;
-            setPrepareStatementParams(ps, parameterIndex, values, paramType);
-        }
-
-        if(executeType != ExecuteType.EXECUTE_BATCH|| batchExecuteInfoList ==null)return;
-        for (DragonPrepareStatement.BatchExecuteInfo batchExecuteInfo : batchExecuteInfoList) {
-            switch (batchExecuteInfo.batchType) {
-                case STATEMENT:
-                    realStatement.addBatch((String) batchExecuteInfo.paramter);
-                    break;
-                case PREPARESTATEMENT:
-                    Map<Integer,DragonPrepareStatement.ParamSetting> parameters= (Map<Integer,DragonPrepareStatement.ParamSetting>) batchExecuteInfo.paramter;
-                    for (Map.Entry<Integer,DragonPrepareStatement.ParamSetting> entry:parameters.entrySet()) {
-                        Integer parameterIndex = entry.getKey();
-                        Object[] values = entry.getValue().values;
-                        DragonPrepareStatement.ParamType paramType = entry.getValue().paramType;
-                        setPrepareStatementParams((PreparedStatement) realStatement, parameterIndex, values, paramType);
-                    }
-                    ((PreparedStatement) realStatement).addBatch();
-                    break;
+    protected void setBatchExecuteParams() throws SQLException {
+        for (Object obj : batchExecuteInfoList) {
+            if(obj instanceof String){
+                realStatement.addBatch((String) obj);
+                continue;
+            }
+            if(obj instanceof Map){
+                Map<Integer,DragonPrepareStatement.ParamSetting> parameters= (Map<Integer,DragonPrepareStatement.ParamSetting>) obj;
+                for (Map.Entry<Integer,DragonPrepareStatement.ParamSetting> entry:parameters.entrySet()) {
+                    Integer parameterIndex = entry.getKey();
+                    Object[] values = entry.getValue().values;
+                    DragonPrepareStatement.ParamType paramType = entry.getValue().paramType;
+                    setPrepareStatementParams((PreparedStatement) realStatement, parameterIndex, values, paramType);
+                }
+                ((PreparedStatement) realStatement).addBatch();
             }
         }
     }
-
-
-
 
     @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {

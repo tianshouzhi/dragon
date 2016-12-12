@@ -69,7 +69,6 @@ public class HAConnectionManager {
         if (datasourceWrapper == null) {
             throw new IllegalArgumentException("not found datasouce with dbIndex:" + dbIndex.getIndexStr());
         }
-        LOGGER.debug("get a new connection from {}",datasourceWrapper.getDbIndex().getIndexStr());
         CommonDataSource realDataSource = datasourceWrapper.getRealDataSource();
         Connection connection=null;
 

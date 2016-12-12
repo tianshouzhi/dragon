@@ -22,7 +22,7 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
     protected Integer level; //事务隔离级别
     protected String catalog;
     protected Integer holdability;
-    protected Properties clientInfo;
+    protected Properties clientInfo=new Properties();
     protected Map<String, Class<?>> typeMap;
 
     @Override

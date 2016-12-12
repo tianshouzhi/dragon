@@ -3,8 +3,8 @@ package com.tianshouzhi.dragon.common.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.CreateType.*;
 import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.ExecuteType.*;
@@ -13,8 +13,7 @@ import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.ExecuteType.*;
  * Created by TIANSHOUZHI336 on 2016/12/12.
  */
 public abstract class DragonStatement extends WrapperAdapter implements Statement{
-    protected Lock batchLock=new ReentrantLock();
-    protected DragonConnection dragonConnection;
+
     //Statement构造创建参数
     protected Integer resultSetType;
     protected Integer resultSetConcurrency;
@@ -35,13 +34,13 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
     protected String[] columnNames;
     //Statement状态参数，用户主动调用api设置
     protected boolean isClosed = false;
-
     //Statement查询执行结果
     protected ResultSet resultSet;
     //Statement更新执行结果
     protected ResultSet generatedKeys;
     protected int updateCount = 0;
     protected  int[] batchExecuteResult;
+    protected List<Object> batchExecuteInfoList =new CopyOnWriteArrayList<Object>();
 
     protected ExecuteType executeType =null;
     protected CreateType createType =null;
@@ -63,20 +62,17 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         RESULTSET_TYPE_CONCURRENCY_HOLDABILITY
     }
 
-    protected DragonStatement(DragonConnection dragonConnection) {
-        this.dragonConnection=dragonConnection;
+    protected DragonStatement() {
         this.createType =NONE;
     }
 
-    protected DragonStatement(Integer resultSetType, Integer resultSetConcurrency, DragonConnection dragonConnection) {
-        this.dragonConnection=dragonConnection;
+    protected DragonStatement(Integer resultSetType, Integer resultSetConcurrency) {
         this.resultSetType=resultSetType;
         this.resultSetConcurrency=resultSetConcurrency;
         this.createType =RESULTSET_TYPE_CONCURRENCY;
     }
 
-    protected DragonStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability, DragonConnection dragonConnection) {
-        this.dragonConnection = dragonConnection;
+    protected DragonStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability) {
         this.resultSetType = resultSetType;
         this.resultSetConcurrency = resultSetConcurrency;
         this.resultSetHoldability = resultSetHoldability;
@@ -90,30 +86,6 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         executeType = EXECUTE_QUERY;
         doExecute();
         return resultSet;
-    }
-
-    protected void setStatementParams(Statement realStatement) throws SQLException {
-        if(queryTimeout!=null){
-            realStatement.setQueryTimeout(queryTimeout);
-        }
-        if(fetchSize!=null){
-            realStatement.setFetchSize(fetchSize);
-        }
-        if(fetchDirection!=null){
-            realStatement.setFetchSize(fetchDirection);
-        }
-        if(poolable!=null){
-            realStatement.setPoolable(poolable);
-        }
-        if(maxFieldSize!=null){
-            realStatement.setMaxFieldSize(maxFieldSize);
-        }
-        if(maxRows!=null){
-            realStatement.setMaxRows(maxRows);
-        }
-        if(enableEscapeProcessing!=null){
-            realStatement.setEscapeProcessing(enableEscapeProcessing);
-        }
     }
 
     //===================显示指定进行更新 =======================
@@ -199,7 +171,13 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         return batchExecuteResult;
     }
 
+    @Override
+    public void addBatch(String sql) throws SQLException {
+        batchExecuteInfoList.add(sql);
+    }
+
     protected abstract boolean doExecute() throws SQLException;
+
     @Override
     public int getResultSetConcurrency() throws SQLException {
         return this.resultSetConcurrency;
@@ -207,11 +185,6 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
     @Override
     public int getResultSetType() throws SQLException {
         return resultSetType;
-    }
-
-    @Override
-    public DragonConnection getConnection() throws SQLException {
-        return dragonConnection;
     }
 
 

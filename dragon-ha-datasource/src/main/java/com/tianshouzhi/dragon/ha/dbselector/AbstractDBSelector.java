@@ -110,7 +110,6 @@ public abstract class AbstractDBSelector implements DBSelector {
                 result = rangeDBIndexMap.get(weightRange);
             }
         }
-        LOGGER.debug("select result is {}", result);
         return result;
     }
 

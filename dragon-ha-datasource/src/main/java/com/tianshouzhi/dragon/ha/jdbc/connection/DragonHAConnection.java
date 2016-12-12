@@ -1,7 +1,9 @@
 package com.tianshouzhi.dragon.ha.jdbc.connection;
 
+import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.DragonConnection;
 import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
+import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
@@ -198,18 +200,18 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         dbIndex = dbIndexes.get(i);
         realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
         setRealConnectionParams(realConnection);
-        LOGGER.debug("get a new connection from: {}",dbIndex);
+        LOGGER.debug("get a connection from dbIndex :{}",dbIndex);
     }
     private Connection buildNewReadConnectionIfNeed() throws SQLException {
         if(realConnection!=null){
-            LOGGER.debug("current connection is not null,return current,dbIndex:{}",dbIndex);
+            LOGGER.debug("current connection is not null,dbIndex:{},return current!!!",dbIndex);
             setRealConnectionParams(realConnection);
             return realConnection;
         }
         dbIndex = hAConnectionManager.selectReadDBIndex();
         realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
         setRealConnectionParams(realConnection);
-        LOGGER.debug("get a new write connection from:{}",dbIndex);
+        LOGGER.debug("current connection is null,get a new read connection from:{}",dbIndex);
         return realConnection;
     }
     public Connection buildNewReadConnectionExclue(Set<DBIndex> excludes) throws SQLException {
@@ -229,7 +231,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
     public Connection buildNewWriteConnectionIfNeed() throws SQLException {
         if(realConnection==null||realConnection.isReadOnly()){
             if(realConnection!=null) {
-                LOGGER.debug("current connection is a read connection,try to get a new write connection");
+                LOGGER.debug("current connection is a read connection,dbIndex:{},try to get a new write connection",dbIndex);
                 realConnection.close();
             } else {
                 LOGGER.debug("current connection is null,try to get a new write connection");
@@ -418,7 +420,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         return realConnection.createSQLXML();
     }
 
-    public DBIndex getDBIndex() {
+    public DBIndex getCurrentDBIndex() {
         return dbIndex;
     }
 
@@ -429,5 +431,11 @@ public class DragonHAConnection extends DragonConnection implements Connection{
     @Override
     public String nativeSQL(String sql) throws SQLException {
         return null;
+    }
+
+    public ExceptionSorter getExceptionSorter() throws SQLException {
+        DatasourceWrapper datasourceWrapper = hAConnectionManager.getDatasourceWrapperByDbIndex(dbIndex);
+        ExceptionSorter exceptionSorter = datasourceWrapper.getExceptionSorter();
+        return exceptionSorter;
     }
 }

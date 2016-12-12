@@ -175,17 +175,4 @@ public interface DragonPrepareStatement extends PreparedStatement{
              }
          }
     }
-    //====================================批处理相关============================================
-     enum BatchType{
-        STATEMENT,PREPARESTATEMENT;
-    }
-    class BatchExecuteInfo {
-        public BatchType batchType;
-        public Object paramter;
-
-        public BatchExecuteInfo(BatchType batchType, Object paramter) {
-            this.batchType = batchType;
-            this.paramter = paramter;
-        }
-    }
 }

@@ -13,4 +13,8 @@ public class DragonException extends SQLException{
     public DragonException(InterruptedException e) {
         super(e);
     }
+
+    public DragonException(String message, SQLException e) {
+        super(message,e);
+    }
 }

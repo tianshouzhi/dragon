@@ -24,7 +24,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
     public void testDelete() throws SQLException {
         DragonHAConnection connection = this.connection;
         PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM USER WHERE id=?");
-        preparedStatement.setInt(1,1);
+        preparedStatement.setInt(1,2);
         int i = preparedStatement.executeUpdate();
         Assert.assertTrue(i<=1);
     }
@@ -33,14 +33,14 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         DragonHAConnection connection = this.connection;
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE USER SET name=? WHERE id=?");
         preparedStatement.setString(1,"wangxiaoxiao");
-        preparedStatement.setInt(2,2);
+        preparedStatement.setInt(2,3);
         int i = preparedStatement.executeUpdate();
         Assert.assertTrue(i<=1);
     }
     @Test
     public void testQuery() throws SQLException {
         DragonHAConnection connection = this.connection;
-        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =tddl_master)*/SELECT * from USER");
+        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         ResultSet resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -52,7 +52,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
     @Test
     public void mixTest() throws SQLException {
         DragonHAConnection connection = this.connection;
-        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =tddl_master)*/SELECT * from USER");
+        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         ResultSet resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -66,7 +66,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         int i = preparedStatement.executeUpdate();
         Assert.assertEquals("insert success",i,1);
 
-        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =tddl_master)*/SELECT * from USER");
+        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -79,7 +79,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         preparedStatement.setString(1,"wanghanao");
         preparedStatement.executeUpdate();
 
-        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =tddl_master)*/SELECT * from USER");
+        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_slave1)*/SELECT * from USER");
         preparedStatement.executeQuery();
         resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -99,7 +99,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         preparedStatement.addBatch();
         preparedStatement.setString(1,"huhuamin1");
         preparedStatement.addBatch();
-//        preparedStatement.addBatch("INSERT INTO USER VALUES ('xxxxxxx')"); //混合使用两种模式会报错
+        preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx')"); //混合使用两种模式会报错
         int[] ints = preparedStatement.executeBatch();
         System.out.println(ints);
         testQuery();

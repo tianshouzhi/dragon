@@ -1,12 +1,10 @@
 package com.tianshouzhi.dragon.ha.jdbc.statement;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
-import com.tianshouzhi.dragon.common.jdbc.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.DragonStatement;
 import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.ha.jdbc.connection.HAConnectionManager;
 import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +15,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.ExecuteType.EXECUTE_BATCH;
 
@@ -29,18 +25,19 @@ public class DragonHAStatement extends DragonStatement implements Statement {
     private static final Logger LOGGER= LoggerFactory.getLogger(DragonHAStatement.class);
     protected DragonHAConnection dragonHAConnection;
     protected Statement realStatement;
-    protected Lock batchLock=new ReentrantLock();
-
     public DragonHAStatement(DragonHAConnection dragonConnection) {
-        super(dragonConnection);
+        super();
+        this.dragonHAConnection=dragonConnection;
     }
 
-    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, DragonConnection dragonConnection) {
-        super(resultSetType, resultSetConcurrency, dragonConnection);
+    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, DragonHAConnection dragonConnection) {
+        super(resultSetType, resultSetConcurrency);
+        this.dragonHAConnection=dragonConnection;
     }
 
-    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability, DragonConnection dragonConnection) {
-        super(resultSetType, resultSetConcurrency, resultSetHoldability, dragonConnection);
+    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability, DragonHAConnection dragonConnection){
+        super(resultSetType, resultSetConcurrency, resultSetHoldability);
+        this.dragonHAConnection=dragonConnection;
     }
 
     //只有单条sql的时候，应该调用这个方法，batch和callablestatemnt自行处理
@@ -62,15 +59,12 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 }
                 createRealStatement(realConnection);
                 isResultSet = doExecuteByType();
-                //正常执行完成，跳出循环，不进行重试
-                setExecuteResult();
-                return isResultSet;
+                setExecuteResult(isResultSet);
+                return isResultSet; //正常执行完成，跳出循环，不进行重试
             } catch (SQLException e) {
                 //出现异常
-                DBIndex dbIndex = dragonHAConnection.getDBIndex();
-                HAConnectionManager haConnectionManager = dragonHAConnection.getHAConnectionManager();
-                DatasourceWrapper datasourceWrapper = haConnectionManager.getDatasourceWrapperByDbIndex(dbIndex);
-                ExceptionSorter exceptionSorter = datasourceWrapper.getExceptionSorter();
+                DBIndex dbIndex = dragonHAConnection.getCurrentDBIndex();
+                ExceptionSorter exceptionSorter=dragonHAConnection.getExceptionSorter();
                 if (exceptionSorter.isExceptionFatal(e)) {//如果是致命异常
                     LOGGER.error("fatal exception,sqlstate:{},error code:{},sql:{}", e.getSQLState(), e.getErrorCode(), sql);
                     dragonHAConnection.getHAConnectionManager().invalid(dbIndex);
@@ -94,7 +88,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                         }
                         createRealStatement(newConnection);
                     } else {//如果开启了事务，或者是写操作，或者是致命异常，不重试
-                        throw new SQLException("sql '" + sql + "' execute fail, no retry", e);
+                        throw new DragonException("sql '" + sql + "' execute fail, no retry", e);
                     }
                 }
             }
@@ -113,7 +107,42 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 realStatement = realConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
                 break;
         }
-       setStatementParams(realStatement);
+        setStatementParams(realStatement);
+    }
+    protected void setStatementParams(Statement realStatement) throws SQLException {
+        if(queryTimeout!=null){
+            realStatement.setQueryTimeout(queryTimeout);
+        }
+        if(fetchSize!=null){
+            realStatement.setFetchSize(fetchSize);
+        }
+        if(fetchDirection!=null){
+            realStatement.setFetchSize(fetchDirection);
+        }
+        if(poolable!=null){
+            realStatement.setPoolable(poolable);
+        }
+        if(maxFieldSize!=null){
+            realStatement.setMaxFieldSize(maxFieldSize);
+        }
+        if(maxRows!=null){
+            realStatement.setMaxRows(maxRows);
+        }
+        if(enableEscapeProcessing!=null){
+            realStatement.setEscapeProcessing(enableEscapeProcessing);
+        }
+        //如果是批处理，需要设置sql
+        if(executeType == ExecuteType.EXECUTE_BATCH&&batchExecuteInfoList.size()>0){
+            setBatchExecuteParams();
+        }
+    }
+
+    protected void setBatchExecuteParams() throws SQLException {
+        for (Object o : batchExecuteInfoList) {
+            if(o instanceof String){
+                realStatement.addBatch((String) o);
+            }
+        }
     }
 
 
@@ -126,16 +155,26 @@ public class DragonHAStatement extends DragonStatement implements Statement {
         return false;
     }
 
+    /**
+     * 是否需要失败重试
+     * @return
+     * @throws SQLException
+     */
     protected boolean failRetry() throws SQLException {
         return dragonHAConnection.getCurrentRealConnection().getAutoCommit() == true
                 && executeType !=EXECUTE_BATCH //batchexecute的情况下，不判断sql
                && SqlTypeUtil.isQuery(sql,useSqlTypeCache());
     }
 
-    protected void setExecuteResult() throws SQLException {
-        this.resultSet = realStatement.getResultSet();
-        this.updateCount = realStatement.getUpdateCount();
-        this.generatedKeys = realStatement.getGeneratedKeys();
+    protected void setExecuteResult(boolean isResultSet) throws SQLException {
+        if(isResultSet){
+            this.resultSet = realStatement.getResultSet();
+        }else {
+            this.updateCount = realStatement.getUpdateCount();
+            if(autoGeneratedKeys!=null&&Statement.RETURN_GENERATED_KEYS==autoGeneratedKeys){
+                  this.generatedKeys = realStatement.getGeneratedKeys();
+            }
+        }
     }
 
     protected boolean doExecuteByType() throws SQLException {
@@ -171,34 +210,26 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 break;
             case EXECUTE_BATCH:
                 batchExecuteResult= realStatement.executeBatch();
+                break;
+            default:
+                throw new DragonException("unkown excute type "+executeType+",sql is "+sql);
         }
         return isResultSet;
     }
 
-
     //============================批处理操作，JDBC规范规定只能是更新语句，因此总是获取写connection==========
 
-
-    @Override
-    public void addBatch(String sql) throws SQLException {
-        try {
-            batchLock.lockInterruptibly();
-            Connection currentRealConnection = dragonHAConnection.getCurrentRealConnection();
-            if (currentRealConnection == null || currentRealConnection.isReadOnly()) {
-                createRealStatement(dragonHAConnection.buildNewWriteConnectionIfNeed());
-            }
-            realStatement.addBatch(sql);
-        } catch (InterruptedException e) {
-            throw new SQLException(e);
-        } finally {
-            batchLock.unlock();
-        }
-    }
     @Override
     public void clearBatch() throws SQLException {
+        batchExecuteInfoList.clear();
         if(realStatement!=null){
             realStatement.clearBatch();
         }
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dragonHAConnection;
     }
 
     /**
