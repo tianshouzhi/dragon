@@ -1,12 +1,11 @@
 package com.tianshouzhi.dragon.ha.jdbc;
 
-import com.tianshouzhi.dragon.common.DataSourceAdapter;
+import com.tianshouzhi.dragon.common.jdbc.DataSourceAdapter;
 import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
 import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.connection.HAConnectionManager;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +35,12 @@ public class DragonHADatasource extends DataSourceAdapter{
         }
     }
     @Override
-    public Connection getConnection() throws SQLException {
-        init();
-        return new DragonHAConnection(HAConnectionManager);
+    public DragonHAConnection getConnection() throws SQLException {
+        return getConnection(null,null);
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
+    public DragonHAConnection getConnection(String username, String password) throws SQLException {
         init();
         return new DragonHAConnection(username,password, HAConnectionManager);
     }

@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.common;
+package com.tianshouzhi.dragon.common.jdbc;
 
 import java.sql.SQLException;
 import java.sql.Wrapper;

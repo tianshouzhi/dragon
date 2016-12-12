@@ -1,81 +1,106 @@
 package com.tianshouzhi.dragon.ha.jdbc.connection;
 
+import com.tianshouzhi.dragon.common.jdbc.DragonConnection;
+import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
+import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
+import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
+import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
-public class DragonHAConnection extends HAConnectionAdapter implements Connection{
-    List<Statement> statementList=new CopyOnWriteArrayList<Statement>();
-    public DragonHAConnection(HAConnectionManager HAConnectionManager) throws SQLException {
-        this(null,null, HAConnectionManager);
+public class DragonHAConnection extends DragonConnection implements Connection{
+    private static final Logger LOGGER= LoggerFactory.getLogger(DragonHAConnection.class);
+    /**
+     * 在没有使用读写分离的情况下，用户可能在一个Connection即执行读，也执行写。
+     * 在使用读写分离的时候，读需要使用读连接(ReadDBSelector)，写需要使用写连接(WriteDBSelector)。
+     * 为了简化使用，实现者只需要通过调用getRealConnection方法，既可以获取对应的连接
+     * <p>
+     * 在事务的情况下，总是需要保持对同一个连接的引用
+     * 对于不是事务的情况下，则可以每次重新通过DBSelector进行选择
+     */
+    protected Connection realConnection;
+    protected HAConnectionManager hAConnectionManager;
+    private DBIndex dbIndex;//当前连接是从哪一个数据源中获取的
+
+    public DragonHAConnection(String userName, String password, HAConnectionManager hAConnectionManager) throws SQLException {
+        if(hAConnectionManager ==null){
+            throw new SQLException("parameter 'hAConnectionManager' can't be null");
+        }
+        this.userName = userName;
+        this.password = password;
+        this.hAConnectionManager = hAConnectionManager;
     }
 
-    public DragonHAConnection(String userName, String password, HAConnectionManager HAConnectionManager) throws SQLException {
-        super(userName, password, HAConnectionManager);
-    }
-
+    //==================================================创建Statement部分=========================================================
     @Override
-    public Statement createStatement() throws SQLException {
+    public DragonHAStatement createStatement() throws SQLException {
         DragonHAStatement dragonHAStatement = new DragonHAStatement(this);
         statementList.add(dragonHAStatement);
         return dragonHAStatement;
     }
+
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+    public DragonHAStatement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
         DragonHAStatement dragonHAStatement = new DragonHAStatement(resultSetType, resultSetConcurrency, this);
         statementList.add(dragonHAStatement);
         return dragonHAStatement;
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public DragonHAStatement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         DragonHAStatement dragonHAStatement = new DragonHAStatement(resultSetType, resultSetConcurrency, resultSetHoldability, this);
         statementList.add(dragonHAStatement);
         return dragonHAStatement;
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, resultSetType, resultSetConcurrency, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
     }
+
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, autoGeneratedKeys, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, columnIndexes, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+    public DragonHAPrepareStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
         DragonHAPrepareStatement dragonHAPrepareStatement = new DragonHAPrepareStatement(sql, columnNames, this);
         statementList.add(dragonHAPrepareStatement);
         return dragonHAPrepareStatement;
@@ -93,7 +118,7 @@ public class DragonHAConnection extends HAConnectionAdapter implements Connectio
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
         if(realConnection==null||realConnection.isReadOnly()){
-            buildNewWriteConnection();
+            buildNewWriteConnectionIfNeed();
         }
         return realConnection.prepareCall(sql);
     }
@@ -101,7 +126,7 @@ public class DragonHAConnection extends HAConnectionAdapter implements Connectio
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         if(realConnection==null||realConnection.isReadOnly()){
-            buildNewWriteConnection();
+            buildNewWriteConnectionIfNeed();
         }
         return realConnection.prepareCall(sql,resultSetType,resultSetConcurrency);
     }
@@ -109,10 +134,121 @@ public class DragonHAConnection extends HAConnectionAdapter implements Connectio
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         if(realConnection==null||realConnection.isReadOnly()){
-            buildNewWriteConnection();
+            buildNewWriteConnectionIfNeed();
         }
         return realConnection.prepareCall(sql,resultSetType,resultSetConcurrency,resultSetHoldability);
     }
+
+  //===============================================获取真实连接================================================================
+    /**
+     * 获取真实连接，会根据以下情况自动切换真实连接
+     * 1 当前是只读连接，但是开启了事务
+     * 2 当前是只读连接，但是传入了一个写sql
+     * 3 其他情况，返回当前连接
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
+    public Connection getRealConnection(String sql,boolean useSqlTypeCache) throws SQLException {
+
+        //如果已经开启了事务 总是获取写连接
+        if (autoCommit == false) {
+            LOGGER.debug("autoCommit={},sql:{}",autoCommit,sql);
+            return  buildNewWriteConnectionIfNeed();
+        }
+        //如果没有开启事务
+        //1、判断有没有ThreadLocal hint
+        List<DBIndex> hintDBIndexes = ThreadLocalHintUtil.getHintDBIndexes();
+        if(hintDBIndexes!=null&&hintDBIndexes.size()>0){
+            LOGGER.debug("get connection by thread local hint,sql:{}",sql);
+            buildNewConnectionByHintIfNeed(hintDBIndexes);
+            return realConnection;
+        }
+
+        //2、sql中有hint
+        hintDBIndexes = SqlHintUtil.getSQLHintDBIndex(sql);
+        if(hintDBIndexes!=null&&hintDBIndexes.size()>0){
+            LOGGER.debug("try get connection by sql hint,sql:{}",sql);
+            buildNewConnectionByHintIfNeed(hintDBIndexes);
+            return realConnection;
+        }
+
+        //3、没有hint且没有开启事务
+        boolean sqlIsQuery = SqlTypeUtil.isQuery(sql,useSqlTypeCache);
+        if(sqlIsQuery){
+            LOGGER.debug("try to get connection by sql:{}",sql);
+            return buildNewReadConnectionIfNeed();
+        }else {
+            LOGGER.debug("try to get connection by sql:{}",sql);
+            return  buildNewWriteConnectionIfNeed();
+        }
+
+    }
+
+    private void buildNewConnectionByHintIfNeed(List<DBIndex> dbIndexes) throws SQLException {
+        if(dbIndexes.contains(dbIndex)){
+            LOGGER.debug("current connection's dbIndex is {}, return current",dbIndex);
+            setRealConnectionParams(realConnection);
+            return;
+        }
+        if(realConnection!=null){
+            realConnection.close();
+        }
+        int i = new Random().nextInt(dbIndexes.size());
+        dbIndex = dbIndexes.get(i);
+        realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
+        setRealConnectionParams(realConnection);
+        LOGGER.debug("get a new connection from: {}",dbIndex);
+    }
+    private Connection buildNewReadConnectionIfNeed() throws SQLException {
+        if(realConnection!=null){
+            LOGGER.debug("current connection is not null,return current,dbIndex:{}",dbIndex);
+            setRealConnectionParams(realConnection);
+            return realConnection;
+        }
+        dbIndex = hAConnectionManager.selectReadDBIndex();
+        realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
+        setRealConnectionParams(realConnection);
+        LOGGER.debug("get a new write connection from:{}",dbIndex);
+        return realConnection;
+    }
+    public Connection buildNewReadConnectionExclue(Set<DBIndex> excludes) throws SQLException {
+        if(realConnection!=null){
+            realConnection.close();
+        }
+        DBIndex dbIndex=hAConnectionManager.selectReadDBIndexExclude(excludes);
+        if(dbIndex==null){
+            return null;
+        }else{
+            this.dbIndex=dbIndex;
+            realConnection=hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
+            setRealConnectionParams(realConnection);
+            return realConnection;
+        }
+    }
+    public Connection buildNewWriteConnectionIfNeed() throws SQLException {
+        if(realConnection==null||realConnection.isReadOnly()){
+            if(realConnection!=null) {
+                LOGGER.debug("current connection is a read connection,try to get a new write connection");
+                realConnection.close();
+            } else {
+                LOGGER.debug("current connection is null,try to get a new write connection");
+            };
+            dbIndex = hAConnectionManager.selectWriteDBIndex();
+            realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
+            setRealConnectionParams(realConnection);
+            LOGGER.debug("get a new write connection from: {}",dbIndex);
+            return realConnection;
+        }
+        LOGGER.debug("current connection is a write connection,dbIndex:{},return current!",dbIndex);
+        return realConnection;
+    }
+
+    public HAConnectionManager getHAConnectionManager() {
+        return hAConnectionManager;
+    }
+
+
 
     /**
      * 针对关闭connection是否会自动关闭Statement和ResultSet的问题，以及Statement和ResultSet所占用资源是否会自动释放问题，JDBC处理规范或JDK规范中做了如下描述：
@@ -125,16 +261,173 @@ public class DragonHAConnection extends HAConnectionAdapter implements Connectio
      */
     @Override
     public void close() throws SQLException {
-        if (realConnection != null) {
-            realConnection.close();
-            realConnection=null;
-        }
         for (Statement statement : statementList) {
             if(!statement.isClosed()){
                 statement.close();
             }
-            statement=null;
+        }
+        statementList.clear();
+        if (realConnection != null) {
+            realConnection.close();
+            realConnection=null;
         }
         isClosed = true;
+    }
+
+    @Override
+    public DatabaseMetaData getMetaData() throws SQLException {
+//        checkClosed();
+        if (realConnection != null) {
+            realConnection.getMetaData();
+        }
+        return null;
+    }
+
+    @Override
+    public void commit() throws SQLException {
+//        checkClosed();
+        if (realConnection != null) {
+            realConnection.commit();
+        }
+    }
+
+    /**
+     * 回滚到事务的最开始
+     */
+    @Override
+    public void rollback() throws SQLException {
+//        checkClosed();
+        if(realConnection!=null){
+            realConnection.rollback();
+        }
+    }
+
+    @Override
+    public void rollback(Savepoint savepoint) throws SQLException {
+//        checkClosed();
+        if (realConnection != null) {
+            realConnection.rollback(savepoint);
+        }
+    }
+
+    @Override
+    public Savepoint setSavepoint() throws SQLException {
+//        checkClosed();
+        Savepoint savepoint=null;
+        if(realConnection!=null){
+            return realConnection.setSavepoint();
+        }
+        return savepoint;
+    }
+
+    @Override
+    public Savepoint setSavepoint(String name) throws SQLException {
+//        checkClosed();
+        Savepoint savepoint=null;
+        if(realConnection!=null){
+            return realConnection.setSavepoint(name);
+        }
+        return savepoint;
+    }
+
+    /**
+     * JDBC规范，移除一个savepoint的时候，需要将这个savepoint以及之后的savepoint都移除，
+     * 当调用已经移除的savepoint的方法时，抛出SQLException异常
+     *
+     * @param savepoint
+     * @throws SQLException
+     */
+    @Override
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        if(realConnection!=null)
+            realConnection.releaseSavepoint(savepoint);
+    }
+
+    //====================================================================
+
+    @Override
+    public SQLWarning getWarnings() throws SQLException {
+        if (realConnection != null) {
+            return realConnection.getWarnings();
+        }
+        return null;
+    }
+
+    @Override
+    public void clearWarnings() throws SQLException {
+//        checkClosed();
+        if (realConnection != null) {
+            realConnection.clearWarnings();
+        }
+    }
+
+    @Override
+    public boolean isValid(int timeout) throws SQLException {
+        return realConnection.isValid(timeout);
+    }
+
+    @Override
+    public String getClientInfo(String name) throws SQLException {
+        if(clientInfo!=null){
+            return clientInfo.getProperty(name);
+        }
+        return null;
+    }
+
+    @Override
+    public Properties getClientInfo() throws SQLException {
+        if(realConnection!=null){
+            return realConnection.getClientInfo();
+        }
+        return clientInfo;
+    }
+    //======================调用create方法，默认创建一个写连接，因为只有插入或更新的的时候，可能才会用到create方法=========
+    @Override
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createArrayOf(typeName,elements);
+    }
+
+    @Override
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createStruct(typeName,attributes);
+    }
+
+    @Override
+    public Clob createClob() throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createClob();
+    }
+
+    @Override
+    public Blob createBlob() throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createBlob();
+    }
+
+    @Override
+    public NClob createNClob() throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createNClob();
+    }
+
+    @Override
+    public SQLXML createSQLXML() throws SQLException {
+        buildNewWriteConnectionIfNeed();
+        return realConnection.createSQLXML();
+    }
+
+    public DBIndex getDBIndex() {
+        return dbIndex;
+    }
+
+    public Connection getCurrentRealConnection() {
+        return realConnection;
+    }
+
+    @Override
+    public String nativeSQL(String sql) throws SQLException {
+        return null;
     }
 }
