@@ -37,8 +37,8 @@ public class TransactionTest {
         Connection connection = dragonHADatasource.getConnection();
         connection.setAutoCommit(false);
         try{
-            PreparedStatement insert1 = connection.prepareStatement("INSERT into user(user_id,username) VALUES (26,'huhuamin')");
-            PreparedStatement insert2 = connection.prepareStatement("INSERT into user(user_id,username) VALUES (25,'wangxiaoxiao')");
+            PreparedStatement insert1 = connection.prepareStatement("INSERT into user(user_id,username) VALUES (29,'huhuamin')");
+            PreparedStatement insert2 = connection.prepareStatement("INSERT into user(user_id,username) VALUES (28,'wangxiaoxiao')");
             insert1.execute();
             insert2.execute();
             connection.commit();

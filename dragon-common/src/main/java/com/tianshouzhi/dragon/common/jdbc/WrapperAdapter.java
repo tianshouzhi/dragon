@@ -16,4 +16,6 @@ public class WrapperAdapter implements Wrapper{
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
+
+
 }

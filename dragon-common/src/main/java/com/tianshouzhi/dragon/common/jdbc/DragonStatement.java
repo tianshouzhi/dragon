@@ -82,6 +82,7 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
     //=======================显示指定进行查询==================
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
+        checkClosed();
         this.sql=sql;
         executeType = EXECUTE_QUERY;
         doExecute();

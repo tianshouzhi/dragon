@@ -25,8 +25,16 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
     protected Properties clientInfo=new Properties();
     protected Map<String, Class<?>> typeMap;
 
+    protected void checkClosed() throws SQLException {
+        if (isClosed) {
+            throw new SQLException("No operations allowed after connection closed.");
+        }
+    }
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        if(isClosed){
+            throw new SQLClientInfoException();
+        }
         if(clientInfo==null){
             clientInfo=new Properties();
         }
@@ -35,6 +43,9 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        if(isClosed){
+            throw new SQLClientInfoException();
+        }
         clientInfo=properties;
     }
 
@@ -45,24 +56,29 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
+        checkClosed();
         this.autoCommit = autoCommit;
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
+        checkClosed();
         return autoCommit;
     }
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
+        checkClosed();
         this.level = level;
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
+        checkClosed();
         return level;
     }
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
+        checkClosed();
         if (autoCommit) {
             throw new SQLException("This method cannot be called during a transaction");
         } else {
@@ -72,41 +88,42 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
 
     @Override
     public boolean isReadOnly() throws SQLException {
+        checkClosed();
         return isReadOnly;
     }
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
+        checkClosed();
         this.catalog = catalog;
     }
 
     @Override
     public String getCatalog() throws SQLException {
+        checkClosed();
         return catalog;
     }
     @Override
     public void setHoldability(int holdability) throws SQLException {
+        checkClosed();
         this.holdability = holdability;
     }
 
     @Override
     public int getHoldability() throws SQLException {
+        checkClosed();
         return holdability;
     }
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
+        checkClosed();
         return typeMap;
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+        checkClosed();
         typeMap=map;
-    }
-
-    protected void checkClosed() throws SQLException {
-        if (isClosed) {
-            throw new SQLException("No operations allowed after connection closed.");
-        }
     }
 
     protected void setRealConnectionParams(Connection ... connections) throws SQLException {
