@@ -1,9 +1,6 @@
 package com.tianshouzhi.dragon.common.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -18,10 +15,10 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
     protected String password;
     protected boolean isClosed = false;
     protected boolean autoCommit = true;//是否自动提交
-    protected Boolean isReadOnly = false;
-    protected Integer level; //事务隔离级别
+    protected boolean isReadOnly = false;
+    protected int level=Connection.TRANSACTION_READ_COMMITTED; //mysql默认事务隔离级别
     protected String catalog;
-    protected Integer holdability;
+    protected int holdability= ResultSet.CLOSE_CURSORS_AT_COMMIT;//mysql只支持这个
     protected Properties clientInfo=new Properties();
     protected Map<String, Class<?>> typeMap;
 
@@ -135,22 +132,16 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
             if(clientInfo.size()!=0){
                 wrappedConnection.setClientInfo(clientInfo);
             }
-            if(holdability!=null){
-                wrappedConnection.setHoldability(holdability);
-            }
+            wrappedConnection.setHoldability(holdability);
             if(typeMap!=null){
                 wrappedConnection.setTypeMap(typeMap);
             }
             if(catalog!=null){
                 wrappedConnection.setCatalog(catalog);
             }
-            if(isReadOnly!=null){
-                //因为ReadDBSelector会将所有的只读连接设置为readonly，如果这里设置了，则会对判断造成影响
-//            realConnection.setReadOnly(isReadOnly());
-            }
-            if(level!=null){
-                wrappedConnection.setTransactionIsolation(level);
-            }
+            //因为ReadDBSelector会将所有的只读连接设置为readonly，如果这里设置了，则会对判断造成影响
+//            wrappedConnection.setReadOnly(isReadOnly());
+            wrappedConnection.setTransactionIsolation(level);
         }
     }
 }
