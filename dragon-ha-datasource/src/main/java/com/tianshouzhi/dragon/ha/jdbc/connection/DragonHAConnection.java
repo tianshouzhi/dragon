@@ -197,7 +197,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
     private void buildNewConnectionByHintIfNeed(List<DBIndex> dbIndexes) throws SQLException {
         if(dbIndexes.contains(dbIndex)){
             LOGGER.debug("current connection's dbIndex is {}, return current",dbIndex);
-            setRealConnectionParams(realConnection);
+            setConnectionParams(realConnection);
             return;
         }
         if(realConnection!=null){
@@ -206,18 +206,18 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         int i = new Random().nextInt(dbIndexes.size());
         dbIndex = dbIndexes.get(i);
         realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
-        setRealConnectionParams(realConnection);
+        setConnectionParams(realConnection);
         LOGGER.debug("get a connection from dbIndex :{}",dbIndex);
     }
     private Connection buildNewReadConnectionIfNeed() throws SQLException {
         if(realConnection!=null){
             LOGGER.debug("current connection is not null,dbIndex:{},return current!!!",dbIndex);
-            setRealConnectionParams(realConnection);
+            setConnectionParams(realConnection);
             return realConnection;
         }
         dbIndex = hAConnectionManager.selectReadDBIndex();
         realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
-        setRealConnectionParams(realConnection);
+        setConnectionParams(realConnection);
         LOGGER.debug("current connection is null,get a new read connection from:{}",dbIndex);
         return realConnection;
     }
@@ -231,7 +231,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         }else{
             this.dbIndex=dbIndex;
             realConnection=hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
-            setRealConnectionParams(realConnection);
+            setConnectionParams(realConnection);
             return realConnection;
         }
     }
@@ -248,7 +248,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
             LOGGER.debug("get a new write connection from: {}",dbIndex);
         }
         LOGGER.debug("current connection is a write connection,dbIndex:{},return current!",dbIndex);
-        setRealConnectionParams(realConnection);
+        setConnectionParams(realConnection);
         return realConnection;
     }
 

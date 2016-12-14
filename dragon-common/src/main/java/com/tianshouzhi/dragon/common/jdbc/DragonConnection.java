@@ -123,25 +123,26 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
         typeMap=map;
     }
 
-    protected void setRealConnectionParams(Connection ... connections) throws SQLException {
+    protected void setConnectionParams(Connection ... connections) throws SQLException {
         if(connections==null||connections.length==0){
             throw new IllegalArgumentException("connections can't be null or empty!!!");
         }
-        for (Connection wrappedConnection : connections) {
-            wrappedConnection.setAutoCommit(autoCommit);
+        for (Connection connection : connections) {
+            connection.setAutoCommit(autoCommit);
             if(clientInfo.size()!=0){
-                wrappedConnection.setClientInfo(clientInfo);
+                connection.setClientInfo(clientInfo);
             }
-            wrappedConnection.setHoldability(holdability);
+            connection.setHoldability(holdability);
             if(typeMap!=null){
-                wrappedConnection.setTypeMap(typeMap);
+                connection.setTypeMap(typeMap);
             }
             if(catalog!=null){
-                wrappedConnection.setCatalog(catalog);
+                connection.setCatalog(catalog);
             }
+                //// FIXME: 2016/12/14
             //因为ReadDBSelector会将所有的只读连接设置为readonly，如果这里设置了，则会对判断造成影响
 //            wrappedConnection.setReadOnly(isReadOnly());
-            wrappedConnection.setTransactionIsolation(level);
+            connection.setTransactionIsolation(level);
         }
     }
 }
