@@ -13,6 +13,7 @@
         <module>dragon-ha-datasource</module>
         <module>dragon-dynamic-datasource</module>
         <module>dragon-common</module>
+        <module>dragon-sqlparser</module>
     </modules>
 
     <dependencyManagement>
@@ -57,7 +58,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
-                <version>1.0.14</version>
+                <version>1.0.24</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

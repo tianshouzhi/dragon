@@ -379,6 +379,9 @@ public class DragonHAConnection extends DragonConnection implements Connection{
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
+        if(timeout<0){
+            throw new DragonException("the value supplied for timeout is less then 0");
+        }
         if(realConnection==null){
             return true;
         }

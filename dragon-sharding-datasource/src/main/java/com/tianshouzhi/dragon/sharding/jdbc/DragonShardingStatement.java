@@ -1,26 +1,14 @@
 package com.tianshouzhi.dragon.sharding.jdbc;
 
-import com.tianshouzhi.dragon.common.jdbc.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.DragonStatement;
 
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public class DragonShardingStatement extends DragonStatement{
-
-    protected DragonShardingStatement(DragonConnection dragonConnection) {
-        super(dragonConnection);
-    }
-
-    protected DragonShardingStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability, DragonConnection dragonConnection) {
-        super(resultSetType, resultSetConcurrency, resultSetHoldability, dragonConnection);
-    }
-
-    protected DragonShardingStatement(Integer resultSetType, Integer resultSetConcurrency, DragonConnection dragonConnection) {
-        super(resultSetType, resultSetConcurrency, dragonConnection);
-    }
 
     @Override
     protected boolean doExecute() throws SQLException {
@@ -58,13 +46,13 @@ public class DragonShardingStatement extends DragonStatement{
     }
 
     @Override
-    public void addBatch(String sql) throws SQLException {
+    public void clearBatch() throws SQLException {
 
     }
 
     @Override
-    public void clearBatch() throws SQLException {
-
+    public DragonShardingConnection getConnection() throws SQLException {
+        return null;
     }
 
     @Override
