@@ -72,7 +72,7 @@ public class HAConnectionManager {
         if(StringUtils.isAnyBlank(username,password))
             connection = realDataSource.getConnection();
         else
-            connection = realDataSource.getConnection(username,password);
+            connection = realDataSource.getConnection(username,password);//druid不支持这个方法
 
         if(!connection.isReadOnly()&&datasourceWrapper.isReadOnly()&&indexDSMap.get(dbIndex).isReadOnly()){
             connection.setReadOnly(true);

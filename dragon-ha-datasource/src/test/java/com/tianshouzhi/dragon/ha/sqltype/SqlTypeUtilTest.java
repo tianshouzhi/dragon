@@ -5,7 +5,7 @@ package com.tianshouzhi.dragon.ha.sqltype;
  */
 public class SqlTypeUtilTest {
    /* @Test
-    public void test() throws SQLException {
+    public void selectProbilityTest() throws SQLException {
         boolean query = SqlTypeUtil.isQuery("select * from");
 
     }*/
