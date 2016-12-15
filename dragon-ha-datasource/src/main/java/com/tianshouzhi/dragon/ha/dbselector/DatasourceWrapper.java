@@ -5,6 +5,7 @@ import com.tianshouzhi.dragon.common.exception.MySqlExceptionSorter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.CommonDataSource;
+import javax.sql.DataSource;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
@@ -13,11 +14,11 @@ public class DatasourceWrapper {
     private DBIndex dbIndex;
     private Integer readWeight;
     private Integer writeWeight;
-    private CommonDataSource realDataSource;
+    private DataSource realDataSource;
     private boolean isReadOnly;
     private ExceptionSorter exceptionSorter=new MySqlExceptionSorter();
 
-    public DatasourceWrapper(String dbIndex, int readWeight, int writeWeight, CommonDataSource realDataSource) {
+    public DatasourceWrapper(String dbIndex, int readWeight, int writeWeight, DataSource realDataSource) {
         check(dbIndex,readWeight,writeWeight,realDataSource);
         this.dbIndex = new DBIndex(dbIndex);
         this.readWeight = readWeight;
@@ -54,11 +55,11 @@ public class DatasourceWrapper {
         this.writeWeight = writeWeight;
     }
 
-    public CommonDataSource getRealDataSource() {
+    public DataSource getRealDataSource() {
         return realDataSource;
     }
 
-    public void setRealDataSource(CommonDataSource realDataSource) {
+    public void setRealDataSource(DataSource realDataSource) {
         this.realDataSource = realDataSource;
     }
 

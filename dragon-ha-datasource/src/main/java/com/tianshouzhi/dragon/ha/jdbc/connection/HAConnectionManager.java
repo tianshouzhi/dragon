@@ -5,10 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.CommonDataSource;
-import javax.sql.ConnectionPoolDataSource;
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -69,25 +66,14 @@ public class HAConnectionManager {
         if (datasourceWrapper == null) {
             throw new IllegalArgumentException("not found datasouce with dbIndex:" + dbIndex.getIndexStr());
         }
-        CommonDataSource realDataSource = datasourceWrapper.getRealDataSource();
+        DataSource realDataSource = datasourceWrapper.getRealDataSource();
         Connection connection=null;
 
-        if (realDataSource instanceof XADataSource) {
-            connection= ((XADataSource) realDataSource).getXAConnection().getConnection();
-        }
-        if (connection==null&&realDataSource instanceof ConnectionPoolDataSource) {
-            connection= ((ConnectionPoolDataSource) realDataSource).getPooledConnection().getConnection();
-        }
-        if(connection==null && realDataSource instanceof DataSource){
-            if(StringUtils.isAnyBlank(username,password))
-            connection = ((DataSource) realDataSource).getConnection(username,password);
-            else
-                connection = ((DataSource) realDataSource).getConnection();
-        }
+        if(StringUtils.isAnyBlank(username,password))
+            connection = realDataSource.getConnection();
+        else
+            connection = realDataSource.getConnection(username,password);
 
-        if(connection==null){
-            throw new SQLException("only support Connection and PooledConnection and XAonnection");
-        }
         if(!connection.isReadOnly()&&datasourceWrapper.isReadOnly()&&indexDSMap.get(dbIndex).isReadOnly()){
             connection.setReadOnly(true);
         }

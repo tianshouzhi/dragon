@@ -273,12 +273,6 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         if(isClosed()){
             return;
         }
-        for (Statement statement : statementList) {
-            if(!statement.isClosed()){
-                statement.close();
-            }
-        }
-        statementList.clear();
         if (realConnection != null) {
             realConnection.close();
             realConnection=null;
@@ -468,5 +462,9 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         DatasourceWrapper datasourceWrapper = hAConnectionManager.getDatasourceWrapperByDbIndex(dbIndex);
         ExceptionSorter exceptionSorter = datasourceWrapper.getExceptionSorter();
         return exceptionSorter;
+    }
+
+    public DBIndex getDbIndex() {
+        return dbIndex;
     }
 }

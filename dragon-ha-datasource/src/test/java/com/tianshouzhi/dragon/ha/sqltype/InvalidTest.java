@@ -1,60 +1,37 @@
 package com.tianshouzhi.dragon.ha.sqltype;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.mysql.jdbc.Driver;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
-import com.tianshouzhi.dragon.ha.jdbc.DragonHADatasource;
+import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/7.
  */
-public class InvalidTest {
+public class InvalidTest extends BaseTest{
     @Test
-    public void test() throws SQLException {
-        List<DatasourceWrapper> list = new ArrayList<DatasourceWrapper>();
-        DragonHADatasource dragonHADatasource = new DragonHADatasource(list);
-        DruidDataSource master = new DruidDataSource();
-        master.setUsername("root");
-        master.setPassword("shxx12151022");
-        master.setDriverClassName(Driver.class.getName());
-        master.setUrl("jdbc:mysql://localhost:3306/tddl_master");
-        list.add(new DatasourceWrapper("tddl_master", 0, 10, master));
-
-        DruidDataSource slave = new DruidDataSource();
-        slave.setUsername("root");
-        slave.setPassword("shxx12151022");
-        slave.setDriverClassName(Driver.class.getName());
-        slave.setUrl("jdbc:mysql://localhost:3306/tddl_slave");
-        list.add(new DatasourceWrapper("tddl_slave", 10, 0, slave));
-
-        Connection connection = dragonHADatasource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
-        boolean goon=true;
-        do{
-            try {
+    public void test() {
+        int i=0;
+        while(i<30){
+            try{
+                DragonHAConnection connection = dragonHADatasource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("user_id");
-                    String tag_name = resultSet.getString("username");
-                    System.out.println("user_id:" + id + ",username:" + tag_name);
+                i++;
+                while(resultSet.next()){
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("name");
+                    System.out.println(i+","+connection.getDbIndex()+",id:" + id + ",name:" + name);
                 }
-                goon=false;
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
+                resultSet.close();
+                preparedStatement.close();
+                connection.close();
+//                Thread.sleep(1000);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        }while (goon);
+        }
 
     }
 }
