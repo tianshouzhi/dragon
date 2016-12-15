@@ -88,16 +88,19 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
         setStatementParams(realStatement);
     }
     public ResultSet executeQuery() throws SQLException {
+        checkClosed();
         prepareExcuteType=PREPARE_EXECUTE_QUERY;
         doExecute();
         return this.resultSet;
     }
     public int executeUpdate() throws SQLException {
+        checkClosed();
         prepareExcuteType=PREPARE_EXECUTE_UPDATE;
         doExecute();
         return this.updateCount;
     }
     public boolean execute() throws SQLException {
+        checkClosed();
         prepareExcuteType=PREPARE_EXECUTE;
         return doExecute();
     }
@@ -142,6 +145,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
      */
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
+        checkClosed();
         if(realStatement!=null){
             return( (PreparedStatement)realStatement).getMetaData();
         }
@@ -150,6 +154,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
+        checkClosed();
         throw new UnsupportedOperationException("getMetaData");
     }
 
@@ -160,6 +165,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
      */
     @Override
     public void addBatch() throws SQLException {
+        checkClosed();
         batchExecuteInfoList.add(params);
         params=new LinkedHashMap<Integer, DragonPrepareStatement.ParamSetting>();
     }
@@ -199,148 +205,177 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
     @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNull,new Object[]{sqlType}));
     }
 
     @Override
     public void setBoolean(int parameterIndex, boolean x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBoolean,new Object[]{x}));
     }
 
     @Override
     public void setByte(int parameterIndex, byte x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setByte,new Object[]{x}));
     }
 
     @Override
     public void setShort(int parameterIndex, short x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setShort,new Object[]{x}));
     }
 
     @Override
     public void setInt(int parameterIndex, int x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setInt,new Object[]{x}));
     }
 
     @Override
     public void setLong(int parameterIndex, long x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setLong,new Object[]{x}));
     }
 
     @Override
     public void setFloat(int parameterIndex, float x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setFloat,new Object[]{x}));
     }
 
     @Override
     public void setDouble(int parameterIndex, double x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setDouble,new Object[]{x}));
     }
 
     @Override
     public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBigDecimal,new Object[]{x}));
     }
 
     @Override
     public void setString(int parameterIndex, String x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setString,new Object[]{x}));
     }
 
     @Override
     public void setBytes(int parameterIndex, byte[] x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBytes,new Object[]{x}));
     }
 
     @Override
     public void setDate(int parameterIndex, Date x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setDate,new Object[]{x}));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setTime,new Object[]{x}));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setTimestamp,new Object[]{x}));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setAsciiStream2,new Object[]{x,length}));
     }
 
     @Override
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setUnicodeStream2,new Object[]{x,length}));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBinaryStream2,new Object[]{x,length}));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setObject2,new Object[]{x}));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setObject,new Object[]{x}));
     }
 
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setCharacterStream2,new Object[]{reader,length}));
     }
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setRef,new Object[]{x}));
     }
 
     @Override
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBlob,new Object[]{x}));
     }
 
     @Override
     public void setClob(int parameterIndex, Clob x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setClob,new Object[]{x}));
     }
 
     @Override
     public void setArray(int parameterIndex, Array x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setArray,new Object[]{x}));
     }
 
 
     @Override
     public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setDate2,new Object[]{x,cal}));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setTime2,new Object[]{x,cal}));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setTimestamp,new Object[]{x,cal}));
     }
 
     @Override
     public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNull2,new Object[]{sqlType,typeName}));
     }
 
     @Override
     public void setURL(int parameterIndex, URL x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setURL,new Object[]{x}));
     }
 
@@ -348,101 +383,121 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setRowId,new Object[]{x}));
     }
 
     @Override
     public void setNString(int parameterIndex, String value) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNString,new Object[]{value}));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNCharacterStream2,new Object[]{value,length}));
     }
 
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNClob,new Object[]{value}));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setClob2,new Object[]{reader,length}));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBlob2,new Object[]{inputStream,length}));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNClob2,new Object[]{reader,length}));
     }
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setSQLXML,new Object[]{xmlObject}));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setObject3,new Object[]{x,targetSqlType,scaleOrLength}));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setAsciiStream2,new Object[]{x,length}));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBinaryStream2,new Object[]{x,length}));
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setCharacterStream2,new Object[]{reader,length}));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setAsciiStream,new Object[]{x}));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBinaryStream,new Object[]{x}));
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setCharacterStream,new Object[]{reader}));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNCharacterStream,new Object[]{value}));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setClob,new Object[]{reader}));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setBlob,new Object[]{inputStream}));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNClob,new Object[]{reader}));
     }
 
     @Override
     public void clearParameters() throws SQLException {
+        checkClosed();
         params.clear();
     }
 }

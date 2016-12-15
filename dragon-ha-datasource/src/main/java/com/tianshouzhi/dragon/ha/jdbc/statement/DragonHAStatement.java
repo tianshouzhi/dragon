@@ -207,6 +207,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     @Override
     public void clearBatch() throws SQLException {
+        checkClosed();
         batchExecuteInfoList.clear();
         if(realStatement!=null){
             realStatement.clearBatch();
@@ -215,6 +216,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     @Override
     public Connection getConnection() throws SQLException {
+        checkClosed();
         return dragonHAConnection;
     }
 
@@ -227,6 +229,10 @@ public class DragonHAStatement extends DragonStatement implements Statement {
         if(resultSet!=null){
             resultSet.close();
             resultSet=null;
+        }
+        if(generatedKeys!=null){
+            generatedKeys.close();
+            generatedKeys=null;
         }
         if(realStatement!=null){
             realStatement.close();
@@ -243,15 +249,18 @@ public class DragonHAStatement extends DragonStatement implements Statement {
      */
     @Override
     public boolean getMoreResults() throws SQLException {
+        checkClosed();
         return realStatement.getMoreResults();
     }
     @Override
     public boolean getMoreResults(int current) throws SQLException {
+        checkClosed();
         return realStatement.getMoreResults(current);
     }
 
     @Override
     public void cancel() throws SQLException {
+        checkClosed();
         if(realStatement!=null){
             realStatement.cancel();
         }
@@ -259,6 +268,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
+        checkClosed();
         if(realStatement!=null){
             return realStatement.getWarnings();
         }
@@ -267,6 +277,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     @Override
     public void clearWarnings() throws SQLException {
+        checkClosed();
         if(realStatement!=null){
             realStatement.clearWarnings();
         }
@@ -274,6 +285,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     @Override
     public void setCursorName(String name) throws SQLException {
+        checkClosed();
         if(realStatement!=null){
             realStatement.setCursorName(name);
         }
