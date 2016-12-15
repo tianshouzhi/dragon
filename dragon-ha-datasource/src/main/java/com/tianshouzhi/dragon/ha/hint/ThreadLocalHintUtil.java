@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ThreadLocalHintUtil {
     private static final String DB_INDEX_KEY="DB_INDEX_HINT";
-    public static final ThreadLocal< List<DBIndex>> hint=new ThreadLocal< List<DBIndex>>();
+    private static final ThreadLocal< List<DBIndex>> hint=new ThreadLocal< List<DBIndex>>();
     public static void setDBIndexes(String ... dbIndexes){
         if(dbIndexes!=null&&dbIndexes.length>0){
             List<DBIndex> dbIndexList=new ArrayList<DBIndex>();

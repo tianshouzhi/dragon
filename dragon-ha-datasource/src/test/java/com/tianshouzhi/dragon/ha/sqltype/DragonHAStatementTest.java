@@ -1,11 +1,13 @@
 package com.tianshouzhi.dragon.ha.sqltype;
 
+import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/7.
@@ -31,19 +33,44 @@ public class DragonHAStatementTest extends BaseTest{
         }
     }
     @Test
-    public void testDelete(){
-
+    public void testDelete() throws SQLException {
+        DragonHAConnection connection = this.connection;
+        Statement statement = connection.createStatement();
+        int i = statement.executeUpdate("DELETE from USER where id>10");
+        System.out.println(i);
     }
     @Test
-    public void testUpdate(){
-
+    public void testQuery() throws SQLException {
+        ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
+        DragonHAConnection connection = this.connection;
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM USER ");
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id:" + id + ",name:" + name);
+        }
+        ThreadLocalHintUtil.remove();
     }
     @Test
-    public void testQuery(){
-
+    public void testUpdate() throws SQLException {
+        testQuery();
+        ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
+        DragonHAConnection connection = this.connection;
+        Statement statement = connection.createStatement();
+        int i = statement.executeUpdate("UPDATE user SET name='tianshouzhi' where id<=10");
+        System.out.println(i);
+        testQuery();
+        ThreadLocalHintUtil.remove();
     }
-    @Test
-    public void testBatch(){
 
+    @Test
+    public void testBatch() throws SQLException {
+        DragonHAConnection connection = this.connection;
+        Statement statement = connection.createStatement();
+        statement.addBatch("insert into user(name) VALUES ('wanghanhao'),('huhuamin')");
+        statement.addBatch("insert into user(name) VALUES ('luyang')");
+        int[] ints = statement.executeBatch();
+        System.out.println(Arrays.toString(ints));
     }
 }

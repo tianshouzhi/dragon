@@ -184,11 +184,10 @@ public class DragonHAConnection extends DragonConnection implements Connection{
 
         //3、没有hint且没有开启事务
         boolean sqlIsQuery = SqlTypeUtil.isQuery(sql,useSqlTypeCache);
+        LOGGER.debug("try to get connection by sql:{}",sql);
         if(sqlIsQuery){
-            LOGGER.debug("try to get connection by sql:{}",sql);
             return buildNewReadConnectionIfNeed();
         }else {
-            LOGGER.debug("try to get connection by sql:{}",sql);
             return  buildNewWriteConnectionIfNeed();
         }
 
@@ -246,6 +245,8 @@ public class DragonHAConnection extends DragonConnection implements Connection{
             dbIndex = hAConnectionManager.selectWriteDBIndex();
             realConnection = hAConnectionManager.getConnectionByDbIndex(dbIndex,userName,password);
             LOGGER.debug("get a new write connection from: {}",dbIndex);
+            setConnectionParams(realConnection);
+            return realConnection;
         }
         LOGGER.debug("current connection is a write connection,dbIndex:{},return current!",dbIndex);
         setConnectionParams(realConnection);
@@ -295,7 +296,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
     @Override
     public void commit() throws SQLException {
         checkClosed();
-        if(!autoCommit){
+        if(autoCommit){
             throw new DragonException("This method should be used only when auto-commit mode has been disabled.");
         }
         if (realConnection != null) {
@@ -309,7 +310,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
     @Override
     public void rollback() throws SQLException {
         checkClosed();
-        if(!autoCommit){
+        if(autoCommit){
             throw new DragonException("This method should be used only when auto-commit mode has been disabled.");
         }
         if(realConnection!=null){

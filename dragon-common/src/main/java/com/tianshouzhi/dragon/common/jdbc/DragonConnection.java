@@ -24,7 +24,7 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
 
     protected void checkClosed() throws SQLException {
         if (isClosed) {
-            throw new SQLException("No operations allowed after connection closed.");
+            throw new SQLException("No operations allowed after connection closed. you should to use a new connection");
         }
     }
     @Override

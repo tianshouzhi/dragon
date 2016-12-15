@@ -93,13 +93,13 @@ public class DragonHAPrepareStatementTest extends BaseTest{
     public void testBatch() throws SQLException {
         DragonHAConnection connection = this.connection;
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT  INTO  user(name) VALUES (?)");
-        preparedStatement.setString(1,"wangxiaoxiao1");
+        preparedStatement.setString(1,"wangxiaoxiao2");
         preparedStatement.addBatch();
-        preparedStatement.setString(1,"wanghanhao1");
+        preparedStatement.setString(1,"wanghanhao2");
         preparedStatement.addBatch();
-        preparedStatement.setString(1,"huhuamin1");
+        preparedStatement.setString(1,"huhuamin2");
         preparedStatement.addBatch();
-        preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx')"); //混合使用两种模式会报错
+        preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx2')"); //混合使用两种模式会报错
         int[] ints = preparedStatement.executeBatch();
         System.out.println(ints);
         testQuery();

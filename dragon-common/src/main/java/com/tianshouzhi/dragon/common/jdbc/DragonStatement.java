@@ -24,7 +24,7 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
     protected int fetchDirection=ResultSet.FETCH_FORWARD;//mysql只支持这个，其他的被忽略
     protected int fetchSize=0;//mysql默认是0，表示忽略这个设置
     protected boolean poolable=true;//mysql默认为true
-    protected int maxRows=-1;//mysql中，-1表示没有限制，返回所有，但是最多只能返回50000000条数据，超出的部分被忽略
+    protected int maxRows=50000000;//mysql中，-1表示没有限制，返回所有，但是最多只能返回50000000条数据，超出的部分被忽略
     protected int maxFieldSize=65535;//mysql一行最多可以有65535个字段
     protected boolean enableEscapeProcessing=true;//mysql默认值为true
 
