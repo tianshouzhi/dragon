@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.sharding.jdbc;
+package com.tianshouzhi.dragon.sharding.jdbc.resultset;
 
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 

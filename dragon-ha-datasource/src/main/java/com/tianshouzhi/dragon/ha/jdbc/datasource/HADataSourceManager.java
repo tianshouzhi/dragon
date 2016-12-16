@@ -1,6 +1,11 @@
-package com.tianshouzhi.dragon.ha.jdbc.connection;
+package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
-import com.tianshouzhi.dragon.ha.dbselector.*;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceManager;
+import com.tianshouzhi.dragon.ha.dbselector.DBSelector;
+import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.dbselector.ReadDBSelector;
+import com.tianshouzhi.dragon.ha.dbselector.WriteDBSelector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,25 +22,25 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
-public class HAConnectionManager {
-    private static final Logger LOGGER= LoggerFactory.getLogger(HAConnectionManager.class);
-    private Map<DBIndex, DatasourceWrapper> indexDSMap = new ConcurrentHashMap<DBIndex, DatasourceWrapper>();
+public class HADataSourceManager extends DataSourceManager{
+    private static final Logger LOGGER= LoggerFactory.getLogger(HADataSourceManager.class);
+    private Map<DataSourceIndex, DatasourceWrapper> indexDSMap = new ConcurrentHashMap<DataSourceIndex, DatasourceWrapper>();
     private BlockingQueue<DatasourceWrapper> invalidQueue = new LinkedBlockingDeque<DatasourceWrapper>();
     private DBSelector readDBSelector;
     private DBSelector writeDBSelector;
     private AtomicBoolean isRebuiding =new AtomicBoolean(false);
-    public HAConnectionManager(List<DatasourceWrapper> datasourceWrapperList) {
+    public HADataSourceManager(List<DatasourceWrapper> datasourceWrapperList) {
         rebuild(datasourceWrapperList);
         runInvalidRecoveryThread();
     }
 
     public void rebuild(List<DatasourceWrapper> datasourceWrapperList) {
-        if(!isRebuiding.getAndSet(true)){
-            LOGGER.info("start building hAConnectionManager...");
+        if(isRebuiding.compareAndSet(false,true)){
+            LOGGER.info("start building hADataSourceManager...");
             long start=System.currentTimeMillis();
             indexDSMap.clear();
             for (DatasourceWrapper datasourceWrapper : datasourceWrapperList) {
-                DBIndex index = datasourceWrapper.getDbIndex();
+                DataSourceIndex index = datasourceWrapper.getDataSourceIndex();
                 if (indexDSMap.containsKey(index)) {
                     throw new RuntimeException("index must be unique,'" + index + "' duplicated");
                 }
@@ -44,27 +49,27 @@ public class HAConnectionManager {
             readDBSelector = new ReadDBSelector(datasourceWrapperList);
             writeDBSelector = new WriteDBSelector(datasourceWrapperList);
             isRebuiding.set(false);
-            LOGGER.info("end building hAConnectionManager ...elapse:{}ms",System.currentTimeMillis()-start);
+            LOGGER.info("end building hADataSourceManager ...elapse:{}ms",System.currentTimeMillis()-start);
         }
     }
-    public DBIndex selectWriteDBIndex(){
+    public DataSourceIndex selectWriteDBIndex(){
         while (!isRebuiding.get())break;
         return writeDBSelector.select();
     }
-    public DBIndex selectReadDBIndex(){
+    public DataSourceIndex selectReadDBIndex(){
         while (!isRebuiding.get())break;
         return readDBSelector.select();
     }
 
-    public DatasourceWrapper getDatasourceWrapperByDbIndex(DBIndex dbIndex) throws SQLException{
+    public DatasourceWrapper getDatasourceWrapperByDbIndex(DataSourceIndex dataSourceIndex) throws SQLException{
         while (!isRebuiding.get())break;
-        return indexDSMap.get(dbIndex);
+        return indexDSMap.get(dataSourceIndex);
     }
-    public Connection getConnectionByDbIndex(DBIndex dbIndex,String username,String password) throws SQLException {
+    public Connection getConnectionByDbIndex(DataSourceIndex dataSourceIndex, String username, String password) throws SQLException {
         while (!isRebuiding.get())break;
-        DatasourceWrapper datasourceWrapper = indexDSMap.get(dbIndex);
+        DatasourceWrapper datasourceWrapper = indexDSMap.get(dataSourceIndex);
         if (datasourceWrapper == null) {
-            throw new IllegalArgumentException("not found datasouce with dbIndex:" + dbIndex.getIndexStr());
+            throw new IllegalArgumentException("not found datasouce with dataSourceIndex:" + dataSourceIndex.getIndexStr());
         }
         DataSource realDataSource = datasourceWrapper.getRealDataSource();
         Connection connection=null;
@@ -74,23 +79,23 @@ public class HAConnectionManager {
         else
             connection = realDataSource.getConnection(username,password);//druid不支持这个方法
 
-        if(!connection.isReadOnly()&&datasourceWrapper.isReadOnly()&&indexDSMap.get(dbIndex).isReadOnly()){
+        if(!connection.isReadOnly()&&datasourceWrapper.isReadOnly()&&indexDSMap.get(dataSourceIndex).isReadOnly()){
             connection.setReadOnly(true);
         }
         return connection;
 
     }
 
-    public Connection getConnectionByDbIndex(List<DBIndex> hintDBIndexes,String username,String password) throws SQLException {
+    public Connection getConnectionByDbIndex(List<DataSourceIndex> hintDataSourceIndices, String username, String password) throws SQLException {
         while (!isRebuiding.get())break;
-        if(hintDBIndexes==null&&hintDBIndexes.size()==0){
-            throw new SQLException("hintDBIndexes can't be bull or empty");
+        if(hintDataSourceIndices ==null&& hintDataSourceIndices.size()==0){
+            throw new SQLException("hintDataSourceIndices can't be bull or empty");
         }
-        if(hintDBIndexes.size()==1){
-           return getConnectionByDbIndex(hintDBIndexes.get(0),username,password);
+        if(hintDataSourceIndices.size()==1){
+           return getConnectionByDbIndex(hintDataSourceIndices.get(0),username,password);
         }
-        int randomIndex = new Random().nextInt(hintDBIndexes.size());
-        return getConnectionByDbIndex(hintDBIndexes.get(randomIndex),username,password);
+        int randomIndex = new Random().nextInt(hintDataSourceIndices.size());
+        return getConnectionByDbIndex(hintDataSourceIndices.get(randomIndex),username,password);
     }
     private void runInvalidRecoveryThread() {
         Thread recoveryThread=new Thread("DRAGON-HA-RecoveryThread"){
@@ -103,8 +108,8 @@ public class HAConnectionManager {
                         try {
                             Connection connection = realDataSource.getConnection();
                             if(connection.isValid(3000)){
-                                LOGGER.info("datasource '{}' is recovered,try to rebuid.....",invalid.getDbIndex());
-                                indexDSMap.put(invalid.getDbIndex(),invalid);
+                                LOGGER.info("datasource '{}' is recovered,try to rebuid.....",invalid.getDataSourceIndex());
+                                indexDSMap.put(invalid.getDataSourceIndex(),invalid);
                                 rebuild(new ArrayList<DatasourceWrapper>(indexDSMap.values()));
                             }
                         } catch (SQLException e) {
@@ -120,23 +125,23 @@ public class HAConnectionManager {
         recoveryThread.setDaemon(true);
         recoveryThread.start();
     }
-    public void invalid(DBIndex dbIndex) {
+    public void invalid(DataSourceIndex dataSourceIndex) {
         while (!isRebuiding.get())break;
-        if (indexDSMap.get(dbIndex) != null) {
-            DatasourceWrapper datasourceWrapper = indexDSMap.get(dbIndex);
-            LOGGER.warn("invalid datasource {}",datasourceWrapper.getDbIndex());
+        if (indexDSMap.get(dataSourceIndex) != null) {
+            DatasourceWrapper datasourceWrapper = indexDSMap.get(dataSourceIndex);
+            LOGGER.warn("invalid datasource {}",datasourceWrapper.getDataSourceIndex());
             invalidQueue.add(datasourceWrapper);
-            indexDSMap.remove(dbIndex);
+            indexDSMap.remove(dataSourceIndex);
             rebuild(new ArrayList<DatasourceWrapper>(indexDSMap.values()));
         }
     }
 
-    public DBIndex selectReadDBIndexExclude(Set<DBIndex> excludes) {
-        Set<DBIndex> managedDBIndexes = readDBSelector.getManagedDBIndexes();
-        managedDBIndexes.removeAll(excludes);
-        if(managedDBIndexes.isEmpty()){
+    public DataSourceIndex selectReadDBIndexExclude(Set<DataSourceIndex> excludes) {
+        Set<DataSourceIndex> managedDataSourceIndices = readDBSelector.getManagedDBIndexes();
+        managedDataSourceIndices.removeAll(excludes);
+        if(managedDataSourceIndices.isEmpty()){
             return null;
         }
-        return managedDBIndexes.iterator().next();
+        return managedDataSourceIndices.iterator().next();
     }
 }

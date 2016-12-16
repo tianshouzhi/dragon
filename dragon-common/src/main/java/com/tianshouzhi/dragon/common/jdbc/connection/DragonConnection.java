@@ -1,4 +1,6 @@
-package com.tianshouzhi.dragon.common.jdbc;
+package com.tianshouzhi.dragon.common.jdbc.connection;
+
+import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import java.sql.*;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class DragonConnection extends WrapperAdapter implements  Connection{
     protected List<Statement> statementList=new CopyOnWriteArrayList<Statement>();
-    protected String userName;
+    protected String username;
     protected String password;
     protected boolean isClosed = false;
     protected boolean autoCommit = true;//是否自动提交
@@ -21,6 +23,11 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
     protected int holdability= ResultSet.CLOSE_CURSORS_AT_COMMIT;//mysql只支持这个
     protected Properties clientInfo=new Properties();
     protected Map<String, Class<?>> typeMap;
+
+    public DragonConnection(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     protected void checkClosed() throws SQLException {
         if (isClosed) {

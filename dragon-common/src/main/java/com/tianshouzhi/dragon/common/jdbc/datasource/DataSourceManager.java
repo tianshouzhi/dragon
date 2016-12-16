@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.common.jdbc;
+package com.tianshouzhi.dragon.common.jdbc.datasource;
 
 //import com.sun.xml.internal.ws.util.StringUtils;
 
@@ -13,7 +13,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
-public class DataSourceManager {
+public abstract class DataSourceManager {
+
     protected ConcurrentMap<String,DataSource> indexDSMap =new ConcurrentHashMap<String, DataSource>();
     protected void add(String datasourceIndex,DataSource dataSource){
         if(StringUtils.isBlank(datasourceIndex)||dataSource==null){

@@ -1,4 +1,6 @@
-package com.tianshouzhi.dragon.common.jdbc;
+package com.tianshouzhi.dragon.common.jdbc.statement;
+
+import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,8 +8,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.CreateType.*;
-import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.ExecuteType.*;
+import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.CreateType.*;
+import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.ExecuteType.*;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/12.

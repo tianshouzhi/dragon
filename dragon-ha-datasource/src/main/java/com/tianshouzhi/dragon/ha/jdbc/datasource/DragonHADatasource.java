@@ -1,10 +1,10 @@
-package com.tianshouzhi.dragon.ha.jdbc;
+package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.jdbc.DataSourceAdapter;
-import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.ha.jdbc.connection.HAConnectionManager;
+import com.tianshouzhi.dragon.ha.jdbc.connection.HADataSourceManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
-public class DragonHADatasource extends DataSourceAdapter{
+public class DragonHADatasource extends DragonDataSource {
 
-    private HAConnectionManager HAConnectionManager;
+    private HADataSourceManager HADataSourceManager;
     private List<DatasourceWrapper> datasourceWrapperList=new CopyOnWriteArrayList<DatasourceWrapper>();
     private AtomicBoolean inited=new AtomicBoolean(false);
     public DragonHADatasource(List<DatasourceWrapper> datasourceWrapperList) {
@@ -26,23 +26,18 @@ public class DragonHADatasource extends DataSourceAdapter{
     }
 
     public void init(){
-        if(!inited.get()){
-            inited.set(true);
+        if(inited.compareAndSet(false,true)){
             if(datasourceWrapperList==null||datasourceWrapperList.size()==0){
                 throw new IllegalArgumentException("construct parameter 'datasourceWrapperList' can't be empty");
             }
-            HAConnectionManager =new HAConnectionManager(datasourceWrapperList);
+            HADataSourceManager =new HADataSourceManager(datasourceWrapperList);
         }
-    }
-    @Override
-    public DragonHAConnection getConnection() throws SQLException {
-        return getConnection(null,null);
     }
 
     @Override
     public DragonHAConnection getConnection(String username, String password) throws SQLException {
         init();
-        return new DragonHAConnection(username,password, HAConnectionManager);
+        return new DragonHAConnection(username,password, HADataSourceManager);
     }
 
     public void add(DatasourceWrapper...newDatasourceWrappers) throws SQLException{
@@ -51,20 +46,20 @@ public class DragonHADatasource extends DataSourceAdapter{
                 datasourceWrapperList.addAll(Arrays.asList(newDatasourceWrappers));
             }else{
                 datasourceWrapperList.addAll(Arrays.asList(newDatasourceWrappers));
-                HAConnectionManager.rebuild(datasourceWrapperList);
+                HADataSourceManager.rebuild(datasourceWrapperList);
             }
         }
     }
 
     public void remove(String...dbIndex){
         if(dbIndex==null||dbIndex.length==0){return;}
-        List<DBIndex> dbIndexList=new ArrayList<DBIndex>();
+        List<DataSourceIndex> dataSourceIndexList =new ArrayList<DataSourceIndex>();
         for (String index : dbIndex) {
-            dbIndexList.add(new DBIndex(index));
+            dataSourceIndexList.add(new DataSourceIndex(index));
         }
-        if(dbIndexList!=null&&dbIndexList.size()>0){
-            datasourceWrapperList.removeAll(dbIndexList);
-            HAConnectionManager.rebuild(datasourceWrapperList);
+        if(dataSourceIndexList !=null&& dataSourceIndexList.size()>0){
+            datasourceWrapperList.removeAll(dataSourceIndexList);
+            HADataSourceManager.rebuild(datasourceWrapperList);
         }
     }
     // 相同dbIndex的更新,.其他的忽略

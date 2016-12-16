@@ -1,12 +1,12 @@
-package com.tianshouzhi.dragon.ha.dbselector;
+package com.tianshouzhi.dragon.common.jdbc.datasource;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
-public class DBIndex {
+public class DataSourceIndex {
     private String indexStr;
 
-    public DBIndex(String indexStr) {
+    public DataSourceIndex(String indexStr) {
         this.indexStr = indexStr;
     }
 
@@ -28,7 +28,7 @@ public class DBIndex {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DBIndex that = (DBIndex) o;
+        DataSourceIndex that = (DataSourceIndex) o;
 
         return indexStr != null ? indexStr.equals(that.indexStr) : that.indexStr == null;
 
