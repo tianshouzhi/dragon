@@ -1,11 +1,10 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceManager;
-import com.tianshouzhi.dragon.ha.dbselector.DBSelector;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
-import com.tianshouzhi.dragon.ha.dbselector.ReadDBSelector;
-import com.tianshouzhi.dragon.ha.dbselector.WriteDBSelector;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DBSelector;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.ReadDBSelector;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.WriteDBSelector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
-public class HADataSourceManager extends DataSourceManager{
+public class HADataSourceManager{
     private static final Logger LOGGER= LoggerFactory.getLogger(HADataSourceManager.class);
     private Map<DataSourceIndex, DatasourceWrapper> indexDSMap = new ConcurrentHashMap<DataSourceIndex, DatasourceWrapper>();
     private BlockingQueue<DatasourceWrapper> invalidQueue = new LinkedBlockingDeque<DatasourceWrapper>();
@@ -71,7 +70,7 @@ public class HADataSourceManager extends DataSourceManager{
         if (datasourceWrapper == null) {
             throw new IllegalArgumentException("not found datasouce with dataSourceIndex:" + dataSourceIndex.getIndexStr());
         }
-        DataSource realDataSource = datasourceWrapper.getRealDataSource();
+        DataSource realDataSource = datasourceWrapper.getPhysicalDataSource();
         Connection connection=null;
 
         if(StringUtils.isAnyBlank(username,password))
@@ -102,7 +101,7 @@ public class HADataSourceManager extends DataSourceManager{
                 try {
                     DatasourceWrapper invalid = invalidQueue.take();
                     while(true){
-                        DataSource realDataSource = (DataSource) invalid.getRealDataSource();
+                        DataSource realDataSource = (DataSource) invalid.getPhysicalDataSource();
                         try {
                             Connection connection = realDataSource.getConnection();
                             if(connection.isValid(3000)){

@@ -22,7 +22,7 @@ public class HintTest extends BaseTest{
             String tag_name = resultSet.getString("name");
             System.out.println("id:"+id+",name:"+tag_name);
         }
-        preparedStatement = connection.prepareStatement("/*DRAGON_HA ( DBINDEXES = dragon_ha_master )*/ SELECT * FROM user ");
+        preparedStatement = connection.prepareStatement("/*DRAGON_HA ( PHYSICAL_DS_INDEXES = dragon_ha_master )*/ SELECT * FROM user ");
 
         resultSet = preparedStatement.executeQuery();
         while(resultSet.next()){

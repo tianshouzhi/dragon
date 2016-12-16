@@ -40,7 +40,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
     @Test
     public void testQuery() throws SQLException {
         DragonHAConnection connection = this.connection;
-        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
+        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         ResultSet resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -52,7 +52,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
     @Test
     public void mixTest() throws SQLException {
         DragonHAConnection connection = this.connection;
-        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
+        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         ResultSet resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -66,7 +66,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         int i = preparedStatement.executeUpdate();
         Assert.assertEquals("insert success",i,1);
 
-        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_master)*/SELECT * from USER");
+        preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =dragon_ha_master)*/SELECT * from USER");
         preparedStatement.executeQuery();
         resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){
@@ -79,7 +79,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         preparedStatement.setString(1,"wanghanao");
         preparedStatement.executeUpdate();
 
-        preparedStatement = connection.prepareStatement("/*DRAGON_HA( DBINDEXES =dragon_ha_slave1)*/SELECT * from USER");
+        preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =dragon_ha_slave1)*/SELECT * from USER");
         preparedStatement.executeQuery();
         resultSet = preparedStatement.getResultSet();
         while (resultSet.next()){

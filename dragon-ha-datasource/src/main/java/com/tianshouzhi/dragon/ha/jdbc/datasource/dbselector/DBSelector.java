@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.dbselector;
+package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 

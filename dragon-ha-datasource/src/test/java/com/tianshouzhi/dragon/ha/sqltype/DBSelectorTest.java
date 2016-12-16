@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.sqltype;
 
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class DBSelectorTest extends BaseTest{
         int i=0;
         while(i<3000){
             try{
-                DragonHAConnection connection = dragonHADatasource.getConnection();
+                DragonHAConnection connection = (DragonHAConnection) dragonHADatasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
                 ResultSet resultSet = preparedStatement.executeQuery();
                 i++;

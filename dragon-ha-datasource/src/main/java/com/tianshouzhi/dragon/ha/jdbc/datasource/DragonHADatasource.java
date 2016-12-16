@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.sql.SQLException;

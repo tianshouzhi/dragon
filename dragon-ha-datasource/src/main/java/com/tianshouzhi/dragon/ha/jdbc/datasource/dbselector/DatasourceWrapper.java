@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.dbselector;
+package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.exception.MySqlExceptionSorter;
@@ -15,18 +15,18 @@ public class DatasourceWrapper {
     private DataSourceIndex dataSourceIndex;
     private int readWeight=10;
     private int writeWeight=10;
-    private DataSource realDataSource;
+    private DataSource physicalDataSource;
     private boolean isReadOnly;
     private ExceptionSorter exceptionSorter=new MySqlExceptionSorter();
-    public DatasourceWrapper(String dataSourceIndex, DataSource realDataSource) {
-        this(dataSourceIndex,10,10,realDataSource);
+    public DatasourceWrapper(String dataSourceIndex, DataSource physicalDataSource) {
+        this(dataSourceIndex,10,10, physicalDataSource);
     }
-    public DatasourceWrapper(String dataSourceIndex, int readWeight, int writeWeight, DataSource realDataSource) {
-        check(dataSourceIndex,readWeight,writeWeight,realDataSource);
+    public DatasourceWrapper(String dataSourceIndex, int readWeight, int writeWeight, DataSource physicalDataSource) {
+        check(dataSourceIndex,readWeight,writeWeight, physicalDataSource);
         this.dataSourceIndex = new DataSourceIndex(dataSourceIndex);
         this.readWeight = readWeight;
         this.writeWeight = writeWeight;
-        this.realDataSource = realDataSource;
+        this.physicalDataSource = physicalDataSource;
         this.isReadOnly=readWeight>0&&writeWeight==0;
     }
 
@@ -38,7 +38,7 @@ public class DatasourceWrapper {
             throw new IllegalArgumentException("either 'readWeight' or 'writeWeight' can't less than zero,and can't be zero at the same time,current readWeight:"+readWeight+",current writeWeight:"+writeWeight);
         }
         if(realDataSource==null){
-            throw new IllegalArgumentException("parameter 'realDataSource' can't be null");
+            throw new IllegalArgumentException("parameter 'physicalDataSource' can't be null");
         }
     }
 
@@ -50,8 +50,8 @@ public class DatasourceWrapper {
         return writeWeight;
     }
 
-    public DataSource getRealDataSource() {
-        return realDataSource;
+    public DataSource getPhysicalDataSource() {
+        return physicalDataSource;
     }
     public DataSourceIndex getDataSourceIndex() {
         return dataSourceIndex;
@@ -66,7 +66,7 @@ public class DatasourceWrapper {
                 "dataSourceIndex=" + dataSourceIndex +
                 ", readWeight=" + readWeight +
                 ", writeWeight=" + writeWeight +
-                ", realDataSource=" + realDataSource.getClass().getName() +
+                ", physicalDataSource=" + physicalDataSource.getClass().getName() +
                 '}';
     }
 

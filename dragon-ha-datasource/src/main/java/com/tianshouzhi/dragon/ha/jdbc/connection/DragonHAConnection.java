@@ -4,7 +4,7 @@ import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;

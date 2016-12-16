@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.dbselector;
+package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public abstract class AbstractDBSelector implements DBSelector {
             DataSourceIndex dataSourceIndex = datasourceWrapper.getDataSourceIndex();
             Integer readWeight = datasourceWrapper.getReadWeight();
             Integer writeWeight = datasourceWrapper.getWriteWeight();
-            CommonDataSource realDataSource = datasourceWrapper.getRealDataSource();
+            CommonDataSource realDataSource = datasourceWrapper.getPhysicalDataSource();
             WeightRange caculateRange=null;
             for (Map.Entry<WeightRange, DataSourceIndex> weightRangeDBIndexEntry : rangeDBIndexMap.entrySet()) {
                 DataSourceIndex value = weightRangeDBIndexEntry.getValue();

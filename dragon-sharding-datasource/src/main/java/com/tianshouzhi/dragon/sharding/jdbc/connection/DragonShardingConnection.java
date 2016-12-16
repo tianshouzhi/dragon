@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.sharding.jdbc.connection;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
+import com.tianshouzhi.dragon.sharding.jdbc.datasource.ShardingDataSourceManager;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 
 import java.sql.*;
@@ -11,9 +12,9 @@ import java.util.Properties;
  */
 public class DragonShardingConnection extends DragonConnection {
 
-    private ShardingConnManager dragonShardingConnManager;
+    private ShardingDataSourceManager dragonShardingConnManager;
 
-    public DragonShardingConnection(String username, String password, ShardingConnManager dragonShardingConnManager) throws SQLException {
+    public DragonShardingConnection(String username, String password, ShardingDataSourceManager dragonShardingConnManager) throws SQLException {
         super(username, password);
         if(dragonShardingConnManager ==null){
             throw new SQLException("parameter 'dragonConnectionManager' can't be null");

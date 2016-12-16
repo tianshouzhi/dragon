@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.ha.sqltype;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mysql.jdbc.Driver;
-import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.After;
