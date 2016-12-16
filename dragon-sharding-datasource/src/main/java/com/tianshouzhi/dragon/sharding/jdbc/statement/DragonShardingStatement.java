@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.jdbc.statement;
 
-import com.tianshouzhi.dragon.common.jdbc.DragonStatement;
-import com.tianshouzhi.dragon.sharding.jdbc.DragonShardingConnection;
+import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
 
 import java.sql.SQLException;
 import java.sql.SQLWarning;

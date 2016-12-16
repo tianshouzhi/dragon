@@ -4,7 +4,6 @@ import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.ha.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.ha.jdbc.connection.HADataSourceManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DragonHADatasource extends DragonDataSource {
 
-    private HADataSourceManager HADataSourceManager;
+    private com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager HADataSourceManager;
     private List<DatasourceWrapper> datasourceWrapperList=new CopyOnWriteArrayList<DatasourceWrapper>();
     private AtomicBoolean inited=new AtomicBoolean(false);
     public DragonHADatasource(List<DatasourceWrapper> datasourceWrapperList) {
@@ -51,10 +50,10 @@ public class DragonHADatasource extends DragonDataSource {
         }
     }
 
-    public void remove(String...dbIndex){
-        if(dbIndex==null||dbIndex.length==0){return;}
+    public void remove(String...dataSourceIndexes){
+        if(dataSourceIndexes==null||dataSourceIndexes.length==0){return;}
         List<DataSourceIndex> dataSourceIndexList =new ArrayList<DataSourceIndex>();
-        for (String index : dbIndex) {
+        for (String index : dataSourceIndexes) {
             dataSourceIndexList.add(new DataSourceIndex(index));
         }
         if(dataSourceIndexList !=null&& dataSourceIndexList.size()>0){

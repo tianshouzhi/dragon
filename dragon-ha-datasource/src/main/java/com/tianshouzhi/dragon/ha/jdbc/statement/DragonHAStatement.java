@@ -2,8 +2,8 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
-import com.tianshouzhi.dragon.common.jdbc.DragonStatement;
-import com.tianshouzhi.dragon.ha.dbselector.DBIndex;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
+import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.tianshouzhi.dragon.common.jdbc.DragonStatement.ExecuteType.EXECUTE_BATCH;
+import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.ExecuteType.EXECUTE_BATCH;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
@@ -48,7 +48,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
         int errorCount = 0;
         boolean isResultSet = false;
         int maxRetryTimes = 3;
-        Set<DBIndex> excludes = null;
+        Set<DataSourceIndex> excludes = null;
         for (int i = 0; i < maxRetryTimes; i++) {
             Connection realConnection=null;
             try {
@@ -63,11 +63,11 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 return isResultSet; //正常执行完成，跳出循环，不进行重试
             } catch (SQLException e) {
                 //出现异常
-                DBIndex dbIndex = dragonHAConnection.getCurrentDBIndex();
+                DataSourceIndex dataSourceIndex = dragonHAConnection.getCurrentDBIndex();
                 ExceptionSorter exceptionSorter=dragonHAConnection.getExceptionSorter();
                 if (exceptionSorter.isExceptionFatal(e)) {//如果是致命异常
                     LOGGER.error("fatal exception,sqlstate:{},error code:{},sql:{}", e.getSQLState(), e.getErrorCode(), sql);
-                    dragonHAConnection.getHAConnectionManager().invalid(dbIndex);
+                    dragonHAConnection.getHAConnectionManager().invalid(dataSourceIndex);
                     throw e;
                 } else {
                     //不是致命异常,没有开启事务，其sql是查询，重试
@@ -77,9 +77,9 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                             throw new SQLException("query failed after try 3 times,sql is:" + sql, e);
                         }
                         if(excludes==null){
-                            excludes=new HashSet<DBIndex>();
+                            excludes=new HashSet<DataSourceIndex>();
                         }
-                        excludes.add(dbIndex);
+                        excludes.add(dataSourceIndex);
                         //选择一个新的数据源，创建connection，并且重新创建statement
                         Connection newConnection=dragonHAConnection.buildNewReadConnectionExclue(excludes);
                         if(newConnection==null){
@@ -204,7 +204,6 @@ public class DragonHAStatement extends DragonStatement implements Statement {
     }
 
     //============================批处理操作，JDBC规范规定只能是更新语句，因此总是获取写connection==========
-
     @Override
     public void clearBatch() throws SQLException {
         checkClosed();

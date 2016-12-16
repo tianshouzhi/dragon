@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler;
 
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.sharding.jdbc.DragonShardingConnection;
-import com.tianshouzhi.dragon.sharding.jdbc.DragonShardingStatement;
+import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
+import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

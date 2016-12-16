@@ -50,7 +50,7 @@ public class HintTest extends BaseTest{
         preparedStatement.close();
         connection.close();
         connection=null;
-        DragonHAConnection newConn = dragonHADatasource.getConnection();
+        DragonHAConnection newConn = (DragonHAConnection) dragonHADatasource.getConnection();
          preparedStatement = newConn.prepareStatement("SELECT * FROM user ");
          resultSet = preparedStatement.executeQuery();
         while(resultSet.next()){

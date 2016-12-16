@@ -9,13 +9,13 @@ public class TableRouteManager {
     /**
      * key为逻辑表名，value是对应的逻辑表对象
      */
-    private Map<String,LogicTable> logicTableMap;
+    private Map<String,TableRoute> logicTableMap;
 
-    public TableRouteManager(Map<String, LogicTable> logicTableMap) {
+    public TableRouteManager(Map<String, TableRoute> logicTableMap) {
         this.logicTableMap = logicTableMap;
     }
 
-    public LogicTable getLogicTable(String logicTableName){
+    public TableRoute getLogicTable(String logicTableName){
         return logicTableMap.get(logicTableName);
     }
 

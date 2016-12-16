@@ -1,0 +1,4 @@
+com\tianshouzhi\dragon\sqlparser\parser\dialect\MysqlSQLStatementParser.class
+com\tianshouzhi\dragon\sqlparser\ast\SQLStatement.class
+com\tianshouzhi\dragon\sqlparser\parser\SQLStatementParser.class
+com\tianshouzhi\dragon\sqlparser\SqlParserUtil.class

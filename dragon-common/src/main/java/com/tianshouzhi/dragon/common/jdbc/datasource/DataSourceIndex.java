@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.common.jdbc.datasource;
 
 /**
- * Created by TIANSHOUZHI336 on 2016/12/2.
+ * 此类表示数据源的编号，本人的开发习惯是，见名知意，如果直接用String的话，不知道含义是什么
  */
 public class DataSourceIndex {
     private String indexStr;
@@ -12,10 +12,6 @@ public class DataSourceIndex {
 
     public String getIndexStr() {
         return indexStr;
-    }
-
-    public void setIndexStr(String indexStr) {
-        this.indexStr = indexStr;
     }
 
     @Override

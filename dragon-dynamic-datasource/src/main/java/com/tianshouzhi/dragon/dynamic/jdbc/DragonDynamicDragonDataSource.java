@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.dynamic.jdbc;
 
-import com.tianshouzhi.dragon.common.jdbc.DragonDataSource;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;

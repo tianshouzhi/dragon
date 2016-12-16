@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.dbselector;
 
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ public abstract class AbstractDBSelector implements DBSelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDBSelector.class);
 
-    protected Map<WeightRange, DBIndex> rangeDBIndexMap = new ConcurrentHashMap<WeightRange, DBIndex>();
+    protected Map<WeightRange, DataSourceIndex> rangeDBIndexMap = new ConcurrentHashMap<WeightRange, DataSourceIndex>();
     protected int totalWeight = 0;
 
     public AbstractDBSelector(List<DatasourceWrapper> datasourceWrapperList) {
@@ -32,26 +33,26 @@ public abstract class AbstractDBSelector implements DBSelector {
         }
     }
 
-    private String buildLog(Map<WeightRange, DBIndex> rangeDBIndexMap, List<DatasourceWrapper> filterResult) {
+    private String buildLog(Map<WeightRange, DataSourceIndex> rangeDBIndexMap, List<DatasourceWrapper> filterResult) {
         StringBuilder sb=new StringBuilder("\n");
         sb.append("managed datasource num:"+filterResult.size());
         sb.append(",total weight:"+totalWeight);
         sb.append("\n[\n");
         for (DatasourceWrapper datasourceWrapper : filterResult) {
-            DBIndex dbIndex = datasourceWrapper.getDbIndex();
+            DataSourceIndex dataSourceIndex = datasourceWrapper.getDataSourceIndex();
             Integer readWeight = datasourceWrapper.getReadWeight();
             Integer writeWeight = datasourceWrapper.getWriteWeight();
             CommonDataSource realDataSource = datasourceWrapper.getRealDataSource();
             WeightRange caculateRange=null;
-            for (Map.Entry<WeightRange, DBIndex> weightRangeDBIndexEntry : rangeDBIndexMap.entrySet()) {
-                DBIndex value = weightRangeDBIndexEntry.getValue();
-                if(value.equals(dbIndex)){
+            for (Map.Entry<WeightRange, DataSourceIndex> weightRangeDBIndexEntry : rangeDBIndexMap.entrySet()) {
+                DataSourceIndex value = weightRangeDBIndexEntry.getValue();
+                if(value.equals(dataSourceIndex)){
                     caculateRange=weightRangeDBIndexEntry.getKey();
                     break;
                 }
             }
             sb.append("{");
-            sb.append("dbIndex:"+dbIndex.getIndexStr()
+            sb.append("dataSourceIndex:"+ dataSourceIndex.getIndexStr()
                     +",readWeight:"+readWeight
                     +",writeWeight:"+writeWeight
                     +",type:" +realDataSource.getClass().getSimpleName()
@@ -70,7 +71,7 @@ public abstract class AbstractDBSelector implements DBSelector {
             int start = current;
             int end = current + getWeight(datasourceWrapper);
             WeightRange weightRange = new WeightRange(start, end);
-            rangeDBIndexMap.put(weightRange, datasourceWrapper.getDbIndex());
+            rangeDBIndexMap.put(weightRange, datasourceWrapper.getDataSourceIndex());
             current = end;
         }
     }
@@ -101,10 +102,10 @@ public abstract class AbstractDBSelector implements DBSelector {
     protected abstract int getWeight(DatasourceWrapper datasourceWrapper);
 
     @Override
-    public DBIndex select() {
+    public DataSourceIndex select() {
         int random = new Random().nextInt(totalWeight);
         Set<WeightRange> weightRanges = rangeDBIndexMap.keySet();
-        DBIndex result = null;
+        DataSourceIndex result = null;
         for (WeightRange weightRange : weightRanges) {
             if (random >= weightRange.start && random <weightRange.end) {
                 result = rangeDBIndexMap.get(weightRange);
@@ -113,7 +114,7 @@ public abstract class AbstractDBSelector implements DBSelector {
         return result;
     }
 
-    public Set<DBIndex> getManagedDBIndexes(){
-        return new HashSet<DBIndex>(rangeDBIndexMap.values());
+    public Set<DataSourceIndex> getManagedDBIndexes(){
+        return new HashSet<DataSourceIndex>(rangeDBIndexMap.values());
     }
 }

@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.sharding.rule;
 
-import com.tianshouzhi.dragon.sharding.ha.HADataSourceIndex;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,18 +8,18 @@ import java.util.Map;
  */
 public class TableRoute {
     /**
-     * 物理表名 与 HA数据源编号的对应关系
+     * 物理表名 与 HA数据源编号 的对应关系
      */
-    private Map<String,HADataSourceIndex> phsicalTableHAIndexMap;
+    private Map<String,String> phsicalTableHAIndexMap;
 
-    public TableRoute(Map<String, HADataSourceIndex> phsicalTableHAIndexMap) {
+    public TableRoute(Map<String, String> phsicalTableHAIndexMap) {
         this.phsicalTableHAIndexMap = phsicalTableHAIndexMap;
     }
-    public Map<String,HADataSourceIndex> get(String ... pyhicalTableNames){
-        Map<String,HADataSourceIndex> result=new HashMap<String, HADataSourceIndex>();
+    public Map<String,String> get(String ... pyhicalTableNames){
+        Map<String,String> result=new HashMap<String, String>();
         for (String pyhicalTableName : pyhicalTableNames) {
-            HADataSourceIndex haDataSourceIndex = phsicalTableHAIndexMap.get(pyhicalTableName);
-            result.put(pyhicalTableName,haDataSourceIndex);
+            String String = phsicalTableHAIndexMap.get(pyhicalTableName);
+            result.put(pyhicalTableName,String);
         }
         return result;
     }

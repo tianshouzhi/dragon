@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler;
 
-import com.tianshouzhi.dragon.common.jdbc.DragonStatement;
-import com.tianshouzhi.dragon.sharding.jdbc.DragonShardingStatement;
+import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 
 import java.util.List;
 

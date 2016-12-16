@@ -4,6 +4,8 @@ package com.tianshouzhi.dragon.common.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.util.*;
@@ -14,10 +16,10 @@ import java.util.concurrent.ConcurrentMap;
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public abstract class DataSourceManager {
-
-    protected ConcurrentMap<String,DataSource> indexDSMap =new ConcurrentHashMap<String, DataSource>();
-    protected void add(String datasourceIndex,DataSource dataSource){
-        if(StringUtils.isBlank(datasourceIndex)||dataSource==null){
+    private static final Logger LOGGER= LoggerFactory.getLogger(DataSourceManager.class);
+    protected ConcurrentMap<DataSourceIndex,DataSource> indexDSMap =new ConcurrentHashMap<DataSourceIndex, DataSource>();
+    protected void add(DataSourceIndex datasourceIndex,DataSource dataSource){
+        if(datasourceIndex ==null||dataSource==null){
             throw new IllegalArgumentException("paramter datasourceIndex and dataSource can't be null");
         }
        indexDSMap.put(datasourceIndex, dataSource);
@@ -26,14 +28,17 @@ public abstract class DataSourceManager {
         if(StringUtils.isBlank(datasourceIndex)){
            return;
         }
-        indexDSMap.remove(datasourceIndex);
+        DataSource remove = indexDSMap.remove(new DataSourceIndex(datasourceIndex));
+        if(remove==null){
+            LOGGER.warn("no datasource find by index:{},doesn't remove any datasource",datasourceIndex);
+        }
     }
 
     protected DataSource getDatasourceByTndex(String index) throws DragonException {
         if(StringUtils.isBlank(index)){
             throw new IllegalArgumentException("paramter 'index' can't be null");
         }
-        DataSource dataSource = indexDSMap.get(index);
+        DataSource dataSource = indexDSMap.get(new DataSourceIndex(index));
         if(dataSource==null){
             throw new DragonException("can't find dataSource with index: "+index);
         }
@@ -62,14 +67,19 @@ public abstract class DataSourceManager {
         return dataSources;
     }
 
+    /**
+     * @param indexes
+     * @return one of dataource which index is member of indexes array,if not found return null
+     * @throws DragonException
+     */
     protected DataSource getDatasourceExcludeTndexes(String...indexes) throws DragonException {
         DataSource dataSource=null;
-        Iterator<Map.Entry<String, DataSource>> iterator = indexDSMap.entrySet().iterator();
+        Iterator<Map.Entry<DataSourceIndex, DataSource>> iterator = indexDSMap.entrySet().iterator();
         while (dataSource!=null&&iterator.hasNext()){
-            Map.Entry<String, DataSource> next = iterator.next();
-            String key = next.getKey();
-            for (String index : indexes) {
-                if(key.equals(index)){
+            Map.Entry<DataSourceIndex, DataSource> next = iterator.next();
+            DataSourceIndex index = next.getKey();
+            for (String currentIndex : indexes) {
+                if(index.getIndexStr().equals(currentIndex)){
                     dataSource=next.getValue();
                     break;
                 }

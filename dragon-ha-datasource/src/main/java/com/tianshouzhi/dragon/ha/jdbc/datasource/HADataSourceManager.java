@@ -42,7 +42,7 @@ public class HADataSourceManager extends DataSourceManager{
             for (DatasourceWrapper datasourceWrapper : datasourceWrapperList) {
                 DataSourceIndex index = datasourceWrapper.getDataSourceIndex();
                 if (indexDSMap.containsKey(index)) {
-                    throw new RuntimeException("index must be unique,'" + index + "' duplicated");
+                    throw new RuntimeException("dataSourceIndex must be unique,'" + index + "' duplicated");
                 }
                 indexDSMap.put(index, datasourceWrapper);
             }
@@ -78,12 +78,10 @@ public class HADataSourceManager extends DataSourceManager{
             connection = realDataSource.getConnection();
         else
             connection = realDataSource.getConnection(username,password);//druid不支持这个方法
-
         if(!connection.isReadOnly()&&datasourceWrapper.isReadOnly()&&indexDSMap.get(dataSourceIndex).isReadOnly()){
             connection.setReadOnly(true);
         }
         return connection;
-
     }
 
     public Connection getConnectionByDbIndex(List<DataSourceIndex> hintDataSourceIndices, String username, String password) throws SQLException {
