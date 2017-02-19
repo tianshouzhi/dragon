@@ -24,11 +24,12 @@
     <orderEntry type="module-library">
       <library name="Maven: com.alibaba:tools:1.6.0">
         <CLASSES>
-          <root url="jar://D:/Java/jdk1.6.0_45/jre/../lib/tools.jar!/" />
+          <root url="jar://D:/Java/jdk1.8.0_60/jre/../lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
   </component>
 </module>

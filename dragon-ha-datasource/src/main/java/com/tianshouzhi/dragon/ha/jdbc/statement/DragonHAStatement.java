@@ -2,7 +2,6 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
@@ -48,7 +47,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
         int errorCount = 0;
         boolean isResultSet = false;
         int maxRetryTimes = 3;
-        Set<DataSourceIndex> excludes = null;
+        Set<String> excludes = null;
         for (int i = 0; i < maxRetryTimes; i++) {
             Connection realConnection=null;
             try {
@@ -63,7 +62,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 return isResultSet; //正常执行完成，跳出循环，不进行重试
             } catch (SQLException e) {
                 //出现异常
-                DataSourceIndex dataSourceIndex = dragonHAConnection.getCurrentDBIndex();
+                String dataSourceIndex = dragonHAConnection.getCurrentDBIndex();
                 ExceptionSorter exceptionSorter=dragonHAConnection.getExceptionSorter();
                 if (exceptionSorter.isExceptionFatal(e)) {//如果是致命异常
                     LOGGER.error("fatal exception,sqlstate:{},error code:{},sql:{}", e.getSQLState(), e.getErrorCode(), sql);
@@ -77,7 +76,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                             throw new SQLException("query failed after try 3 times,sql is:" + sql, e);
                         }
                         if(excludes==null){
-                            excludes=new HashSet<DataSourceIndex>();
+                            excludes=new HashSet<String>();
                         }
                         excludes.add(dataSourceIndex);
                         //选择一个新的数据源，创建connection，并且重新创建statement

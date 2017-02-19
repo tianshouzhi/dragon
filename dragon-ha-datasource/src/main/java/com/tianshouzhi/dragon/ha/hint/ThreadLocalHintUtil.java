@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.ha.hint;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,17 +7,17 @@ import java.util.List;
  * Created by TIANSHOUZHI336 on 2016/12/4.
  */
 public class ThreadLocalHintUtil {
-    private static final ThreadLocal< List<DataSourceIndex>> hint=new ThreadLocal< List<DataSourceIndex>>();
+    private static final ThreadLocal< List<String>> hint=new ThreadLocal< List<String>>();
     public static void setDBIndexes(String ... dbIndexes){
         if(dbIndexes!=null&&dbIndexes.length>0){
-            List<DataSourceIndex> dataSourceIndexList =new ArrayList<DataSourceIndex>();
+            List<String> dataSourceIndexList =new ArrayList<String>();
             for (String dbIndex : dbIndexes) {
-                dataSourceIndexList.add(new DataSourceIndex(dbIndex));
+                dataSourceIndexList.add(dbIndex);
             }
             hint.set(dataSourceIndexList);
         }
     }
-    public static List<DataSourceIndex> getHintDataSourceIndexes(){
+    public static List<String> getHintDataSourceIndexes(){
         return hint.get();
     }
 

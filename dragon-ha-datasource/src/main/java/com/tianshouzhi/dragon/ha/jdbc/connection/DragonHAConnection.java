@@ -3,11 +3,10 @@ package com.tianshouzhi.dragon.ha.jdbc.connection;
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
@@ -35,7 +34,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
      */
     protected Connection realConnection;
     protected HADataSourceManager hADataSourceManager;
-    private DataSourceIndex dataSourceIndex;//当前连接是从哪一个数据源中获取的
+    private String dataSourceIndex;//当前连接是从哪一个数据源中获取的
 
     public DragonHAConnection(String username, String password, HADataSourceManager hADataSourceManager) throws SQLException {
         super(username, password);
@@ -168,7 +167,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         }
         //如果没有开启事务
         //1、判断有没有ThreadLocal hint
-        List<DataSourceIndex> hintDataSourceIndices = ThreadLocalHintUtil.getHintDataSourceIndexes();
+        List<String> hintDataSourceIndices = ThreadLocalHintUtil.getHintDataSourceIndexes();
         if(hintDataSourceIndices !=null&& hintDataSourceIndices.size()>0){
             LOGGER.debug("get connection by thread local hint,sql:{}",sql);
             buildNewConnectionByHintIfNeed(hintDataSourceIndices);
@@ -194,7 +193,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
 
     }
 
-    private void buildNewConnectionByHintIfNeed(List<DataSourceIndex> dataSourceIndices) throws SQLException {
+    private void buildNewConnectionByHintIfNeed(List<String> dataSourceIndices) throws SQLException {
         if(dataSourceIndices.contains(dataSourceIndex)){
             LOGGER.debug("current connection's dataSourceIndex is {}, return current", dataSourceIndex);
             setConnectionParams(realConnection);
@@ -221,11 +220,11 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         LOGGER.debug("current connection is null,get a new read connection from:{}", dataSourceIndex);
         return realConnection;
     }
-    public Connection buildNewReadConnectionExclue(Set<DataSourceIndex> excludes) throws SQLException {
+    public Connection buildNewReadConnectionExclue(Set<String> excludes) throws SQLException {
         if(realConnection!=null){
             realConnection.close();
         }
-        DataSourceIndex dataSourceIndex = hADataSourceManager.selectReadDBIndexExclude(excludes);
+        String dataSourceIndex = hADataSourceManager.selectReadDBIndexExclude(excludes);
         if(dataSourceIndex ==null){
             return null;
         }else{
@@ -444,7 +443,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         return realConnection.createSQLXML();
     }
 
-    public DataSourceIndex getCurrentDBIndex() {
+    public String getCurrentDBIndex() {
         return dataSourceIndex;
     }
 
@@ -465,7 +464,7 @@ public class DragonHAConnection extends DragonConnection implements Connection{
         return exceptionSorter;
     }
 
-    public DataSourceIndex getDataSourceIndex() {
+    public String getDataSourceIndex() {
         return dataSourceIndex;
     }
 }

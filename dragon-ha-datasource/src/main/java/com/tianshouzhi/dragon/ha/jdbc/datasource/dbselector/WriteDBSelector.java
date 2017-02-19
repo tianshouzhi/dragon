@@ -1,13 +1,13 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public class WriteDBSelector extends AbstractDBSelector{
-    public WriteDBSelector(List<DatasourceWrapper> datasourceWrapperList) {
-        super(datasourceWrapperList);
+    public WriteDBSelector(Map<String,DatasourceWrapper> indexDsMap) {
+        super(indexDsMap);
     }
 
     @Override

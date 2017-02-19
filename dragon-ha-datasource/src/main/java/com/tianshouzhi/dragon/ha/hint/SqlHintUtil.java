@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.ha.hint;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,7 +24,7 @@ public class SqlHintUtil {
             SQL_HINT_PREFIX_GROUP+SQL_HINT_DBIDEX_GROUP +SQL_DBIDEX_GROUP+SQL_HINT_POSTFIX_GROUP+SQL_GROUP,
             Pattern.CASE_INSENSITIVE);
 
-    public static List<DataSourceIndex> getHintDataSourceIndex(String sql){
+    public static List<String> getHintDataSourceIndex(String sql){
         if(sql==null){
             return null;
         }
@@ -37,9 +35,9 @@ public class SqlHintUtil {
         }
         String dbIndex = matcher.group(3);//第0个group是整体，因此第3个
         String[] split = dbIndex.split(",");
-        List<DataSourceIndex> dataSourceIndexList =new ArrayList<DataSourceIndex>();{
+        List<String> dataSourceIndexList =new ArrayList<String>();{
             for (String s : split) {
-                dataSourceIndexList.add(new DataSourceIndex(s));
+                dataSourceIndexList.add(s);
             }
         }
         return dataSourceIndexList;

@@ -1,6 +1,5 @@
 package com.tianshouzhi.dragon.ha.sqltype;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ public class DBSelectorTest extends BaseTest{
 
     @Test
     public void selectProbilityTest() {
-        Map<DataSourceIndex,AtomicInteger> map=new HashMap<DataSourceIndex, AtomicInteger>();
+        Map<String,AtomicInteger> map=new HashMap<String, AtomicInteger>();
         int i=0;
         while(i<3000){
             try{
@@ -28,7 +27,7 @@ public class DBSelectorTest extends BaseTest{
                 while(resultSet.next()){
                     int id = resultSet.getInt("id");
                     String name = resultSet.getString("name");
-                    DataSourceIndex dataSourceIndex = connection.getDataSourceIndex();
+                    String dataSourceIndex = connection.getDataSourceIndex();
                     AtomicInteger atomicInteger = map.get(dataSourceIndex);
                     if(atomicInteger==null){
                         atomicInteger=new AtomicInteger();

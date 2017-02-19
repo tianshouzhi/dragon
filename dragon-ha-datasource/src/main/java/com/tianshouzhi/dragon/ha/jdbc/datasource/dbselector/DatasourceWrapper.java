@@ -2,7 +2,6 @@ package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.exception.MySqlExceptionSorter;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.CommonDataSource;
@@ -12,7 +11,6 @@ import javax.sql.DataSource;
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public class DatasourceWrapper {
-    private DataSourceIndex dataSourceIndex;
     private int readWeight=10;
     private int writeWeight=10;
     private DataSource physicalDataSource;
@@ -23,7 +21,6 @@ public class DatasourceWrapper {
     }
     public DatasourceWrapper(String dataSourceIndex, int readWeight, int writeWeight, DataSource physicalDataSource) {
         check(dataSourceIndex,readWeight,writeWeight, physicalDataSource);
-        this.dataSourceIndex = new DataSourceIndex(dataSourceIndex);
         this.readWeight = readWeight;
         this.writeWeight = writeWeight;
         this.physicalDataSource = physicalDataSource;
@@ -53,9 +50,6 @@ public class DatasourceWrapper {
     public DataSource getPhysicalDataSource() {
         return physicalDataSource;
     }
-    public DataSourceIndex getDataSourceIndex() {
-        return dataSourceIndex;
-    }
 
     public boolean isReadOnly(){
         return isReadOnly;
@@ -63,7 +57,6 @@ public class DatasourceWrapper {
     @Override
     public String toString() {
         return "DatasourceWrapper{" +
-                "dataSourceIndex=" + dataSourceIndex +
                 ", readWeight=" + readWeight +
                 ", writeWeight=" + writeWeight +
                 ", physicalDataSource=" + physicalDataSource.getClass().getName() +
@@ -74,19 +67,4 @@ public class DatasourceWrapper {
         return exceptionSorter;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DatasourceWrapper that = (DatasourceWrapper) o;
-
-        return dataSourceIndex != null ? dataSourceIndex.equals(that.dataSourceIndex) : that.dataSourceIndex == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return dataSourceIndex != null ? dataSourceIndex.hashCode() : 0;
-    }
 }
