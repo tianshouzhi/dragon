@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceIndex;
-
 import java.util.Map;
 
 /**
@@ -11,13 +9,13 @@ public class LogicTable {
     /*
      *物理表的表名 与 对应的DragonHADatasoce数据源之间的映射关系
      */
-    private Map<String,DataSourceIndex> physicalTableHAIndexMap;
+    private Map<String,String> physicalTableHAIndexMap;
 
-    public LogicTable(Map<String, DataSourceIndex> physicalTableHAIndexMap) {
+    public LogicTable(Map<String, String> physicalTableHAIndexMap) {
         this.physicalTableHAIndexMap = physicalTableHAIndexMap;
     }
 
-    public Map<String, DataSourceIndex> getPhysicalTableHAIndexMap() {
+    public Map<String, String> getPhysicalTableHAIndexMap() {
         return physicalTableHAIndexMap;
     }
 }
