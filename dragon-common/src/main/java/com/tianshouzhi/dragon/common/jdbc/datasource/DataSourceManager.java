@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class DataSourceManager {
     private static final Logger LOGGER= LoggerFactory.getLogger(DataSourceManager.class);
-    protected ConcurrentMap<DataSourceIndex,DataSource> indexDSMap =new ConcurrentHashMap<DataSourceIndex, DataSource>();
-    protected void add(DataSourceIndex datasourceIndex,DataSource dataSource){
+    protected ConcurrentMap<String,DataSource> indexDSMap =new ConcurrentHashMap<String, DataSource>();
+    protected void add(String datasourceIndex,DataSource dataSource){
         if(datasourceIndex ==null||dataSource==null){
             throw new IllegalArgumentException("paramter datasourceIndex and dataSource can't be null");
         }
@@ -28,7 +28,7 @@ public abstract class DataSourceManager {
         if(StringUtils.isBlank(datasourceIndex)){
            return;
         }
-        DataSource remove = indexDSMap.remove(new DataSourceIndex(datasourceIndex));
+        DataSource remove = indexDSMap.remove(datasourceIndex);
         if(remove==null){
             LOGGER.warn("no datasource find by index:{},doesn't remove any datasource",datasourceIndex);
         }
@@ -38,7 +38,7 @@ public abstract class DataSourceManager {
         if(StringUtils.isBlank(index)){
             throw new IllegalArgumentException("paramter 'index' can't be null");
         }
-        DataSource dataSource = indexDSMap.get(new DataSourceIndex(index));
+        DataSource dataSource = indexDSMap.get(index);
         if(dataSource==null){
             throw new DragonException("can't find dataSource with index: "+index);
         }
@@ -74,12 +74,12 @@ public abstract class DataSourceManager {
      */
     protected DataSource getDatasourceExcludeTndexes(String...indexes) throws DragonException {
         DataSource dataSource=null;
-        Iterator<Map.Entry<DataSourceIndex, DataSource>> iterator = indexDSMap.entrySet().iterator();
+        Iterator<Map.Entry<String, DataSource>> iterator = indexDSMap.entrySet().iterator();
         while (dataSource!=null&&iterator.hasNext()){
-            Map.Entry<DataSourceIndex, DataSource> next = iterator.next();
-            DataSourceIndex index = next.getKey();
+            Map.Entry<String, DataSource> next = iterator.next();
+            String index = next.getKey();
             for (String currentIndex : indexes) {
-                if(index.getIndexStr().equals(currentIndex)){
+                if(index.equals(currentIndex)){
                     dataSource=next.getValue();
                     break;
                 }

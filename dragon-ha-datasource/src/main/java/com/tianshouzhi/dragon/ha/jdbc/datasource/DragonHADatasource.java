@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
@@ -16,17 +15,15 @@ public class DragonHADatasource extends DragonDataSource {
 
     private HADataSourceManager haDataSourceManager;
 //    private List<DatasourceWrapper> datasourceWrapperList=new CopyOnWriteArrayList<DatasourceWrapper>();
-    private AtomicBoolean inited=new AtomicBoolean(false);
-
     public DragonHADatasource() {
         haDataSourceManager=new HADataSourceManager();
     }
 
-    public void init(){
-        if(inited.compareAndSet(false,true)){
-            haDataSourceManager.rebuild();
-        }
+    @Override
+    protected void doInit() {
+        haDataSourceManager.rebuild();
     }
+
 
     @Override
     public DragonHAConnection getConnection(String username, String password) throws SQLException {
@@ -41,6 +38,7 @@ public class DragonHADatasource extends DragonDataSource {
      * @throws SQLException
      */
     public void put(String dsIndex,DatasourceWrapper datasourceWrapper) throws SQLException{
+        init();
         if(StringUtils.isBlank(dsIndex)||datasourceWrapper==null){
             throw new SQLException("'dsIndex' and 'datasourceWrapper' can't be null or empty");
         }
@@ -48,10 +46,12 @@ public class DragonHADatasource extends DragonDataSource {
     }
 
     public void remove(String dsIndex) {
+        init();
           getIndexDsMap().remove(dsIndex);
     }
 
     public Map<String,DatasourceWrapper> getIndexDsMap() {
+        init();
         return haDataSourceManager.getIndexDSMap();
     }
     /**
@@ -59,9 +59,11 @@ public class DragonHADatasource extends DragonDataSource {
      * @param dsIndexMap
      */
     public void setIndexDsMap(Map<String,DatasourceWrapper> dsIndexMap) throws SQLException{
+        init();
         if(dsIndexMap==null||dsIndexMap.size()==0){
             throw new SQLException("'dsIndexMap' can't be null or empty");
         }
         haDataSourceManager.setIndexDSMap(dsIndexMap);
     }
+
 }

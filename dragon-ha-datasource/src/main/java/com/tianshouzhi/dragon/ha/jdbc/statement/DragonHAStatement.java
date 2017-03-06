@@ -4,7 +4,6 @@ import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -14,7 +14,7 @@ public class DragonException extends SQLException{
         super(e);
     }
 
-    public DragonException(String message, SQLException e) {
+    public DragonException(String message, Exception e) {
         super(message,e);
     }
 }

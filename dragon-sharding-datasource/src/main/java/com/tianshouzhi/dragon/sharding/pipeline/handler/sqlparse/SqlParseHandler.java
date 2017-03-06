@@ -1,9 +1,12 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlparse;
 
-import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.parser.SQLParserUtils;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.alibaba.druid.util.JdbcConstants;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.Handler;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.HandlerContext;
+import com.tianshouzhi.dragon.sharding.pipeline.Handler;
+import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 
 import java.util.List;
 
@@ -13,20 +16,16 @@ import java.util.List;
 public class SqlParseHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) {
-     DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
-        DragonStatement.ExecuteType executeType = dragonShardingStatement.getExecuteType();
-        if(executeType== DragonStatement.ExecuteType.EXECUTE_BATCH){//批处理
-            List<Object> batchExecuteInfoList = dragonShardingStatement.getBatchExecuteInfoList();
-            if(!batchExecuteInfoList.isEmpty()){
-                for (Object o : batchExecuteInfoList) {
-                    if(o instanceof String){
-
-                    }
-                }
-            }
-        }else{//非批处理
+        if(context.getSqlRouteMap()==null){//说明没有hint
+            DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
             String sql = dragonShardingStatement.getSql();
-
+            SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);
+            List<SQLStatement> sqlStatements = sqlStatementParser.parseStatementList();
+            if(sqlStatements.size()==1){
+                context.setParsedSqlStatement(sqlStatements.get(0));
+            }else{
+                throw new RuntimeException("only support one sql!!");
+            }
         }
     }
 }

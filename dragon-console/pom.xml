@@ -11,5 +11,22 @@
 
     <artifactId>dragon-console</artifactId>
 
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId> org.springframework.boot </groupId >
+                <artifactId> spring-boot-dependencies </artifactId >
+                <version> 1.4.1.RELEASE </version >
+                <type> pom </type >
+                <scope> import </scope >
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
 </project>

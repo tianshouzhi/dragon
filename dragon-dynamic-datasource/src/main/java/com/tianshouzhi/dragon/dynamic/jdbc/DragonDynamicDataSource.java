@@ -8,11 +8,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * 动态数据源只需要实现一个DataSource接口即可，Connection、Statement等接口不用实现
+ * 只需要实现一个DataSource接口即可，Connection、Statement等接口不用实现
  */
 public class DragonDynamicDataSource extends DragonDataSource {
 
-    private DataSource realDataSource;
+    private Class<DataSource> dataSourceClass;
+    private DataSource wrapperedDataSource;
     /**
      * 远程配置地址
      */
@@ -20,35 +21,62 @@ public class DragonDynamicDataSource extends DragonDataSource {
     /**
      * 远程配置key
      */
-    private String key;
-
-    public DragonDynamicDataSource(String remoteConfAddr, String key) {
-        this.remoteConfAddr = remoteConfAddr;
-        this.key = key;
-    }
+    private String remoteKey;
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return realDataSource.getConnection(username,password);
+        return wrapperedDataSource.getConnection(username,password);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return realDataSource.getLoginTimeout();
+        return wrapperedDataSource.getLoginTimeout();
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-         realDataSource.setLoginTimeout(seconds);
+         wrapperedDataSource.setLoginTimeout(seconds);
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        realDataSource.setLogWriter(out);
+        wrapperedDataSource.setLogWriter(out);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return realDataSource.getLogWriter();
+        return wrapperedDataSource.getLogWriter();
+    }
+
+    public DataSource getWrapperedDataSource() {
+        return wrapperedDataSource;
+    }
+
+    public void setWrapperedDataSource(DataSource wrapperedDataSource) {
+        this.wrapperedDataSource = wrapperedDataSource;
+    }
+
+    public String getRemoteConfAddr() {
+        return remoteConfAddr;
+    }
+
+    public void setRemoteConfAddr(String remoteConfAddr) {
+        this.remoteConfAddr = remoteConfAddr;
+    }
+
+    public String getRemoteKey() {
+        return remoteKey;
+    }
+
+    public void setRemoteKey(String remoteKey) {
+        this.remoteKey = remoteKey;
+    }
+
+    public Class<DataSource> getDataSourceClass() {
+        return dataSourceClass;
+    }
+
+    public void setDataSourceClass(Class<DataSource> dataSourceClass) {
+        this.dataSourceClass = dataSourceClass;
     }
 }

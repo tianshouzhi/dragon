@@ -17,7 +17,6 @@ package com.alibaba.druid.sql.ast.expr;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLExprImpl;
-import com.alibaba.druid.sql.dialect.oracle.visitor.OracleASTVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
 import java.io.Serializable;
@@ -103,14 +102,14 @@ public class SQLMethodInvokeExpr extends SQLExprImpl implements Serializable {
         visitor.endVisit(this);
     }
 
-    protected void accept0(OracleASTVisitor visitor) {
+  /*  protected void accept0(OracleASTVisitor visitor) {
         if (visitor.visit(this)) {
             acceptChild(visitor, this.owner);
             acceptChild(visitor, this.parameters);
         }
 
         visitor.endVisit(this);
-    }
+    }*/
 
     @Override
     public int hashCode() {

@@ -15,23 +15,13 @@
  */
 package com.alibaba.druid.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
-
-import javax.servlet.GenericServlet;
 
 public class Utils {
 
@@ -165,16 +155,6 @@ public class Utils {
 
     public static Boolean getBoolean(Properties properties, String key) {
         String property = properties.getProperty(key);
-        if ("true".equals(property)) {
-            return Boolean.TRUE;
-        } else if ("false".equals(property)) {
-            return Boolean.FALSE;
-        }
-        return null;
-    }
-
-    public static Boolean getBoolean(GenericServlet servlet, String key) {
-        String property = servlet.getInitParameter(key);
         if ("true".equals(property)) {
             return Boolean.TRUE;
         } else if ("false".equals(property)) {

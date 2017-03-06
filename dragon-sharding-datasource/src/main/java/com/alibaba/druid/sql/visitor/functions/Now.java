@@ -15,10 +15,10 @@
  */
 package com.alibaba.druid.sql.visitor.functions;
 
-import java.util.Date;
-
 import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
 import com.alibaba.druid.sql.visitor.SQLEvalVisitor;
+
+import java.util.Date;
 
 
 public class Now implements Function {

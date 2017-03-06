@@ -15,48 +15,25 @@
  */
 package com.alibaba.druid.sql;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.druid.DruidRuntimeException;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
-import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectOrderByItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQuery;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLSetStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
-import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
-import com.alibaba.druid.sql.dialect.db2.visitor.DB2OutputVisitor;
-import com.alibaba.druid.sql.dialect.db2.visitor.DB2SchemaStatVisitor;
+import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlSchemaStatVisitor;
-import com.alibaba.druid.sql.dialect.odps.visitor.OdpsOutputVisitor;
-import com.alibaba.druid.sql.dialect.odps.visitor.OdpsSchemaStatVisitor;
-import com.alibaba.druid.sql.dialect.oracle.visitor.OracleOutputVisitor;
-import com.alibaba.druid.sql.dialect.oracle.visitor.OracleSchemaStatVisitor;
-import com.alibaba.druid.sql.dialect.oracle.visitor.OracleToMySqlOutputVisitor;
-import com.alibaba.druid.sql.dialect.postgresql.visitor.PGOutputVisitor;
-import com.alibaba.druid.sql.dialect.postgresql.visitor.PGSchemaStatVisitor;
-import com.alibaba.druid.sql.dialect.sqlserver.visitor.SQLServerOutputVisitor;
-import com.alibaba.druid.sql.dialect.sqlserver.visitor.SQLServerSchemaStatVisitor;
-import com.alibaba.druid.sql.parser.ParserException;
-import com.alibaba.druid.sql.parser.SQLExprParser;
-import com.alibaba.druid.sql.parser.SQLParserUtils;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.alibaba.druid.sql.parser.Token;
+import com.alibaba.druid.sql.parser.*;
 import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 import com.alibaba.druid.sql.visitor.SchemaStatVisitor;
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
 import com.alibaba.druid.util.JdbcConstants;
 import com.alibaba.druid.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLUtils {
     public static FormatOption DEFAULT_FORMAT_OPTION = new FormatOption();
@@ -340,16 +317,16 @@ public class SQLUtils {
         return createFormatOutputVisitor(out, null, dbType);
     }
 
-    public static SQLASTOutputVisitor createFormatOutputVisitor(Appendable out, // 
+    public static SQLASTOutputVisitor createFormatOutputVisitor(Appendable out, //
                                                                 List<SQLStatement> statementList, //
                                                                 String dbType) {
-        if (JdbcConstants.ORACLE.equals(dbType) || JdbcConstants.ALI_ORACLE.equals(dbType)) {
+     /*   if (JdbcConstants.ORACLE.equals(dbType) || JdbcConstants.ALI_ORACLE.equals(dbType)) {
             if (statementList == null || statementList.size() == 1) {
                 return new OracleOutputVisitor(out, false);
             } else {
                 return new OracleOutputVisitor(out, true);
             }
-        }
+        }*/
 
         if (JdbcConstants.MYSQL.equals(dbType) //
             || JdbcConstants.MARIADB.equals(dbType) //
@@ -357,7 +334,7 @@ public class SQLUtils {
             return new MySqlOutputVisitor(out);
         }
 
-        if (JdbcConstants.POSTGRESQL.equals(dbType)) {
+      /*  if (JdbcConstants.POSTGRESQL.equals(dbType)) {
             return new PGOutputVisitor(out);
         }
 
@@ -371,7 +348,7 @@ public class SQLUtils {
 
         if (JdbcConstants.ODPS.equals(dbType)) {
             return new OdpsOutputVisitor(out);
-        }
+        }*/
         
         return new SQLASTOutputVisitor(out);
     }
@@ -382,17 +359,17 @@ public class SQLUtils {
     }
 
     public static SchemaStatVisitor createSchemaStatVisitor(String dbType) {
-        if (JdbcConstants.ORACLE.equals(dbType) || JdbcConstants.ALI_ORACLE.equals(dbType)) {
+      /*  if (JdbcConstants.ORACLE.equals(dbType) || JdbcConstants.ALI_ORACLE.equals(dbType)) {
             return new OracleSchemaStatVisitor();
         }
-
+*/
         if (JdbcConstants.MYSQL.equals(dbType) || //
             JdbcConstants.MARIADB.equals(dbType) || //
             JdbcConstants.H2.equals(dbType)) {
             return new MySqlSchemaStatVisitor();
         }
 
-        if (JdbcConstants.POSTGRESQL.equals(dbType)) {
+      /*  if (JdbcConstants.POSTGRESQL.equals(dbType)) {
             return new PGSchemaStatVisitor();
         }
 
@@ -407,7 +384,7 @@ public class SQLUtils {
         if (JdbcConstants.ODPS.equals(dbType)) {
             return new OdpsSchemaStatVisitor();
         }
-
+*/
         return new SchemaStatVisitor();
     }
 
@@ -424,7 +401,7 @@ public class SQLUtils {
      * @author owenludong.lud
      * @param columnName
      * @param tableAlias
-     * @param pattern if pattern is null,it will be set {%Y-%m-%d %H:%i:%s} as mysql default value and set {yyyy-mm-dd
+     * @param pattern if routeRuleVariablePattern is null,it will be set {%Y-%m-%d %H:%i:%s} as mysql default value and set {yyyy-mm-dd
      * hh24:mi:ss} as oracle default value
      * @param dbType {@link JdbcConstants} if dbType is null ,it will be set the mysql as a default value
      */
@@ -470,19 +447,7 @@ public class SQLUtils {
         return groupList;
     }
 
-    public static String translateOracleToMySql(String sql) {
-        List<SQLStatement> stmtList = toStatementList(sql, JdbcConstants.ORACLE);
 
-        StringBuilder out = new StringBuilder();
-        OracleToMySqlOutputVisitor visitor = new OracleToMySqlOutputVisitor(out, false);
-        for (int i = 0; i < stmtList.size(); ++i) {
-            stmtList.get(i).accept(visitor);
-        }
-
-        String mysqlSql = out.toString();
-        return mysqlSql;
-
-    }
 
     public static String addCondition(String sql, String condition, String dbType) {
         String result = addCondition(sql, condition, SQLBinaryOperator.BooleanAnd, false, dbType);
@@ -568,7 +533,7 @@ public class SQLUtils {
 
         SQLBinaryOpExpr newCondition;
         if (left) {
-            newCondition = new SQLBinaryOpExpr(condition, op, where);            
+            newCondition = new SQLBinaryOpExpr(condition, op, where);
         } else {
             newCondition = new SQLBinaryOpExpr(where, op, condition);
         }

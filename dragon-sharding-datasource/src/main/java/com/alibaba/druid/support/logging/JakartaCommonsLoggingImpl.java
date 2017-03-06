@@ -15,9 +15,6 @@
  */
 package com.alibaba.druid.support.logging;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class JakartaCommonsLoggingImpl implements com.alibaba.druid.support.logging.Log {
 
     private Log log;

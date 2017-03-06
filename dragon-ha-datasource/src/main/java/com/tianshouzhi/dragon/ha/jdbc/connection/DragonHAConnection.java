@@ -9,7 +9,6 @@ import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
-import com.tianshouzhi.dragon.ha.sqltype.SqlTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

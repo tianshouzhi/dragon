@@ -13,14 +13,20 @@ public abstract class DragonGroovyEngine {
         engine = manager.getEngineByName("Groovy");
     }
 
-    public static Object eval(String script, Map<String,String> params) throws ScriptException {
-        ScriptContext context=null;
-        if(params!=null){
-            context = new SimpleScriptContext();
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                context.setAttribute(entry.getKey(),entry.getValue(),ScriptContext.ENGINE_SCOPE);
+    public static Object eval(String script, Map<String,String> params){
+        try{
+
+            if(params!=null){
+                ScriptContext context=null;
+                context = new SimpleScriptContext();
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    context.setAttribute(entry.getKey(),entry.getValue(),ScriptContext.ENGINE_SCOPE);
+                }
+                return engine.eval(script, context);
             }
+            return engine.eval(script);
+        }catch (ScriptException e){
+            throw new RuntimeException(e);
         }
-        return engine.eval(script,context);
     }
 }

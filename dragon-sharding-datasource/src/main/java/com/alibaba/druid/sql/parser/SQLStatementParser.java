@@ -26,7 +26,7 @@ import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTriggerStatement.TriggerEvent;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTriggerStatement.TriggerType;
-import com.alibaba.druid.sql.dialect.odps.parser.OdpsSelectParser;
+import com.alibaba.druid.sql.dialect.mysql.parser.MySqlSelectParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1727,7 +1727,7 @@ public class SQLStatementParser extends SQLParser {
     }
 
     public SQLSelectParser createSQLSelectParser() {
-        return new OdpsSelectParser(this.exprParser);
+        return new MySqlSelectParser(this.exprParser);
     }
 
     public SQLUpdateStatement parseUpdateStatement() {

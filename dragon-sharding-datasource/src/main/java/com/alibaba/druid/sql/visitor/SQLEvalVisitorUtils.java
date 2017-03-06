@@ -24,17 +24,11 @@ import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.dialect.db2.visitor.DB2EvalVisitor;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlEvalVisitorImpl;
-import com.alibaba.druid.sql.dialect.oracle.visitor.OracleEvalVisitor;
-import com.alibaba.druid.sql.dialect.postgresql.visitor.PGEvalVisitor;
-import com.alibaba.druid.sql.dialect.sqlserver.visitor.SQLServerEvalVisitor;
 import com.alibaba.druid.sql.visitor.functions.*;
 import com.alibaba.druid.util.HexBin;
 import com.alibaba.druid.util.JdbcUtils;
 import com.alibaba.druid.util.Utils;
-import com.alibaba.druid.wall.spi.WallVisitorUtils;
-import com.alibaba.druid.wall.spi.WallVisitorUtils.WallConditionContext;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -105,7 +99,7 @@ public class SQLEvalVisitorUtils {
             return new MySqlEvalVisitorImpl();
         }
 
-        if (JdbcUtils.MARIADB.equals(dbType)) {
+       /* if (JdbcUtils.MARIADB.equals(dbType)) {
             return new MySqlEvalVisitorImpl();
         }
 
@@ -127,7 +121,7 @@ public class SQLEvalVisitorUtils {
 
         if (JdbcUtils.DB2.equals(dbType)) {
             return new DB2EvalVisitor();
-        }
+        }*/
         
         return new SQLEvalVisitorImpl();
     }
@@ -702,10 +696,10 @@ public class SQLEvalVisitorUtils {
     }
 
     public static boolean visit(SQLEvalVisitor visitor, SQLQueryExpr x) {
-        if (WallVisitorUtils.isSimpleCountTableSource(null, ((SQLQueryExpr) x).getSubQuery())) {
+     /*   if (WallVisitorUtils.isSimpleCountTableSource(null, ((SQLQueryExpr) x).getSubQuery())) {
             x.putAttribute(EVAL_VALUE, 1);
             return false;
-        }
+        }*/
 
         if (x.getSubQuery().getQuery() instanceof SQLSelectQueryBlock) {
             SQLSelectQueryBlock queryBlock = (SQLSelectQueryBlock) x.getSubQuery().getQuery();
@@ -746,10 +740,10 @@ public class SQLEvalVisitorUtils {
     }
 
     public static boolean visit(SQLEvalVisitor visitor, SQLUnaryExpr x) {
-        final WallConditionContext wallConditionContext = WallVisitorUtils.getWallConditionContext();
+        /*final WallConditionContext wallConditionContext = WallVisitorUtils.getWallConditionContext();
         if (x.getOperator() == SQLUnaryOperator.Compl && wallConditionContext != null) {
             wallConditionContext.setBitwise(true);
-        }
+        }*/
 
         x.getExpr().accept(visitor);
 
@@ -802,7 +796,7 @@ public class SQLEvalVisitorUtils {
         left.accept(visitor);
         right.accept(visitor);
 
-        final WallConditionContext wallConditionContext = WallVisitorUtils.getWallConditionContext();
+      /*  final WallConditionContext wallConditionContext = WallVisitorUtils.getWallConditionContext();
         if (x.getOperator() == SQLBinaryOperator.BooleanOr) {
             if (wallConditionContext != null) {
                 if (left.getAttribute(EVAL_VALUE) == Boolean.TRUE || right.getAttribute(EVAL_VALUE) == Boolean.TRUE) {
@@ -826,14 +820,14 @@ public class SQLEvalVisitorUtils {
             if (wallConditionContext != null) {
                 wallConditionContext.setBitwise(true);
             }
-        }
+        }*/
 
         Object leftValue = left.getAttribute(EVAL_VALUE);
         Object rightValue = right.getAttributes().get(EVAL_VALUE);
 
         if (x.getOperator() == SQLBinaryOperator.Like) {
             if (isAlwayTrueLikePattern(x.getRight())) {
-                x.putAttribute(WallVisitorUtils.HAS_TRUE_LIKE, Boolean.TRUE);
+//                x.putAttribute(WallVisitorUtils.HAS_TRUE_LIKE, Boolean.TRUE);
                 x.putAttribute(EVAL_VALUE, Boolean.TRUE);
                 return false;
             }
@@ -882,10 +876,10 @@ public class SQLEvalVisitorUtils {
         if (!rightHasValue) {
             return false;
         }
-
+/*
         if (wallConditionContext != null) {
             wallConditionContext.setConstArithmetic(true);
-        }
+        }*/
 
         leftValue = processValue(leftValue);
         rightValue = processValue(rightValue);
@@ -1919,7 +1913,7 @@ public class SQLEvalVisitorUtils {
 
     public static boolean like(String input, String pattern) {
         if (pattern == null) {
-            throw new IllegalArgumentException("pattern is null");
+            throw new IllegalArgumentException("routeRuleVariablePattern is null");
         }
 
         StringBuilder regexprBuilder = new StringBuilder(pattern.length() + 4);
@@ -1950,13 +1944,13 @@ public class SQLEvalVisitorUtils {
                 regexprBuilder.append('.');
             } else if (ch == '[') {
                 if (stat == STAT_RANGE) {
-                    throw new IllegalArgumentException("illegal pattern : " + pattern);
+                    throw new IllegalArgumentException("illegal routeRuleVariablePattern : " + pattern);
                 }
                 stat = STAT_RANGE;
                 blockStart = i;
             } else if (ch == ']') {
                 if (stat != STAT_RANGE) {
-                    throw new IllegalArgumentException("illegal pattern : " + pattern);
+                    throw new IllegalArgumentException("illegal routeRuleVariablePattern : " + pattern);
                 }
                 String block = pattern.substring(blockStart, i + 1);
                 regexprBuilder.append(block);

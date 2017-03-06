@@ -15,9 +15,9 @@
  */
 package com.alibaba.druid.sql.visitor;
 
-import java.util.List;
-
 import com.alibaba.druid.sql.visitor.functions.Function;
+
+import java.util.List;
 
 public interface SQLEvalVisitor extends SQLASTVisitor {
 
