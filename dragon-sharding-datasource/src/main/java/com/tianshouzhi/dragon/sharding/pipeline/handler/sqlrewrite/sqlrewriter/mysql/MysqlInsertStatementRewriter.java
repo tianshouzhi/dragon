@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter;
+package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
@@ -7,7 +7,6 @@ import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewiter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.collections.CollectionUtils;
@@ -50,8 +49,8 @@ import java.util.*;
  [, col_name=expr] ... ]
  * </pre>
  */
-public class MysqlInsertStatementRewriter implements SqlRewiter{
-    public Map<String,Map<String,SqlRouteInfo>> rewrite(HandlerContext context) throws SQLException{
+public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
+    public Map<String,Map<String,SqlRouteInfo>> doRewrite(HandlerContext context) throws SQLException{
         MySqlInsertStatement sqlStatement= (MySqlInsertStatement) context.getParsedSqlStatement();
         String insertClause="insert into ";
         String logicTableName = sqlStatement.getTableName().getSimpleName().toString();
@@ -97,7 +96,7 @@ public class MysqlInsertStatementRewriter implements SqlRewiter{
                 List<SQLExpr> values = valuesClause.getValues();
                 //取第一个非空的分区字段值作为路由条件
                 Iterator<Map.Entry<Integer, String>> iterator = shardColumnIndexNameMap.entrySet().iterator();
-                Map<String,String> routeParams=new HashMap<String, String>();
+                Map<String,Object> routeParams=new HashMap<String, Object>();
                 while (iterator.hasNext()){
                     Map.Entry<Integer, String> next = iterator.next();
                     Integer shardColumnIndex = next.getKey();
@@ -200,7 +199,7 @@ public class MysqlInsertStatementRewriter implements SqlRewiter{
         if(duplicateKeyUpdateStr!=null){
             sql.append(duplicateKeyUpdateStr);
         }
-        sqlRouteInfo.setSql(sql);
+        sqlRouteInfo.setSql(sql.toString());
 
     }
 

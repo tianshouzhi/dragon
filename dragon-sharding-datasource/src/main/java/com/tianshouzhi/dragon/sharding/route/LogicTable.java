@@ -22,11 +22,11 @@ public class LogicTable extends LogicConfig{
         dbTbShardColumns.addAll(logicDatabase.getMergedShardColumns()) ;
         dbTbShardColumns.addAll(this.getMergedShardColumns());
     }
-    public String getRouteDBIndex(Map<String,String> shardColumnValuesMap){
+    public String getRouteDBIndex(Map<String,Object> shardColumnValuesMap){
         return logicDatabase.getRouteIndex(shardColumnValuesMap);
     }
 
-    public String getRouteTBIndex(Map<String,String> shardColumnValuesMap){
+    public String getRouteTBIndex(Map<String,Object> shardColumnValuesMap){
         return getRouteIndex(shardColumnValuesMap);
     }
 

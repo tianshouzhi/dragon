@@ -7,8 +7,9 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.MysqlDeleteStatementRewriter;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.MysqlInsertStatementRewriter;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlDeleteStatementRewriter;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlInsertStatementRewriter;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlUpdateStatementRewriter;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class SqlRewriteHandler implements Handler {
             if(sqlStatement instanceof SQLInsertStatement){
                 sqlRewiteResult= new MysqlInsertStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLUpdateStatement){
-//            parseUpdateInfo((SQLUpdateStatement)sqlStatement);
+                sqlRewiteResult=new MysqlUpdateStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLDeleteStatement){
                 sqlRewiteResult=new MysqlDeleteStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLSelectStatement){

@@ -376,7 +376,7 @@ public class SchemaStatVisitor extends SQLASTVisitorAdapter {
         }
 
         /*for (SQLExpr item : valueExprs) {
-            Object value = SQLEvalVisitorUtils.eval(getDbType(), item, parameters, false);
+            Object value = SQLEvalVisitorUtils.eval(getDbType(), item, originParameters, false);
             condition.getValues().add(value);
         }*/
     }

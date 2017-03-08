@@ -14,7 +14,7 @@ public class SqlRouteInfo {
     private String tableName;
     private PreparedStatement targetStatement;
     private Map<Integer, DragonPrepareStatement.ParamSetting> parameters=new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
-    private StringBuilder sql;
+    private String sql;
 
     public SqlRouteInfo(String dbName,String tableName) {
         this.dbName = dbName;
@@ -36,11 +36,11 @@ public class SqlRouteInfo {
         this.tableName = tableName;
     }
 
-    public StringBuilder getSql() {
+    public String getSql() {
         return sql;
     }
 
-    public void setSql(StringBuilder sql) {
+    public void setSql(String sql) {
         this.sql = sql;
     }
 

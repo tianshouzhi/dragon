@@ -40,7 +40,7 @@ public class HandlerContext {
         return dragonShardingStatement;
     }
 
-    public LogicTable getLogicTable(String logicTableName) throws SQLException {
+    public LogicTable getLogicTable(String logicTableName) {
         return getRouter().getLogicTable(logicTableName);
     }
 

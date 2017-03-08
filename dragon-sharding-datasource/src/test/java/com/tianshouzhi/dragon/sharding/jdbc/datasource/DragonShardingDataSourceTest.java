@@ -57,7 +57,7 @@ public class DragonShardingDataSourceTest {
 
     @Test
     public void testDelete() throws SQLException {
-        String sql="delete from user where id in(?,?,?,?,?,?,?,?)";
+        String sql="delete from user where id in(?,?,?,?,?,?,?,?) and age>? and active=?";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10000);
@@ -68,6 +68,19 @@ public class DragonShardingDataSourceTest {
         preparedStatement.setInt(6,20100);
         preparedStatement.setInt(7,10101);
         preparedStatement.setInt(8,20101);
+        preparedStatement.setInt(9,10);
+        preparedStatement.setInt(10,1);
+        int updateCount = preparedStatement.executeUpdate();
+        System.out.println("updateCount = " + updateCount);
+    }
+
+    @Test
+    public void testUpdate() throws SQLException {
+        String sql="UPDATE  user SET NAME =? WHERE id=?";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1,"测试更新1");
+        preparedStatement.setInt(2,10101);
         int updateCount = preparedStatement.executeUpdate();
         System.out.println("updateCount = " + updateCount);
     }

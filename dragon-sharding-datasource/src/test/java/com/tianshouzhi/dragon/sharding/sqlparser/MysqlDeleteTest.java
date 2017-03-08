@@ -23,10 +23,7 @@ public class MysqlDeleteTest {
     @Test
     public void testParseDelete(){
 //        String sql="delete from user where id =1 and name=xxx and age=25";
-        String sql="DELETE p.*, pp.* \n" +
-                "FROM product p, productPrice pp \n" +
-                "WHERE p.productId = pp.productId \n" +
-                "AND p.created < '2004-01-01' ";
+        String sql="DELETE FROM user where id in(?,?,?)";
         SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);
         MySqlDeleteStatement deleteStatement = (MySqlDeleteStatement) sqlStatementParser.parseStatement();
         StringBuilder sb=new StringBuilder();

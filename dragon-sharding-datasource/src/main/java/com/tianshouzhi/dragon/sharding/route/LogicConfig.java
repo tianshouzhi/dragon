@@ -45,7 +45,7 @@ public abstract class LogicConfig {
         return nameFormat;
     }
 
-    protected String getRouteIndex(Map<String,String> params) {
+    protected String getRouteIndex(Map<String,Object> params) {
         if(params==null){
             throw new NullPointerException();
         }

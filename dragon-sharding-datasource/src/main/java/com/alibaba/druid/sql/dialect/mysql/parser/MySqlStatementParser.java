@@ -2908,7 +2908,7 @@ public class MySqlStatementParser extends SQLStatementParser {
     }
 
     /**
-     * parse create procedure parameters
+     * parse create procedure originParameters
      * 
      * @param parameters
      */

@@ -105,7 +105,7 @@ public class SQLMethodInvokeExpr extends SQLExprImpl implements Serializable {
   /*  protected void accept0(OracleASTVisitor visitor) {
         if (visitor.visit(this)) {
             acceptChild(visitor, this.owner);
-            acceptChild(visitor, this.parameters);
+            acceptChild(visitor, this.originParameters);
         }
 
         visitor.endVisit(this);
