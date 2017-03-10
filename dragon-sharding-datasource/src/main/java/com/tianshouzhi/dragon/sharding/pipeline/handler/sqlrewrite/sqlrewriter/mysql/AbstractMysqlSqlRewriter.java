@@ -10,6 +10,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.SqlRewriter;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
+import org.apache.commons.collections.MapUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -60,9 +61,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     //判断是否是jdbc ？占位符
     protected boolean isJdbcPlaceHolder(SQLExpr sqlExpr){
+        if(sqlExpr==null){
+            return false;
+        }
         return sqlExpr instanceof SQLVariantRefExpr;
     }
-    protected List<SQLExpr> parseWhereCondition(SQLExpr where){
+    protected List<SQLExpr> parseWhereConditionList(SQLExpr where){
         List<SQLExpr> whereConditionList=new ArrayList<SQLExpr>();
         fillWhereConditionExprList(where,whereConditionList);
         return whereConditionList;
@@ -89,16 +93,17 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         if(dbTbShardColumns.contains(columnName)){
             List<SQLExpr> targetList = conditionItemExpr.getTargetList();
             for (SQLExpr sqlExpr : targetList) {
+                List<Object> valueList = sqlInListConditionMap.get(columnName);
+                Object shardColumnValue=sqlExpr.toString();
+                if(valueList==null){
+                    valueList=new ArrayList<Object>();
+                    sqlInListConditionMap.put(columnName,valueList);
+                }
                 if(isJdbcPlaceHolder(sqlExpr)){
                     DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-                    Object shardColumnValue= paramSetting.values[0];
-                    List<Object> valueList = sqlInListConditionMap.get(columnName);
-                    if(valueList==null){
-                        valueList=new ArrayList<Object>();
-                        sqlInListConditionMap.put(columnName,valueList);
-                    }
-                    valueList.add(shardColumnValue);
+                     shardColumnValue= paramSetting.values[0];
                 }
+                valueList.add(shardColumnValue);
             }
         }
     }
@@ -132,5 +137,56 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             tbSqlRouteInfo=new SqlRouteInfo(routeDBIndex,routeTBIndex);
         }
         dbRouteMap.put(routeTBIndex,tbSqlRouteInfo);
+    }
+
+    protected void makeRouteMap(LogicTable logicTable, Map<String, Object> binaryShardConditionMap, Map<String, List<Object>> sqlInListConditionMap) {
+        //where partition=xxx的情况
+        if (MapUtils.isNotEmpty(binaryShardConditionMap) && MapUtils.isEmpty(sqlInListConditionMap)) {
+            addRouteInfo(logicTable, binaryShardConditionMap);
+        }
+        //where partition1=xxx and partition2 in(x,x,x)的情况
+        if (MapUtils.isNotEmpty(sqlInListConditionMap)) {
+            for (Map.Entry<String, List<Object>> entry : sqlInListConditionMap.entrySet()) {
+                String shardColumn = entry.getKey();
+                List<Object> valueList = entry.getValue();
+                for (Object value : valueList) {
+                    HashMap<String, Object> routeConditionMap = new HashMap<String, Object>();
+                    routeConditionMap.put(shardColumn, value);
+                    if (MapUtils.isNotEmpty(binaryShardConditionMap)) {
+                        routeConditionMap.putAll(binaryShardConditionMap);
+                    }
+                    addRouteInfo(logicTable, routeConditionMap);
+                }
+            }
+        }
+    }
+    protected void fillRouteParamsMap(Set<String> dbTbShardColumns, List<SQLExpr> whereConditionList, Map<String, Object> binaryShardConditionMap, Map<String, List<Object>> sqlInListConditionMap) {
+        for (SQLExpr conditionItemExpr : whereConditionList) {
+            if (conditionItemExpr instanceof SQLBinaryOpExpr) {
+                parseBinaryConditionExpr(dbTbShardColumns, binaryShardConditionMap, (SQLBinaryOpExpr) conditionItemExpr);
+            }
+            if (conditionItemExpr instanceof SQLInListExpr) {
+                parseSQLInListExpr(dbTbShardColumns, sqlInListConditionMap, (SQLInListExpr) conditionItemExpr);
+            }
+            if (conditionItemExpr instanceof SQLBetweenExpr) {
+//                conditionItemExpr.
+            }
+
+            if (conditionItemExpr instanceof SQLInSubQueryExpr) {
+
+            }
+        }
+    }
+    /**生成更新(U)、删除(D)语句的真实sql*/
+    protected void makeUDRealSql(String logicTableName) {
+        for (Map<String, SqlRouteInfo> dbRouteMap : routeMap.values()) {
+            for (SqlRouteInfo tbSqlRouteInfo : dbRouteMap.values()) {
+                String newSql = originSql.replaceAll(logicTableName, tbSqlRouteInfo.getTableName());
+                tbSqlRouteInfo.setSql(newSql);
+                if (isPrepare) {
+                    tbSqlRouteInfo.getParameters().putAll(originParameters);
+                }
+            }
+        }
     }
 }

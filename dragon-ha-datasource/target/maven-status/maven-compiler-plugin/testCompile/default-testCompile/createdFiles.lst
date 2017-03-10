@@ -1,0 +1,8 @@
+com\tianshouzhi\dragon\ha\sqltype\DragonHAPrepareStatementTest.class
+com\tianshouzhi\dragon\ha\sqltype\RwSplitTest.class
+com\tianshouzhi\dragon\ha\sqltype\HintTest.class
+com\tianshouzhi\dragon\ha\sqltype\DBSelectorTest.class
+com\tianshouzhi\dragon\ha\sqltype\SqlTypeUtilTest.class
+com\tianshouzhi\dragon\ha\sqltype\TransactionTest.class
+com\tianshouzhi\dragon\ha\sqltype\DragonHAStatementTest.class
+com\tianshouzhi\dragon\ha\sqltype\BaseTest.class

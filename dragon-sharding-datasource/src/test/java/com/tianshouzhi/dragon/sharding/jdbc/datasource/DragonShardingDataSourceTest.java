@@ -57,7 +57,7 @@ public class DragonShardingDataSourceTest {
 
     @Test
     public void testDelete() throws SQLException {
-        String sql="delete from user where id in(?,?,?,?,?,?,?,?) and age>? and active=?";
+        String sql="delete from user where id in(?,?,?,?,?,?,?,?) ";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10000);
@@ -68,22 +68,42 @@ public class DragonShardingDataSourceTest {
         preparedStatement.setInt(6,20100);
         preparedStatement.setInt(7,10101);
         preparedStatement.setInt(8,20101);
-        preparedStatement.setInt(9,10);
-        preparedStatement.setInt(10,1);
         int updateCount = preparedStatement.executeUpdate();
         System.out.println("updateCount = " + updateCount);
     }
 
     @Test
-    public void testUpdate() throws SQLException {
-        String sql="UPDATE  user SET NAME =? WHERE id=?";
+    public void testUpdateWhereIdIn() throws SQLException {
+        String sql="UPDATE  user SET NAME =? WHERE id in(?,?,?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1,"测试更新1");
+        preparedStatement.setString(1,"测试更新2");
         preparedStatement.setInt(2,10101);
+        preparedStatement.setInt(3,10001);
+        preparedStatement.setInt(4,20001);
+        preparedStatement.setInt(5,10100);
         int updateCount = preparedStatement.executeUpdate();
         System.out.println("updateCount = " + updateCount);
     }
+    @Test
+    public void testUpdateCaseWhen() throws SQLException {
+        String sql="UPDATE user" +
+                "    SET name = CASE id " +
+                "        WHEN 10101 THEN ?" +
+                "        WHEN 10001 THEN ?" +
+                "        WHEN 20001 THEN ?" +
+                "    END " +
+                "WHERE id IN (10101,10001,20001)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        String x = "测试更新case when";
+        preparedStatement.setString(1,x);
+        preparedStatement.setString(2,x);
+        preparedStatement.setString(3,x);
+        int updateCount = preparedStatement.executeUpdate();
+        System.out.println("updateCount = " + updateCount);
+    }
+
 
     public static LogicTable makeLogicTable(String tableName, LogicDatabase logicDatabase){
         String namePattern = tableName+"_{0,number,#0000}";
