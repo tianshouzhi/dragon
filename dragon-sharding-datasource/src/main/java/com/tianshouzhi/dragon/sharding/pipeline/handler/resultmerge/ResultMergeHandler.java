@@ -1,7 +1,10 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge;
 
+import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLOrderBy;
 import com.alibaba.druid.sql.ast.SQLOrderingSpecification;
+import com.alibaba.druid.sql.ast.expr.SQLAggregateExpr;
+import com.alibaba.druid.sql.ast.statement.SQLSelectGroupByClause;
 import com.alibaba.druid.sql.ast.statement.SQLSelectOrderByItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
@@ -53,21 +56,23 @@ public class ResultMergeHandler implements Handler {
             if(CollectionUtils.isEmpty(totalRowRecords)){
                 return ;
             }
-            //order by和limit
+            //处理order by和limit 以及max、min、groupBy等函数
             if(preparedStatementList.size()==1){//只有一个statement，数据库已经排序好，不需要再次排序和解析limit
                 return;
             }else{
                 SQLSelectStatement parsedSqlStatement = (SQLSelectStatement)context.getParsedSqlStatement();
                 MySqlSelectQueryBlock selectQuery = (MySqlSelectQueryBlock) parsedSqlStatement.getSelect().getQuery();
-                SQLOrderBy orderBy = selectQuery.getOrderBy();
-                if(orderBy!=null){
-                    sort(orderBy, totalRowRecords);
-                }
-                MySqlSelectQueryBlock.Limit limit = selectQuery.getLimit();
-                if(limit!=null){
-                    totalRowRecords=limit(context.getOffset(),context.getRowCount(),totalRowRecords);
-                }
+
+                //处理order by
+                tackleOrderBy(selectQuery.getOrderBy(), totalRowRecords);
+
+                //处理聚合函数与group by
+                tackleAggrAndGroupBy(metaData, totalRowRecords, selectQuery);
+
+                //处理limit
+                totalRowRecords=limit(selectQuery.getLimit(),context.getOffset(),context.getRowCount(),totalRowRecords);
             }
+
             shardingResultSet.setRowRecords(totalRowRecords);
             context.setMergedResultSet(shardingResultSet);
 //
@@ -75,14 +80,91 @@ public class ResultMergeHandler implements Handler {
 
     }
 
-    private List<RowRecord> limit(int offset,int rowcount, List<RowRecord> totalRowRecords) {
+    private void tackleAggrAndGroupBy(DragonResultSetMetaData metaData, List<RowRecord> totalRowRecords, MySqlSelectQueryBlock selectQuery) throws SQLException {
+        SQLAggregateExpr firstAggregate=null;//只取第一个聚合函数进行操作
+        int aggregateColumnIndex=0;
+        for (int i = 0; i < selectQuery.getSelectList().size(); i++) {
+            SQLExpr expr = selectQuery.getSelectList().get(i).getExpr();
+            if(expr instanceof SQLAggregateExpr){//聚合函数
+                firstAggregate= (SQLAggregateExpr) expr;
+                aggregateColumnIndex=i+1;
+                break;
+            }
+        }
+        if(firstAggregate!=null){
+            final String methodName = firstAggregate.getMethodName();
+            SQLSelectGroupByClause groupBy = selectQuery.getGroupBy();
+            Map<Object/**group Key*/,List<RowRecord>> groupByMap=new HashMap<Object, List<RowRecord>>();
+            if(groupBy==null){//如果没有group by，则所有都是同一组
+                groupByMap.put("*",totalRowRecords);
+            }else{
+                String groupByColumnLabel = groupBy.getItems().get(0).toString();
+                for (RowRecord rowRecord : totalRowRecords) {
+                    Object groupKey = rowRecord.getValue(groupByColumnLabel);
+                    List<RowRecord> rowRecords = groupByMap.get(groupKey);
+                    if(rowRecords==null){
+                        rowRecords=new ArrayList<RowRecord>();
+                        groupByMap.put(groupKey,rowRecords);
+                    }
+                    rowRecords.add(rowRecord);
+                }
+            }
+
+            if ("COUNT".equals(methodName)) {
+                List<RowRecord> returnRecordList = new ArrayList<RowRecord>();
+                for (Map.Entry<Object, List<RowRecord>> groupByEntry : groupByMap.entrySet()) {
+                    List<RowRecord> groupByList = groupByEntry.getValue();
+                    RowRecord returnRecord = groupByList.get(0);
+                    long count = 0;
+                    for (RowRecord rowRecord : groupByList) {
+                        Long value = (Long) rowRecord.getValue(aggregateColumnIndex);
+                        count += value;
+                    }
+                    returnRecord.putColumnValue(aggregateColumnIndex, metaData.getColumnLabel(aggregateColumnIndex-1), count);
+                    returnRecordList.add(returnRecord);
+                }
+                totalRowRecords.clear();
+                totalRowRecords.addAll(returnRecordList);
+            }
+            if ("MAX".equals(methodName) || "MIN".equals(methodName)) {
+                List<RowRecord> groupByResult=new ArrayList<RowRecord>();
+                for (List<RowRecord> groupByRecords : groupByMap.values()) {
+                    RowRecord returnRecord=groupByRecords.get(0);
+                    for (int i = 1; i < groupByRecords.size(); i++) {
+                        //String、number、Date类型都实现了Comparable接口，可以直接比较，其他类型的比较不支持
+                        Comparable v1= (Comparable) returnRecord.getValue(aggregateColumnIndex);
+                        RowRecord iteratorRecord = groupByRecords.get(i);
+                        Comparable v2= (Comparable) iteratorRecord.getValue(aggregateColumnIndex);
+                        int result = v1.compareTo(v2);
+                        if("MAX".equals(methodName)){
+                            if(result<0){returnRecord=iteratorRecord;}
+                        }else{
+                            if(result>0){returnRecord=iteratorRecord;}
+                        }
+                    }
+                    groupByResult.add(returnRecord);
+                }
+                totalRowRecords.clear();
+                totalRowRecords.addAll(groupByResult);
+            }
+        }
+
+    }
+
+    private List<RowRecord> limit(MySqlSelectQueryBlock.Limit limit, int offset, int rowcount, List<RowRecord> totalRowRecords) {
+        if(limit==null){
+           return totalRowRecords;
+        }
         final int start=offset;
         final int end=Math.min(offset+rowcount,totalRowRecords.size());
         List<RowRecord> subList = totalRowRecords.subList(start, end);
         return subList;
     }
 
-    private void sort(SQLOrderBy orderBy,  List<RowRecord> totalRowRecords) {
+    private void tackleOrderBy(SQLOrderBy orderBy, List<RowRecord> totalRowRecords) {
+        if(orderBy==null){
+            return ;
+        }
         final List<SQLSelectOrderByItem> items = orderBy.getItems();
 
         Comparator<RowRecord> comparator = new Comparator<RowRecord>() {
@@ -104,7 +186,7 @@ public class ResultMergeHandler implements Handler {
                         if(result>0){
                             return asc?1:-1;
                         }
-                        if(result<1){
+                        if(result<0){
                             return asc?-1:1;
                         }
                     }
@@ -124,7 +206,7 @@ public class ResultMergeHandler implements Handler {
                 for (int i = 0; i <metaData.getColumnCount(); i++) {
                     String columnName=metaData.getColumnName(i);
                     Object columnValue = resultSet.getObject(i+1);
-                    rowRecord.addColumn(i+1,columnName,columnValue);
+                    rowRecord.putColumnValue(i+1,columnName,columnValue);
                 }
                 results.add(rowRecord);
             }

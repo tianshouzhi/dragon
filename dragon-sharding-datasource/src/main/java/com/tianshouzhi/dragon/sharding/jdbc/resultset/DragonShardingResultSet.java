@@ -114,42 +114,50 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        return getString(findColumn(columnLabel));
+        return getString(checkColumnLabel(columnLabel));
     }
 
     @Override
     public boolean getBoolean(String columnLabel) throws SQLException {
-        return getBoolean(findColumn(columnLabel));
+        return getBoolean(checkColumnLabel(columnLabel));
     }
 
     @Override
     public byte getByte(String columnLabel) throws SQLException {
-        return getByte(findColumn(columnLabel));
+        return getByte(checkColumnLabel(columnLabel));
     }
 
     @Override
     public short getShort(String columnLabel) throws SQLException {
-        return getShort(findColumn(columnLabel));
+        return getShort(checkColumnLabel(columnLabel));
     }
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        return getInt(findColumn(columnLabel));
+        return getInt(checkColumnLabel(columnLabel));
     }
 
     @Override
     public long getLong(String columnLabel) throws SQLException {
-        return getLong(findColumn(columnLabel));
+        return getLong(checkColumnLabel(columnLabel));
+    }
+
+    private int checkColumnLabel(String columnLabel) throws SQLException {
+        int column = findColumn(columnLabel);
+        if(column==0){
+            throw new SQLException("the columnLabel is not valid:"+columnLabel);
+        }
+        return column;
     }
 
     @Override
     public float getFloat(String columnLabel) throws SQLException {
-        return getFloat(findColumn(columnLabel));
+        return getFloat(checkColumnLabel(columnLabel));
     }
 
     @Override
     public double getDouble(String columnLabel) throws SQLException {
-        return getDouble(findColumn(columnLabel));
+        return getDouble(checkColumnLabel(columnLabel));
     }
 
     @Override
@@ -159,37 +167,37 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public byte[] getBytes(String columnLabel) throws SQLException {
-        return getBytes(findColumn(columnLabel));
+        return getBytes(checkColumnLabel(columnLabel));
     }
 
     @Override
     public Date getDate(String columnLabel) throws SQLException {
-        return getDate(findColumn(columnLabel));
+        return getDate(checkColumnLabel(columnLabel));
     }
 
     @Override
     public Time getTime(String columnLabel) throws SQLException {
-        return getTime(findColumn(columnLabel));
+        return getTime(checkColumnLabel(columnLabel));
     }
 
     @Override
     public Timestamp getTimestamp(String columnLabel) throws SQLException {
-        return getTimestamp(findColumn(columnLabel));
+        return getTimestamp(checkColumnLabel(columnLabel));
     }
 
     @Override
     public InputStream getAsciiStream(String columnLabel) throws SQLException {
-        return getAsciiStream(findColumn(columnLabel));
+        return getAsciiStream(checkColumnLabel(columnLabel));
     }
 
     @Override
     public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-        return getUnicodeStream(findColumn(columnLabel));
+        return getUnicodeStream(checkColumnLabel(columnLabel));
     }
 
     @Override
     public InputStream getBinaryStream(String columnLabel) throws SQLException {
-        return getBinaryStream(findColumn(columnLabel));
+        return getBinaryStream(checkColumnLabel(columnLabel));
     }
 
     @Override
@@ -219,7 +227,7 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        return getObject(findColumn(columnLabel));
+        return getObject(checkColumnLabel(columnLabel));
     }
 
     @Override
@@ -234,7 +242,7 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public Reader getCharacterStream(String columnLabel) throws SQLException {
-        return getCharacterStream(findColumn(columnLabel));
+        return getCharacterStream(checkColumnLabel(columnLabel));
     }
 
     @Override
@@ -244,7 +252,7 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        return getBigDecimal(findColumn(columnLabel));
+        return getBigDecimal(checkColumnLabel(columnLabel));
     }
 
     @Override

@@ -88,18 +88,18 @@ public class DragonShardingDataSourceTest {
     }
     @Test
     public void testSelect() throws SQLException {//limit 2,2
-        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?) order by id asc limit 2,2";
+        String sql="SELECT  max(id),name FROM user  WHERE id in(?,?,?,?)  ";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10101);
         preparedStatement.setInt(2,10001);
         preparedStatement.setInt(3,20001);
-        preparedStatement.setInt(4,10100);
+        preparedStatement.setInt(4,10100);  
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
-            int id = resultSet.getInt("id");
-            String name = resultSet.getString("name");
-            System.out.println("id="+id+",name = " + name);
+            int id = resultSet.getInt(1);
+            String  name = resultSet.getString(2);
+            System.out.println(" min(id)="+id+",name = " + name);
         }
     }
     @Test

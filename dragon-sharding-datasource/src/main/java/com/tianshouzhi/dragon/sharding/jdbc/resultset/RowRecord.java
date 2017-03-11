@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class RowRecord {
     private Map<Integer,Column> resultsMap=new HashMap<Integer, Column>();
-    public void addColumn(Integer columnIndex, String columnLabel, Object columnValue) {
+    public void putColumnValue(Integer columnIndex, String columnLabel, Object columnValue) {
         resultsMap.put(columnIndex,new Column(columnLabel,columnValue));
     }
     public Object getValue(Integer columnIndex){
