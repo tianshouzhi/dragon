@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge;
+package com.tianshouzhi.dragon.sharding.jdbc.resultset;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -6,17 +6,20 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/2/28.
  */
 public class DragonShardingResultSet implements ResultSet{
-    LinkedList linkedList=new LinkedList();
+    private DragonResultSetMetaData metaData;
+    private List<RowRecord> rowRecords;
+    //下一个指针
+    private int nextPointer=-1;
     @Override
     public boolean next() throws SQLException {
-        return linkedList.peek()!=null;
+        return ++nextPointer<rowRecords.size();
     }
 
     @Override
@@ -26,47 +29,47 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public boolean wasNull() throws SQLException {
-        return linkedList.isEmpty();
+        return rowRecords.isEmpty();
     }
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return null;
+        return (String) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
-        return false;
+        return (Boolean) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
-        return 0;
+        return(Byte) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
-        return 0;
+        return (Short) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
-        return 0;
+        return (Integer) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
-        return 0;
+        return (Long) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
-        return 0;
+        return (Float) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
-        return 0;
+        return (Double) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
@@ -76,22 +79,22 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
-        return new byte[0];
+        return ( byte[]) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public Date getDate(int columnIndex) throws SQLException {
-        return null;
+        return (Date) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public Time getTime(int columnIndex) throws SQLException {
-        return null;
+        return (Time) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
-        return null;
+        return (Timestamp) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
@@ -111,42 +114,42 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        return null;
+        return getString(findColumn(columnLabel));
     }
 
     @Override
     public boolean getBoolean(String columnLabel) throws SQLException {
-        return false;
+        return getBoolean(findColumn(columnLabel));
     }
 
     @Override
     public byte getByte(String columnLabel) throws SQLException {
-        return 0;
+        return getByte(findColumn(columnLabel));
     }
 
     @Override
     public short getShort(String columnLabel) throws SQLException {
-        return 0;
+        return getShort(findColumn(columnLabel));
     }
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        return 0;
+        return getInt(findColumn(columnLabel));
     }
 
     @Override
     public long getLong(String columnLabel) throws SQLException {
-        return 0;
+        return getLong(findColumn(columnLabel));
     }
 
     @Override
     public float getFloat(String columnLabel) throws SQLException {
-        return 0;
+        return getFloat(findColumn(columnLabel));
     }
 
     @Override
     public double getDouble(String columnLabel) throws SQLException {
-        return 0;
+        return getDouble(findColumn(columnLabel));
     }
 
     @Override
@@ -156,37 +159,37 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public byte[] getBytes(String columnLabel) throws SQLException {
-        return new byte[0];
+        return getBytes(findColumn(columnLabel));
     }
 
     @Override
     public Date getDate(String columnLabel) throws SQLException {
-        return null;
+        return getDate(findColumn(columnLabel));
     }
 
     @Override
     public Time getTime(String columnLabel) throws SQLException {
-        return null;
+        return getTime(findColumn(columnLabel));
     }
 
     @Override
     public Timestamp getTimestamp(String columnLabel) throws SQLException {
-        return null;
+        return getTimestamp(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getAsciiStream(String columnLabel) throws SQLException {
-        return null;
+        return getAsciiStream(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-        return null;
+        return getUnicodeStream(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getBinaryStream(String columnLabel) throws SQLException {
-        return null;
+        return getBinaryStream(findColumn(columnLabel));
     }
 
     @Override
@@ -206,42 +209,42 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return metaData;
     }
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return null;
+        return  rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        return null;
+        return getObject(findColumn(columnLabel));
     }
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
-        return 0;
+        return metaData.getColumnIndex(columnLabel);
     }
 
     @Override
     public Reader getCharacterStream(int columnIndex) throws SQLException {
-        return null;
+        return (Reader) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public Reader getCharacterStream(String columnLabel) throws SQLException {
-        return null;
+        return getCharacterStream(findColumn(columnLabel));
     }
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return null;
+        return (BigDecimal) rowRecords.get(nextPointer).getValue(columnIndex);
     }
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        return null;
+        return getBigDecimal(findColumn(columnLabel));
     }
 
     @Override
@@ -957,5 +960,13 @@ public class DragonShardingResultSet implements ResultSet{
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
+    }
+
+    public void setMetaData(DragonResultSetMetaData metaData) {
+        this.metaData = metaData;
+    }
+
+    public void setRowRecords( List<RowRecord> rowRecords) {
+        this.rowRecords = rowRecords;
     }
 }

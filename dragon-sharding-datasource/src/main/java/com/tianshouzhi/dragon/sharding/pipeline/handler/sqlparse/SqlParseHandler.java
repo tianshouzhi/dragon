@@ -7,6 +7,7 @@ import com.alibaba.druid.util.JdbcConstants;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
+import org.apache.commons.collections.MapUtils;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ import java.util.List;
 public class SqlParseHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) {
-        if(context.getSqlRouteMap()==null){//说明没有hint
+
+        if(MapUtils.isEmpty(context.getHintMap())){//说明没有hint
             DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
             String sql = dragonShardingStatement.getSql();
             SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);

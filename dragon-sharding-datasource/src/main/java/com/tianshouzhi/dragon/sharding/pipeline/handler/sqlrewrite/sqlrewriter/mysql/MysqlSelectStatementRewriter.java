@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
@@ -64,7 +65,17 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         Map<String, List<Object>> sqlInListRouteParamsMap = new HashMap<String, List<Object>>();
         fillRouteParamsMap(dbTbShardColumns, whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
         makeRouteMap(logicTable, binaryRouteParamsMap, sqlInListRouteParamsMap);
+        //如果同时不为空，说明需要对limit语句进行修改
+        if(query.getOrderBy()!=null&&query.getLimit()!=null){
+            MySqlSelectQueryBlock.Limit limit = query.getLimit();
+            //记录原始的offset和rowcount
+            context.setOffset(((SQLIntegerExpr)limit.getOffset()).getNumber().intValue());
+            context.setRowCount(((SQLIntegerExpr)limit.getRowCount()).getNumber().intValue());
+
+            limit.setOffset(new SQLIntegerExpr(0));
+
+        }
         makeUDRealSql(logicTableName);
-        return null;
+        return routeMap;
     }
 }

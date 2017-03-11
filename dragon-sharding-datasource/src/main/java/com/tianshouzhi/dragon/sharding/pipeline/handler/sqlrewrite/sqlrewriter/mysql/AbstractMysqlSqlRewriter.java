@@ -179,9 +179,11 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     }
     /**生成更新(U)、删除(D)语句的真实sql*/
     protected void makeUDRealSql(String logicTableName) {
+        //不能直接使用originSql，因为Mysql Select会对orderBy limit部分做修改
+        String sql = sqlAst.toString();
         for (Map<String, SqlRouteInfo> dbRouteMap : routeMap.values()) {
             for (SqlRouteInfo tbSqlRouteInfo : dbRouteMap.values()) {
-                String newSql = originSql.replaceAll(logicTableName, tbSqlRouteInfo.getTableName());
+                String newSql = sql.replaceAll(logicTableName, tbSqlRouteInfo.getTableName());
                 tbSqlRouteInfo.setSql(newSql);
                 if (isPrepare) {
                     tbSqlRouteInfo.getParameters().putAll(originParameters);

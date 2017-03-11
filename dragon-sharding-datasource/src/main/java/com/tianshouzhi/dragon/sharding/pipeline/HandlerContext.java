@@ -8,7 +8,9 @@ import com.tianshouzhi.dragon.sharding.route.Router;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/2/24.
@@ -17,12 +19,17 @@ public class HandlerContext {
     private DragonShardingStatement dragonShardingStatement;
     private SQLStatement parsedSqlStatement;
     private Router router;
-    private Map<String, Map<String, SqlRouteInfo>> sqlRouteMap;
+    private Map<String/**dbIndex*/,Set<String/**tbIndex*/>> hintMap=new HashMap<String, Set<String>>();
+    private Map<String/**dbIndex*/, Map<String/*tbIndex*/, SqlRouteInfo>> sqlRouteMap;
 
     //存储执行结果
     private int totalUpdateCount =-1;
     private ResultSet mergedResultSet;
     private boolean isQuery;
+
+    //limit 信息
+    private int offset=-1;
+    private int rowCount=-1;
 
     public HandlerContext(DragonShardingStatement dragonShardingStatement) {
         if(dragonShardingStatement==null){
@@ -90,5 +97,29 @@ public class HandlerContext {
 
     public void setQuery(boolean isQuery) {
         this.isQuery = isQuery;
+    }
+
+    public Map<String, Set<String>> getHintMap() {
+        return hintMap;
+    }
+
+    public void setHintMap(Map<String, Set<String>> hintMap) {
+        this.hintMap = hintMap;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public void setRowCount(int rowCount) {
+        this.rowCount = rowCount;
     }
 }

@@ -9,6 +9,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlDeleteStatementRewriter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlInsertStatementRewriter;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlSelectStatementRewriter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql.MysqlUpdateStatementRewriter;
 
 import java.sql.SQLException;
@@ -21,7 +22,7 @@ public class SqlRewriteHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) throws SQLException{
         SQLStatement sqlStatement = context.getParsedSqlStatement();
-        if(sqlStatement !=null){
+        if(sqlStatement!=null){// 指定了hint，没有parse
             Map<String, Map<String,SqlRouteInfo>> sqlRewiteResult = null;
             if(sqlStatement instanceof SQLInsertStatement){
                 sqlRewiteResult= new MysqlInsertStatementRewriter().rewrite(context);
@@ -30,7 +31,7 @@ public class SqlRewriteHandler implements Handler {
             }else if(sqlStatement instanceof SQLDeleteStatement){
                 sqlRewiteResult=new MysqlDeleteStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLSelectStatement){
-//            parseSelectInfo((SQLSelectStatement)sqlStatement);
+                sqlRewiteResult=new MysqlSelectStatementRewriter().rewrite(context);
             }
             context.setSqlRouteMap(sqlRewiteResult);
         }

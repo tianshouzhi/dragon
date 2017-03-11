@@ -37,7 +37,7 @@ public class DragonShardingStatement extends DragonStatement{
         if(!isQuery){
             updateCount=handlerContext.getTotalUpdateCount();
         }else{
-
+            resultSet=handlerContext.getMergedResultSet();
         }
         return isQuery;
     }
