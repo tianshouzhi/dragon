@@ -103,6 +103,10 @@ public class DragonShardingDataSourceTest {
         }
     }
     @Test
+    public void testMaxMin(){
+
+    }
+    @Test
     public void testUpdateCaseWhen() throws SQLException {
         String sql="UPDATE user" +
                 "    SET name = CASE id " +

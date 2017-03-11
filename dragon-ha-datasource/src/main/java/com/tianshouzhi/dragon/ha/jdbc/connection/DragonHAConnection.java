@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc.connection;
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
+import com.tianshouzhi.dragon.common.util.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;

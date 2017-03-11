@@ -13,9 +13,7 @@
         <module>dragon-ha-datasource</module>
         <module>dragon-dynamic-datasource</module>
         <module>dragon-common</module>
-        <module>dragon-sqlparser</module>
         <module>dragon-console</module>
-        <module>dragon-dynamic-config</module>
         <module>dragon-idgen</module>
     </modules>
 
@@ -58,11 +56,11 @@
                 <artifactId>commons-collections</artifactId>
                 <version>3.2.2</version>
             </dependency>
+            <!--用于sql解析-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>1.0.24</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

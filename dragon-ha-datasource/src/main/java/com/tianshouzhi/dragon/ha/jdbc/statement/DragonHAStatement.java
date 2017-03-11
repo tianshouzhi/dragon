@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.tianshouzhi.dragon.common.util.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

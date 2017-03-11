@@ -1,0 +1,6 @@
+com\tianshouzhi\dragon\idgen\snowflake\IdGenSnowFlakeImpl.class
+com\tianshouzhi\dragon\idgen\IdGen.class
+com\tianshouzhi\dragon\idgen\tair\IdGenTairImpl.class
+com\tianshouzhi\dragon\idgen\AbstractIdGen.class
+com\tianshouzhi\dragon\idgen\redis\IdGenRedisImpl.class
+com\tianshouzhi\dragon\idgen\IdDecorator.class
