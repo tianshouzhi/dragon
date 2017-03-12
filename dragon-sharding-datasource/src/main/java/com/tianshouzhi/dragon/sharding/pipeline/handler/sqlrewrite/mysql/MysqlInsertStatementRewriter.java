@@ -50,7 +50,7 @@ import java.util.*;
  * </pre>
  */
 public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
-    public Map<String,Map<String,SqlRouteInfo>> doRewrite(HandlerContext context) throws SQLException{
+    public void doRewrite(HandlerContext context) throws SQLException{
         MySqlInsertStatement sqlStatement= (MySqlInsertStatement) context.getParsedSqlStatement();
         String insertClause="insert into ";
         String logicTableName = sqlStatement.getTableName().getSimpleName().toString();
@@ -90,7 +90,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
             List<SQLInsertStatement.ValuesClause> valuesList = sqlStatement.getValuesList();
             DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
             Map<String,List<SQLInsertStatement.ValuesClause>> valueListMapByTable=new HashMap<String, List<SQLInsertStatement.ValuesClause>>();
-            Map<String,Map<String,SqlRouteInfo>> dbIndexSplitMap=new HashMap<String, Map<String, SqlRouteInfo>>();
+            Map<String,Map<String,SqlRouteInfo>> dbIndexSplitMap=context.getSqlRouteMap();
             for (int i = 0; i < valuesList.size(); i++) {
                 SQLInsertStatement.ValuesClause valuesClause = valuesList.get(i);
                 List<SQLExpr> values = valuesClause.getValues();
@@ -173,10 +173,9 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
                     makeInsertSql(sqlRouteInfo,insertClause,valuesClauses,columnClause,duplicateKeyUpdateStr);
                 }
             }
-            return dbIndexSplitMap;
 
         }else {//批处理
-            return null;
+
         }
     }
 

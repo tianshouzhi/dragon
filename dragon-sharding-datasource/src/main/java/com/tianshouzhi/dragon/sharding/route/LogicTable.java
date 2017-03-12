@@ -11,12 +11,13 @@ import java.util.Set;
 public class LogicTable extends LogicConfig{
     private LogicDatabase logicDatabase;
     private Set<String> dbTbShardColumns;
-
-    public LogicTable(String namePattern, List<String> routeRuleStrList,LogicDatabase logicDatabase) {
+    private String logicName;
+    public LogicTable(String logicName,String namePattern, List<String> routeRuleStrList,LogicDatabase logicDatabase) {
         super(namePattern, routeRuleStrList);
         if(logicDatabase==null){
             throw new NullPointerException();
         }
+        this.logicName=logicName;
         this.logicDatabase=logicDatabase;
         dbTbShardColumns=new HashSet<String>();
         dbTbShardColumns.addAll(logicDatabase.getMergedShardColumns()) ;
@@ -29,7 +30,9 @@ public class LogicTable extends LogicConfig{
     public String getRouteTBIndex(Map<String,Object> shardColumnValuesMap){
         return getRouteIndex(shardColumnValuesMap);
     }
-
+    public String getLogicName() {
+        return logicName;
+    }
     /**
      * 将dbrule中指定的所有分区字段、tbrule中指定的所有分区字段合并在一起
      * @return

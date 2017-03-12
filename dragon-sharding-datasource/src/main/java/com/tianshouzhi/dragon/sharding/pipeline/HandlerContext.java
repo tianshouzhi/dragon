@@ -27,7 +27,7 @@ public class HandlerContext {
     private ResultSet mergedResultSet;
     private boolean isQuery;
 
-    //limit 信息
+    //limit 信息 todo 有待完善 mysql rowCount=-1 表示从当前读取到最后
     private int offset=-1;
     private int rowCount=-1;
 
@@ -36,6 +36,7 @@ public class HandlerContext {
             throw new NullPointerException();
         }
         this.dragonShardingStatement = dragonShardingStatement;
+        this.sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
         try {
             this.router=dragonShardingStatement.getConnection().getRouter();
         } catch (SQLException e) {
@@ -61,10 +62,6 @@ public class HandlerContext {
 
     public void setParsedSqlStatement(SQLStatement parsedSqlStatement) {
         this.parsedSqlStatement = parsedSqlStatement;
-    }
-
-    public void setSqlRouteMap(Map<String, Map<String, SqlRouteInfo>> sqlRouteMap) {
-        this.sqlRouteMap = sqlRouteMap;
     }
 
     public Map<String, Map<String, SqlRouteInfo>> getSqlRouteMap() {
@@ -93,10 +90,6 @@ public class HandlerContext {
 
     public boolean isQuery() {
         return isQuery;
-    }
-
-    public void setQuery(boolean isQuery) {
-        this.isQuery = isQuery;
     }
 
     public Map<String, Set<String>> getHintMap() {

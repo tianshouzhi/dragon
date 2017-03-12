@@ -1,18 +1,15 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.*;
+import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * <pre>
@@ -34,17 +31,15 @@ import java.util.Set;
 public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
 
     @Override
-    public Map<String, Map<String, SqlRouteInfo>> doRewrite(HandlerContext context) {
+    public void doRewrite(HandlerContext context) {
 
         MySqlUpdateStatement update = (MySqlUpdateStatement) context.getParsedSqlStatement();
-        SQLTableSource ts = update.getTableSource();
-        if (ts != null && ts.toString().contains(",")) {//多表更新语法不支持
+        SQLTableSource tableSource = update.getTableSource();
+        if (tableSource != null && tableSource.toString().contains(",")) {//多表更新语法不支持
             throw new RuntimeException("don't support Multiple-table update syntax!!!sql:" + originSql);
         }
 
-        String logicTableName = update.getTableName().getSimpleName();
-        LogicTable logicTable = context.getLogicTable(logicTableName);
-        Set<String> dbTbShardColumns = logicTable.getDbTbShardColumns();
+        parseLogicTableList(tableSource);
         SQLExpr where = update.getWhere();
         if (where == null) {
             throw new RuntimeException("update sql must contains where!!!sql:" + originSql);
@@ -78,11 +73,11 @@ public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
         //二元操作符的分区条件
         Map<String, Object> binaryRouteParamsMap = new HashMap<String, Object>();
         Map<String, List<Object>> sqlInListRouteParamsMap = new HashMap<String, List<Object>>();
-        fillRouteParamsMap(dbTbShardColumns, whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
-        makeRouteMap(logicTable, binaryRouteParamsMap, sqlInListRouteParamsMap);
+        fillRouteParamsMap(whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
+        makeRouteMap(binaryRouteParamsMap, sqlInListRouteParamsMap);
 //            update.getTableName();
-        makeUDRealSql(logicTableName);
-        return routeMap;
+        makeupRealSql();
+
     }
 
 

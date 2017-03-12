@@ -32,7 +32,7 @@ public class DragonShardingDataSourceTest {
     }
 
     @Test
-    public void testInsert() throws SQLException {
+    public void testBatchInsert() throws SQLException {
         String sql="insert into user(id,name) values(?,?),(?,?),(?,?),(?,?),(?,?),(?,?),(?,?),(?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -58,7 +58,7 @@ public class DragonShardingDataSourceTest {
     }
 
     @Test
-    public void testDelete() throws SQLException {
+    public void testBatchDelete() throws SQLException {
         String sql="delete from user where id in(?,?,?,?,?,?,?,?) ";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -88,8 +88,71 @@ public class DragonShardingDataSourceTest {
         System.out.println("updateCount = " + updateCount);
     }
     @Test
-    public void testSelect() throws SQLException {//limit 2,2
-        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user  WHERE id in(?,?,?,?)  ";
+    public void testJoin() throws SQLException {
+        String sql="SELECT emp.name,emp.age,dept.dept_name from emp,dept where emp.deptId=emp.id and emp.id=?";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10101);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int maxId = resultSet.getInt(1);
+            int minId = resultSet.getInt(2);
+            BigDecimal sum = resultSet.getBigDecimal(3);
+            long count = resultSet.getLong(4);
+            System.out.println(" maxId="+maxId+",minId="+minId+",sum = " + sum+",count="+count);
+        }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+    }
+    @Test
+    public void testSelectIn() throws SQLException {
+        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10101);
+        preparedStatement.setInt(2,10001);
+        preparedStatement.setInt(3,20001);
+        preparedStatement.setInt(4,10100);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+    @Test
+    public void testAlias() throws SQLException {
+        String sql="SELECT  u.id,u.name FROM user u  WHERE u.id=?";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10101);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+    @Test
+    public void testOrderByLimit() throws SQLException {
+        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?) order BY id desc limit 1,2";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10101);
+        preparedStatement.setInt(2,10001);
+        preparedStatement.setInt(3,20001);
+        preparedStatement.setInt(4,10100);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+    @Test
+    public void testAggregateFunciton() throws SQLException {//limit 2,2
+        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user  WHERE id in(?,?,?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10101);
@@ -109,8 +172,23 @@ public class DragonShardingDataSourceTest {
         connection.close();
     }
     @Test
-    public void testMaxMin(){
-
+    public void testAggrGroupBy() throws SQLException {//limit 2,2
+        String sql="SELECT  count(*),name FROM user  WHERE id in(?,?,?,?) GROUP by name";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10101);
+        preparedStatement.setInt(2,10001);
+        preparedStatement.setInt(3,20001);
+        preparedStatement.setInt(4,10100);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            Long count = resultSet.getLong(1);
+            String name = resultSet.getString(2);
+            System.out.println("name = " + name+",count="+count);
+        }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
     }
     @Test
     public void testUpdateCaseWhen() throws SQLException {
@@ -136,7 +214,7 @@ public class DragonShardingDataSourceTest {
         String namePattern = tableName+"_{0,number,#0000}";
         ArrayList<String> routeRuleStrList = new ArrayList<String>();
         routeRuleStrList.add("${id}.toLong()%10000");
-        LogicTable logicTable=new LogicTable(namePattern, routeRuleStrList,logicDatabase);
+        LogicTable logicTable=new LogicTable(tableName,namePattern, routeRuleStrList,logicDatabase);
         return logicTable;
     }
     private static LogicDatabase makeLogicDataSource() {

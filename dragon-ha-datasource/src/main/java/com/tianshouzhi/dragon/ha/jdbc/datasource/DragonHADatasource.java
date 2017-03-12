@@ -59,11 +59,12 @@ public class DragonHADatasource extends DragonDataSource {
      * @param dsIndexMap
      */
     public void setIndexDsMap(Map<String,DatasourceWrapper> dsIndexMap) throws SQLException{
+        haDataSourceManager.setIndexDSMap(dsIndexMap);
         init();
         if(dsIndexMap==null||dsIndexMap.size()==0){
             throw new SQLException("'dsIndexMap' can't be null or empty");
         }
-        haDataSourceManager.setIndexDSMap(dsIndexMap);
+
     }
 
 }

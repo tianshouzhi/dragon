@@ -89,6 +89,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         }
 
     }
+    //混合使用PreparedStatement 和 preparedStatement两种batch
     @Test
     public void testBatch() throws SQLException {
         DragonHAConnection connection = this.connection;
@@ -99,7 +100,7 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         preparedStatement.addBatch();
         preparedStatement.setString(1,"huhuamin2");
         preparedStatement.addBatch();
-        preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx2')"); //混合使用两种模式会报错
+        preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx2')");
         int[] ints = preparedStatement.executeBatch();
         System.out.println(ints);
         testQuery();

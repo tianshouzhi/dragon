@@ -2,17 +2,16 @@ package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
-import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * <pre>
@@ -45,23 +44,24 @@ import java.util.Set;
 public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
 
     @Override
-    protected Map<String, Map<String, SqlRouteInfo>> doRewrite(HandlerContext context) throws SQLException {
+    protected void doRewrite(HandlerContext context) throws SQLException {
         SQLSelectStatement selectStatement= (SQLSelectStatement) sqlAst;
 
         SQLSelect select = selectStatement.getSelect();
 
         MySqlSelectQueryBlock query = (MySqlSelectQueryBlock) select.getQuery();
-        SQLTableSource tableSource = query.getFrom();
+
         SQLExpr where = query.getWhere();
+        //解析where条件，会忽略关联查询条件，例如emp.dept_id=dept.id and emp.id=？，只会得到emp.id=？
         List<SQLExpr> whereConditionList = parseWhereConditionList(where);
-        String logicTableName = ((SQLExprTableSource) tableSource).getExpr().toString();
-        LogicTable logicTable = context.getLogicTable(logicTableName);
-        Set<String> dbTbShardColumns = logicTable.getDbTbShardColumns();
+
+        SQLTableSource tableSource = query.getFrom();
+        parseLogicTableList(tableSource);
         //二元操作符的分区条件
         Map<String, Object> binaryRouteParamsMap = new HashMap<String, Object>();
         Map<String, List<Object>> sqlInListRouteParamsMap = new HashMap<String, List<Object>>();
-        fillRouteParamsMap(dbTbShardColumns, whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
-        makeRouteMap(logicTable, binaryRouteParamsMap, sqlInListRouteParamsMap);
+        fillRouteParamsMap(whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
+        makeRouteMap(binaryRouteParamsMap, sqlInListRouteParamsMap);
         //如果同时不为空，说明需要对limit语句进行修改
         if(query.getOrderBy()!=null&&query.getLimit()!=null){
             MySqlSelectQueryBlock.Limit limit = query.getLimit();
@@ -72,7 +72,8 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
             limit.setOffset(new SQLIntegerExpr(0));
 
         }
-        makeUDRealSql(logicTableName);
-        return routeMap;
+        makeupRealSql();
     }
+
+
 }

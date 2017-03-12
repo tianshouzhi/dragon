@@ -13,7 +13,6 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql.MysqlSe
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql.MysqlUpdateStatementRewriter;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
@@ -24,18 +23,16 @@ public class SqlRewriteHandler implements Handler {
         SQLStatement sqlStatement = context.getParsedSqlStatement();
         boolean isQuery=false;
         if(sqlStatement!=null){// 已经对SQLStatement进行过parse
-            Map<String, Map<String,SqlRouteInfo>> sqlRewiteResult = null;
             if(sqlStatement instanceof SQLInsertStatement){
-                sqlRewiteResult= new MysqlInsertStatementRewriter().rewrite(context);
+                new MysqlInsertStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLUpdateStatement){
-                sqlRewiteResult=new MysqlUpdateStatementRewriter().rewrite(context);
+                new MysqlUpdateStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLDeleteStatement){
-                sqlRewiteResult=new MysqlDeleteStatementRewriter().rewrite(context);
+                new MysqlDeleteStatementRewriter().rewrite(context);
             }else if(sqlStatement instanceof SQLSelectStatement){
-                sqlRewiteResult=new MysqlSelectStatementRewriter().rewrite(context);
+                new MysqlSelectStatementRewriter().rewrite(context);
                 isQuery=true;
             }
-            context.setSqlRouteMap(sqlRewiteResult);
         }
         context.setIsQuery(isQuery);
 

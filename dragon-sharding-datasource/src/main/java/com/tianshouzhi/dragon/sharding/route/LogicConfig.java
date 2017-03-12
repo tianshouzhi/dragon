@@ -22,6 +22,7 @@ public abstract class LogicConfig {
     /**db 和tb 使用到的所有分区字段*/
     private Set<String> mergedShardColumns;
 
+
     public LogicConfig(String nameFormat, List<String> routeRuleStrList) {
         if(StringUtils.isBlank(nameFormat)){
             throw new RuntimeException("nameFormat can't be blank!!!");
@@ -37,7 +38,7 @@ public abstract class LogicConfig {
         }
         mergedShardColumns=new HashSet<String>();
         for (RouteRule routeRule : routeRuleList) {
-            mergedShardColumns.addAll(routeRule.columns);
+            mergedShardColumns.addAll(routeRule.shardColumns);
         }
     }
 
@@ -51,7 +52,7 @@ public abstract class LogicConfig {
         }
         RouteRule selectedRouteRule=null;
         for (RouteRule routeRule : routeRuleList) {
-            if(params.keySet().containsAll(routeRule.getColumns())){
+            if(params.keySet().containsAll(routeRule.getShardColumns())){
                 selectedRouteRule=routeRule;
                 break;
             }
@@ -71,7 +72,7 @@ public abstract class LogicConfig {
     protected static class RouteRule{
         private String originRouteRuleStr;//eg:${user_id}.toLong().intdiv(100)%100
         private String replacedRouteRuleStr;//eg:user_id.toLong().intdiv(100)%100
-        private List<String> columns;
+        private List<String> shardColumns;
 
         public RouteRule(String originRouteRuleStr) {
             if(StringUtils.isBlank(originRouteRuleStr)){
@@ -79,16 +80,16 @@ public abstract class LogicConfig {
             }
 
             this.originRouteRuleStr = originRouteRuleStr;
-            this.columns = new ArrayList<String>();
+            this.shardColumns = new ArrayList<String>();
             Matcher matcher = routeRuleVariablePattern.matcher(originRouteRuleStr);
             StringBuffer sb = new StringBuffer();
             while (matcher.find()) {
                 String varible = matcher.group(1);// 脚本中的变量名${xxx}
                 String column = varible.substring(varible.indexOf("{")+1,varible.indexOf("}"));//变量名：xxx
-                columns.add(column);
+                shardColumns.add(column);
                 matcher.appendReplacement(sb,column);
             }
-            if(CollectionUtils.isEmpty(columns)){
+            if(CollectionUtils.isEmpty(shardColumns)){
                 throw new IllegalArgumentException("'originRouteRuleStr' must contains shard column!!!");
             }
             matcher.appendTail(sb);
@@ -103,8 +104,8 @@ public abstract class LogicConfig {
             return replacedRouteRuleStr;
         }
 
-        public List<String> getColumns() {
-            return columns;
+        public List<String> getShardColumns() {
+            return shardColumns;
         }
     }
 }

@@ -125,6 +125,7 @@ public class DragonShardingConnection extends DragonConnection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
+
         return null;
     }
 

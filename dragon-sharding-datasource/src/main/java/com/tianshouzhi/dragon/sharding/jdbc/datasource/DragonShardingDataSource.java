@@ -25,8 +25,4 @@ public class DragonShardingDataSource extends DragonDataSource {
     public Connection getConnection(String username, String password) throws SQLException {
         return new DragonShardingConnection(username,password,router);
     }
-
-    public LogicTable getLogicTable(String tableName){
-        return router.getLogicTableMap().get(tableName);
-    }
 }

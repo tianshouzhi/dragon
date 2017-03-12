@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * 代表一行记录
  * Created by TIANSHOUZHI336 on 2017/3/10.
  */
 public class RowRecord {

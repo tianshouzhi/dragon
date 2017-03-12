@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.jdbc.resultset;
 
 /**
- * Created by TIANSHOUZHI336 on 2017/3/10.
+ * 表示一行记录中每一列的属性
  */
 public class ColumnMetaData {
 
