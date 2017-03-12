@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql;
+package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;

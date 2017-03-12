@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -88,19 +89,24 @@ public class DragonShardingDataSourceTest {
     }
     @Test
     public void testSelect() throws SQLException {//limit 2,2
-        String sql="SELECT  max(id),name FROM user  WHERE id in(?,?,?,?)  ";
+        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user  WHERE id in(?,?,?,?)  ";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10101);
         preparedStatement.setInt(2,10001);
         preparedStatement.setInt(3,20001);
-        preparedStatement.setInt(4,10100);  
+        preparedStatement.setInt(4,10100);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
-            int id = resultSet.getInt(1);
-            String  name = resultSet.getString(2);
-            System.out.println(" min(id)="+id+",name = " + name);
+            int maxId = resultSet.getInt(1);
+            int minId = resultSet.getInt(2);
+            BigDecimal sum = resultSet.getBigDecimal(3);
+            long count = resultSet.getLong(4);
+            System.out.println(" maxId="+maxId+",minId="+minId+",sum = " + sum+",count="+count);
         }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
     }
     @Test
     public void testMaxMin(){

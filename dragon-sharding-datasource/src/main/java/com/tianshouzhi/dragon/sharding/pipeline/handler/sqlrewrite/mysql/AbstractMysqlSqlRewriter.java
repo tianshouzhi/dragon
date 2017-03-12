@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.mysql;
+package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -8,7 +8,7 @@ import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareState
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter.SqlRewriter;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriter;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.collections.MapUtils;
 

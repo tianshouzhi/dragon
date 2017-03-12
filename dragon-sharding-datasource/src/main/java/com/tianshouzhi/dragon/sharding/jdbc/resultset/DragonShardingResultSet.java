@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.sharding.jdbc.resultset;
 
+import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -13,10 +15,22 @@ import java.util.Map;
  * Created by TIANSHOUZHI336 on 2017/2/28.
  */
 public class DragonShardingResultSet implements ResultSet{
+    private final DragonShardingStatement dragonShardingStatement;
     private DragonResultSetMetaData metaData;
     private List<RowRecord> rowRecords;
     //下一个指针
     private int nextPointer=-1;
+    private List<ResultSet> realResultSetList;
+
+    public DragonShardingResultSet(DragonShardingStatement dragonShardingStatement, DragonResultSetMetaData metaData, List<ResultSet> realResultSetList) {
+        this.realResultSetList = realResultSetList;
+        if(dragonShardingStatement==null||metaData==null){
+            throw new NullPointerException();
+        }
+        this.dragonShardingStatement = dragonShardingStatement;
+        this.metaData = metaData;
+    }
+
     @Override
     public boolean next() throws SQLException {
         return ++nextPointer<rowRecords.size();
@@ -24,7 +38,9 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public void close() throws SQLException {
-
+        for (ResultSet resultSet : realResultSetList) {
+            resultSet.close();
+        }
     }
 
     @Override
@@ -970,11 +986,14 @@ public class DragonShardingResultSet implements ResultSet{
         return false;
     }
 
-    public void setMetaData(DragonResultSetMetaData metaData) {
-        this.metaData = metaData;
-    }
-
     public void setRowRecords( List<RowRecord> rowRecords) {
         this.rowRecords = rowRecords;
+    }
+
+    @Override
+    public String toString() {
+        return "DragonShardingResultSet{" +
+                "rowRecords=" + rowRecords +
+                '}';
     }
 }

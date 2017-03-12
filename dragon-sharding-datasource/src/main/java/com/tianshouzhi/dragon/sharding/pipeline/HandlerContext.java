@@ -6,11 +6,11 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import com.tianshouzhi.dragon.sharding.route.Router;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.sql.Statement;
+import java.util.*;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/2/24.
@@ -121,5 +121,22 @@ public class HandlerContext {
 
     public void setRowCount(int rowCount) {
         this.rowCount = rowCount;
+    }
+
+    public List<Statement> getRealStatementList() {
+        Iterator<Map.Entry<String, Map<String, SqlRouteInfo>>> dbIterator = sqlRouteMap.entrySet().iterator();
+        List<Statement> statementList = new ArrayList<Statement>();
+        while (dbIterator.hasNext()) {
+            Map.Entry<String, Map<String, SqlRouteInfo>> entry = dbIterator.next();
+            String dbIndex = entry.getKey();
+            Map<String, SqlRouteInfo> tbSqlMap = entry.getValue();
+            Iterator<Map.Entry<String, SqlRouteInfo>> tbIterator = tbSqlMap.entrySet().iterator();
+            while (tbIterator.hasNext()) {
+                Map.Entry<String, SqlRouteInfo> tableResult = tbIterator.next();
+                PreparedStatement targetStatement = tableResult.getValue().getTargetStatement();
+                statementList.add(targetStatement);
+            }
+        }
+        return statementList;
     }
 }

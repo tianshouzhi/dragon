@@ -34,4 +34,11 @@ public class RowRecord {
             this.columnValue = columnValue;
         }
     }
+
+    @Override
+    public String toString() {
+        return "RowRecord{" +
+                "resultsMap=" + resultsMap +
+                '}';
+    }
 }

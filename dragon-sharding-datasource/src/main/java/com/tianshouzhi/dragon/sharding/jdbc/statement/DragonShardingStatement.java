@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
@@ -16,6 +18,8 @@ import java.sql.SQLWarning;
 public class DragonShardingStatement extends DragonStatement{
     private static final Logger LOGGER= LoggerFactory.getLogger(DragonShardingStatement.class);
     private DragonShardingConnection dragonShardingConnection;
+    private Pipeline pipeline;
+    private List<Statement> realStatementList;
     public DragonShardingStatement(DragonShardingConnection dragonShardingConnection) {
         this.dragonShardingConnection = dragonShardingConnection;
     }
@@ -30,9 +34,10 @@ public class DragonShardingStatement extends DragonStatement{
 
     @Override
     protected boolean doExecute() throws SQLException {
-        Pipeline pipeline = new Pipeline(this, dragonShardingConnection.getRouter());
+        pipeline = new Pipeline(this, dragonShardingConnection.getRouter());
         pipeline.execute();
         HandlerContext handlerContext = pipeline.getHandlerContext();
+        this.realStatementList=handlerContext.getRealStatementList();
         boolean isQuery = handlerContext.isQuery();
         if(!isQuery){
             updateCount=handlerContext.getTotalUpdateCount();
@@ -44,8 +49,8 @@ public class DragonShardingStatement extends DragonStatement{
 
     @Override
     public void close() throws SQLException {
-        if(resultSet!=null){
-            resultSet.close();
+        for (Statement statement : realStatementList) {
+            statement.close();
         }
     }
 

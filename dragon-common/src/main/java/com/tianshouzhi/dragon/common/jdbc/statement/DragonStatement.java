@@ -47,9 +47,6 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
     protected ExecuteType executeType =null;
     protected CreateType createType =null;
 
-    public ExecuteType getExecuteType() {
-        return executeType;
-    }
 
     public enum ExecuteType {
         EXECUTE_QUERY,
@@ -84,6 +81,10 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         this.resultSetConcurrency = resultSetConcurrency;
         this.resultSetHoldability = resultSetHoldability;
         this.createType =RESULTSET_TYPE_CONCURRENCY_HOLDABILITY;
+    }
+
+    public ExecuteType getExecuteType() {
+        return executeType;
     }
 
     //=======================显示指定进行查询==================
@@ -322,4 +323,6 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
             throw new SQLException("No operations allowed after connection closed.");
         }
     }
+
+
 }

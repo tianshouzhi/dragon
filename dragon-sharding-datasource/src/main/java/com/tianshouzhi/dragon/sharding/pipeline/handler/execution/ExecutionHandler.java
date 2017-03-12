@@ -7,6 +7,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -72,7 +73,8 @@ public class ExecutionHandler implements Handler {
         public Void call() {
             PreparedStatement preparedStatement=null;
             try {
-                preparedStatement = ds.getConnection().prepareStatement(sqlRouteInfo.getSql().toString());
+                Connection realConnection = ds.getConnection();
+                preparedStatement = realConnection.prepareStatement(sqlRouteInfo.getSql().toString());
                 Map<Integer, DragonPrepareStatement.ParamSetting> parameters = sqlRouteInfo.getParameters();
                 Iterator<Map.Entry<Integer, DragonPrepareStatement.ParamSetting>> iterator = parameters.entrySet().iterator();
                 while (iterator.hasNext()){

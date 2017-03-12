@@ -1,7 +1,6 @@
-package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.sqlrewriter;
+package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite;
 
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 
 import java.sql.SQLException;
 import java.util.Map;
