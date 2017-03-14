@@ -1,6 +1,0 @@
-com\tianshouzhi\dragon\sharding\jdbc\statement\DragonShardingPrepareStatement.class
-com\tianshouzhi\dragon\sharding\jdbc\datasource\ShardingDataSourceWrapper.class
-com\tianshouzhi\dragon\sharding\jdbc\datasource\RouteConfig.class
-com\tianshouzhi\dragon\sharding\jdbc\statement\DragonShardingStatement.class
-com\tianshouzhi\dragon\sharding\route\LogicDatabase.class
-com\tianshouzhi\dragon\sharding\jdbc\connection\DragonShardingConnection.class

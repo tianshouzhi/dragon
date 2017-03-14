@@ -10,8 +10,10 @@ import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -29,6 +31,8 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     protected int currentParamterIndex =0;
     protected List<Object> batchExecuteInfoList;
     protected List<LogicTable> parsedLogicTableList;
+    protected Map<String,String> aliasTableNameMap=new HashMap<String, String>();
+    private List<SQLIdentifierExpr> sqlExprTableSourceList=new ArrayList<SQLIdentifierExpr>();
 
     @Override
     public void rewrite(HandlerContext context) throws SQLException {
@@ -66,7 +70,13 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             String logicTableName = ((SQLExprTableSource) tableSource).getExpr().toString();
             LogicTable logicTable = context.getLogicTable(logicTableName);
             parsedLogicTableList.add(logicTable);
-
+            String alias = tableSource.getAlias();
+            if(StringUtils.isBlank(alias)){
+                alias=((SQLExprTableSource) tableSource).getExpr().toString();
+            }
+            sqlExprTableSourceList.add((SQLIdentifierExpr) ((SQLExprTableSource) tableSource).getExpr());
+            aliasTableNameMap.put(alias,logicTableName);
+            return;
         }
         if(tableSource instanceof SQLJoinTableSource){
             SQLTableSource left = ((SQLJoinTableSource) tableSource).getLeft();
@@ -75,12 +85,23 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                 //join 查询的两个表，不能是其他类型的表
                 throw new UnsupportedOperationException("join query only support simple table!");
             }
+            sqlExprTableSourceList.add((SQLIdentifierExpr) ((SQLExprTableSource) left).getExpr());
+            sqlExprTableSourceList.add((SQLIdentifierExpr) ((SQLExprTableSource) right).getExpr());
+
             String leftLogicTableName = ((SQLExprTableSource) left).getExpr().toString();
             LogicTable leftLogicTable = context.getLogicTable(leftLogicTableName);
+            String leftAlias=left.getAlias();
             String rightLogicTableName = ((SQLExprTableSource) right).getExpr().toString();
             LogicTable rightLogicTable = context.getLogicTable(rightLogicTableName);
+            String rightAlias=right.getAlias();
             parsedLogicTableList.add(leftLogicTable);
             parsedLogicTableList.add(rightLogicTable);
+            if(StringUtils.isNoneBlank(leftAlias)){
+                aliasTableNameMap.put(leftAlias,leftLogicTableName);
+            }
+            if(StringUtils.isNoneBlank(leftAlias)){
+                aliasTableNameMap.put(rightAlias,rightLogicTableName);
+            }
             return ;
         }
         if(tableSource instanceof SQLUnionQueryTableSource){
@@ -127,42 +148,64 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             fillWhereConditionExprList(right,whereConditionExprList);
         }
     }
-    protected void parseSQLInListExpr(Set<String> dbTbShardColumns, Map<String, List<Object>> sqlInListConditionMap, SQLInListExpr conditionItemExpr) {
+    protected void parseSQLInListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
+        LogicTable logicTable= getLogicTable(conditionItemExpr.getExpr());
         String columnName= getColumnName(conditionItemExpr.getExpr());
-        if(dbTbShardColumns.contains(columnName)){
+        List<Object> valueList=new ArrayList<Object>();
+        if(logicTable.getDbTbShardColumns().contains(columnName)){
             List<SQLExpr> targetList = conditionItemExpr.getTargetList();
             for (SQLExpr sqlExpr : targetList) {
-                List<Object> valueList = sqlInListConditionMap.get(columnName);
                 Object shardColumnValue=sqlExpr.toString();
-                if(valueList==null){
-                    valueList=new ArrayList<Object>();
-                    sqlInListConditionMap.put(columnName,valueList);
-                }
                 if(isJdbcPlaceHolder(sqlExpr)){
                     DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
                      shardColumnValue= paramSetting.values[0];
                 }
                 valueList.add(shardColumnValue);
             }
+            sqlRouteParams.putInListRouteParams(logicTable,columnName,valueList);
         }
     }
 
-    protected void parseBinaryConditionExpr(Set<String> dbTbShardColumns, Map<String, Object> binaryShardConditionMap, SQLBinaryOpExpr conditionItemExpr) {
+    protected void parseBinaryConditionExpr(SqlRouteParams sqlRouteParams, SQLBinaryOpExpr conditionItemExpr) {
         SQLExpr valueExpr = conditionItemExpr.getRight();
         if(isJdbcPlaceHolder(valueExpr)){
             SQLBinaryOperator operator = conditionItemExpr.getOperator();
             SQLExpr shardColumnExpr = conditionItemExpr.getLeft();
+            LogicTable logicTable= getLogicTable(shardColumnExpr);
             String columnName=getColumnName(shardColumnExpr);
             DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-            if(dbTbShardColumns.contains(columnName)){
+            if(logicTable.getDbTbShardColumns().contains(columnName)){
                 if(SQLBinaryOperator.Equality==operator){
                     Object shardColumnValue=  paramSetting.values[0];
-                    binaryShardConditionMap.put(columnName,shardColumnValue);
+                    sqlRouteParams.putBinaryRouteParams(logicTable,columnName,shardColumnValue);
                 }else{
                     throw new RuntimeException("二元操作符的分区条件，只支持=号!!!");
                 }
             }
         }
+    }
+
+    private LogicTable getLogicTable(SQLExpr shardColumnExpr) {
+        if(parsedLogicTableList.size()==1){
+            return parsedLogicTableList.get(0);
+        }
+
+        //// TODO: 2017/3/13 只根据一个列名，怎么判断其属于哪个表
+        if(shardColumnExpr instanceof SQLIdentifierExpr){//直接使用列名，则取第一个没有别名的tablesource 返回，这里可能存在问题
+            String shardColumnName=((SQLIdentifierExpr) shardColumnExpr).getName();
+
+//            return context.getLogicTable(shardColumnName);
+        }
+        if(shardColumnExpr instanceof SQLPropertyExpr){//表名.列名的情况
+            String logicTableName = ((SQLPropertyExpr) shardColumnExpr).getOwner().toString();
+            LogicTable logicTable = context.getLogicTable(logicTableName);
+            if(logicTable==null){//表名可能使用的是别名
+                logicTableName=aliasTableNameMap.get(logicTableName);
+                logicTable = context.getLogicTable(logicTableName);
+            }
+            return logicTable;
+        }
+        throw new RuntimeException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
     }
 
     private String getColumnName(SQLExpr shardColumnExpr) {
@@ -175,56 +218,62 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         }
         return columnName;
     }
-
-    protected void addRouteInfo(LogicTable logicTable, Map<String, Object> binaryShardConditionMap) {
-        String routeDBIndex = logicTable.getRouteDBIndex(binaryShardConditionMap);
-        String routeTBIndex = logicTable.getRouteTBIndex(binaryShardConditionMap);
-        Map<String, SqlRouteInfo> dbRouteMap = context.getSqlRouteMap().get(routeDBIndex);
+    //根据主维度表生成路由规则
+    private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) {
+        Long primaryTBIndex = primaryLogicTable.getRealTBIndex(binaryShardConditionMap);
+        String realDBName = primaryLogicTable.getRealDBName(binaryShardConditionMap);
+        String primaryTBName = primaryLogicTable.getRealTBName(binaryShardConditionMap);
+        Map<String, SqlRouteInfo> dbRouteMap = context.getSqlRouteMap().get(realDBName);
         if(dbRouteMap==null){
             dbRouteMap=new HashMap<String, SqlRouteInfo>();
-            context.getSqlRouteMap().put(routeDBIndex,dbRouteMap);
+            context.getSqlRouteMap().put(realDBName,dbRouteMap);
         }
-        SqlRouteInfo tbSqlRouteInfo = dbRouteMap.get(routeTBIndex);
-        if(tbSqlRouteInfo==null){
-            tbSqlRouteInfo=new SqlRouteInfo(routeDBIndex,routeTBIndex);
+        if(StringUtils.isNoneBlank(realDBName,primaryTBName)){
+            SqlRouteInfo tbSqlRouteInfo = dbRouteMap.get(primaryTBName);
+            if(tbSqlRouteInfo==null){
+                tbSqlRouteInfo=new SqlRouteInfo(realDBName, primaryTBIndex,primaryTBName);
+            }
+            dbRouteMap.put(primaryTBName,tbSqlRouteInfo);
         }
-        dbRouteMap.put(routeTBIndex,tbSqlRouteInfo);
+
     }
 
-    protected void makeRouteMap( Map<String, Object> binaryShardConditionMap, Map<String, List<Object>> sqlInListConditionMap) {
-        if(parsedLogicTableList.size()==1){
-            LogicTable logicTable = parsedLogicTableList.get(0);
-            //where partition=xxx的情况
-            if (MapUtils.isNotEmpty(binaryShardConditionMap) && MapUtils.isEmpty(sqlInListConditionMap)) {
-                addRouteInfo(logicTable, binaryShardConditionMap);
-            }
-            //where partition1=xxx and partition2 in(x,x,x)的情况
-            if (MapUtils.isNotEmpty(sqlInListConditionMap)) {
-                for (Map.Entry<String, List<Object>> entry : sqlInListConditionMap.entrySet()) {
-                    String shardColumn = entry.getKey();
-                    List<Object> valueList = entry.getValue();
-                    for (Object value : valueList) {
-                        HashMap<String, Object> routeConditionMap = new HashMap<String, Object>();
-                        routeConditionMap.put(shardColumn, value);
-                        if (MapUtils.isNotEmpty(binaryShardConditionMap)) {
-                            routeConditionMap.putAll(binaryShardConditionMap);
-                        }
-                        addRouteInfo(logicTable, routeConditionMap);
+    protected void makeRouteMap(SqlRouteParams sqlRouteParams) {
+        //如果sql中只包含一个表，则可以执行
+        //主维度表
+        LogicTable primaryLogicTable = sqlRouteParams.getPrimaryLogicTable();
+        Map<String, Object> binaryRouteParamsMap = sqlRouteParams.getBinaryRouteParamsMap();
+        Map<String, List<Object>> sqlInListParamsMap = sqlRouteParams.getSqlInListRouteParamsMap();
+        //where partition=xxx的情况
+        if (MapUtils.isNotEmpty(binaryRouteParamsMap) && MapUtils.isEmpty(sqlInListParamsMap)) {
+            addRouteInfo(primaryLogicTable,binaryRouteParamsMap);
+        }
+        //where id in(x,x,x)的情况，支持与binary条件联合确定路由规则
+        if (MapUtils.isNotEmpty(sqlInListParamsMap)) {
+            for (Map.Entry<String, List<Object>> entry : sqlInListParamsMap.entrySet()) {
+                String shardColumn = entry.getKey();
+                List<Object> valueList = entry.getValue();
+                for (Object value : valueList) {
+                    HashMap<String, Object> routeConditionMap = new HashMap<String, Object>();
+                    routeConditionMap.put(shardColumn, value);
+                    if (MapUtils.isNotEmpty(binaryRouteParamsMap)) {
+                        routeConditionMap.putAll(binaryRouteParamsMap);
                     }
+                    addRouteInfo(primaryLogicTable,routeConditionMap);
                 }
             }
         }
-
     }
-    protected void fillRouteParamsMap(List<SQLExpr> whereConditionList, Map<String, Object> binaryShardConditionMap, Map<String, List<Object>> sqlInListConditionMap) {
-        if(parsedLogicTableList.size()==1){
-            Set<String> dbTbShardColumns = parsedLogicTableList.get(0).getDbTbShardColumns();
+    protected void fillSqlRouteParams(List<SQLExpr> whereConditionList, SqlRouteParams sqlRouteParams) {
+//            Set<String> dbTbShardColumns = parsedLogicTableList.get(0).getDbTbShardColumns();
             for (SQLExpr conditionItemExpr : whereConditionList) {
                 if (conditionItemExpr instanceof SQLBinaryOpExpr) {
-                    parseBinaryConditionExpr(dbTbShardColumns, binaryShardConditionMap, (SQLBinaryOpExpr) conditionItemExpr);
+                    parseBinaryConditionExpr(sqlRouteParams, (SQLBinaryOpExpr) conditionItemExpr);
+                    continue;
                 }
                 if (conditionItemExpr instanceof SQLInListExpr) {
-                    parseSQLInListExpr(dbTbShardColumns, sqlInListConditionMap, (SQLInListExpr) conditionItemExpr);
+                    parseSQLInListExpr(sqlRouteParams, (SQLInListExpr) conditionItemExpr);
+                    continue;
                 }
                 if (conditionItemExpr instanceof SQLBetweenExpr) {
 //                conditionItemExpr.
@@ -234,20 +283,29 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
                 }
             }
-        }
+
 
     }
     /**生成更新(U)、删除(D)语句的真实sql*/
-    protected void makeupRealSql() {
-        //不能直接使用originSql，因为Mysql Select会对orderBy limit部分做修改
-        String sql = sqlAst.toString();
+    protected void makeupSqlRouteInfoSqls() {
+        //不能直接使用originSql，因为Mysql Select需要对orderBy limit部分做修改
+//        String sql = sqlAst.toString();
         for (Map<String, SqlRouteInfo> dbRouteMap :  context.getSqlRouteMap().values()) {
             for (SqlRouteInfo tbSqlRouteInfo : dbRouteMap.values()) {
-                for (LogicTable logicTable : parsedLogicTableList) {
-                    String newSql = sql.replaceAll(logicTable.getLogicName(), tbSqlRouteInfo.getTableName());
-                    tbSqlRouteInfo.setSql(newSql);
-                    if (isPrepare) {
-                        tbSqlRouteInfo.getParameters().putAll(originParameters);
+                for (SQLIdentifierExpr sqlIdentifierExpr : sqlExprTableSourceList) {
+                    String tableName = sqlIdentifierExpr.getSimpleName();
+                    sqlIdentifierExpr.putAttribute("originName",tableName);
+                    sqlIdentifierExpr.setName(context.getLogicTable(tableName).format(tbSqlRouteInfo.getPrimaryTBIndex()));
+                }
+                String newSql = sqlAst.toString();
+                tbSqlRouteInfo.setSql(newSql);
+                if (isPrepare) {
+                    tbSqlRouteInfo.getParameters().putAll(originParameters);
+                }
+                for (SQLIdentifierExpr sqlIdentifierExpr : sqlExprTableSourceList) {
+                    String originName = (String) sqlIdentifierExpr.getAttribute("originName");
+                    if(originName!=null){
+                        sqlIdentifierExpr.setName(originName);
                     }
                 }
             }

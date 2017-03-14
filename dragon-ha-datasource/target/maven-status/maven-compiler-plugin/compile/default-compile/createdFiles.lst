@@ -1,10 +1,16 @@
 com\tianshouzhi\dragon\ha\hint\ThreadLocalHintUtil.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\DatasourceWrapper.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\ReadDBSelector.class
 com\tianshouzhi\dragon\ha\jdbc\statement\DragonHAPrepareStatement.class
 com\tianshouzhi\dragon\ha\hint\SqlHintUtil.class
 com\tianshouzhi\dragon\ha\jdbc\connection\DragonHAConnection.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\DBSelector$WeightRange.class
 com\tianshouzhi\dragon\ha\jdbc\statement\DragonHAPrepareStatement$1.class
 com\tianshouzhi\dragon\ha\jdbc\statement\DragonHAStatement$1.class
 com\tianshouzhi\dragon\ha\jdbc\datasource\DragonHADatasource.class
 com\tianshouzhi\dragon\ha\jdbc\datasource\HADataSourceManager.class
 com\tianshouzhi\dragon\ha\jdbc\statement\DragonHAStatement.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\DBSelector.class
 com\tianshouzhi\dragon\ha\jdbc\datasource\HADataSourceManager$1.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\WriteDBSelector.class
+com\tianshouzhi\dragon\ha\jdbc\datasource\dbselector\AbstractDBSelector.class

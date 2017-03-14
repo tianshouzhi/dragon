@@ -115,24 +115,24 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
                     }
                     routeParams.put(shardColumnName,shardColumnValue);
                 }
+                Long realTBIndex=logicTable.getRealTBIndex(routeParams);
+                String realDBName=logicTable.getRealDBName(routeParams);
+                String realTBName=logicTable.getRealTBName(routeParams);
 
-                String routeDBIndex=logicTable.getRouteDBIndex(routeParams);
-                String routeTBIndex=logicTable.getRouteTBIndex(routeParams);
-
-                if(StringUtils.isAnyBlank(routeDBIndex,routeTBIndex)){
+                if(StringUtils.isAnyBlank(realDBName,realTBName)){
                     throw new SQLException();//插入语句中没有包含分区字段的值
                 }
-                Map<String, SqlRouteInfo> tbIndexSpitMap = dbIndexSplitMap.get(routeDBIndex);
+                Map<String, SqlRouteInfo> tbIndexSpitMap = dbIndexSplitMap.get(realDBName);
                 if(tbIndexSpitMap==null){
                     tbIndexSpitMap=new HashMap<String, SqlRouteInfo>();
-                    tbIndexSpitMap.put(routeTBIndex,new SqlRouteInfo(routeDBIndex,routeTBIndex));
+                    tbIndexSpitMap.put(realTBName,new SqlRouteInfo(realDBName,realTBIndex,realTBName));
                 }
-                SqlRouteInfo sqlSplitInfo = tbIndexSpitMap.get(routeTBIndex);
+                SqlRouteInfo sqlSplitInfo = tbIndexSpitMap.get(realTBName);
                 if(sqlSplitInfo==null){
-                    sqlSplitInfo=new SqlRouteInfo(routeDBIndex,routeTBIndex);
+                    sqlSplitInfo=new SqlRouteInfo(realDBName,realTBIndex,realTBName);
                 }
 //            sqlSplitInfo.sql.append(insertClause);
-                String valueListKey = routeDBIndex + "-" + routeTBIndex;
+                String valueListKey = realDBName + "-" + realTBName;
                 List<SQLInsertStatement.ValuesClause> valuesClauses = valueListMapByTable.get(valueListKey);
                 if(valuesClauses==null){
                     valuesClauses=new ArrayList<SQLInsertStatement.ValuesClause>();
@@ -148,8 +148,8 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
                     sqlSplitInfo.addParam(parameters.get(paramStartIndex));
                 }
 
-                tbIndexSpitMap.put(routeTBIndex,sqlSplitInfo);
-                dbIndexSplitMap.put(routeDBIndex,tbIndexSpitMap);
+                tbIndexSpitMap.put(realTBName,sqlSplitInfo);
+                dbIndexSplitMap.put(realDBName,tbIndexSpitMap);
             }
             //on duplicate key update语法
             StringBuilder duplicateKeyUpdateStr=null;
@@ -169,7 +169,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
             for (Map.Entry<String, Map<String, SqlRouteInfo>> dbSqlEntry : dbIndexSplitMap.entrySet()) {
                 Map<String, SqlRouteInfo> tbSqlEntryMap = dbSqlEntry.getValue();
                 for (SqlRouteInfo sqlRouteInfo : tbSqlEntryMap.values()) {
-                    List<SQLInsertStatement.ValuesClause> valuesClauses = valueListMapByTable.get(sqlRouteInfo.getDbName() + "-" + sqlRouteInfo.getTableName());
+                    List<SQLInsertStatement.ValuesClause> valuesClauses = valueListMapByTable.get(sqlRouteInfo.getRealDBName() + "-" + sqlRouteInfo.getPrimaryTBName());
                     makeInsertSql(sqlRouteInfo,insertClause,valuesClauses,columnClause,duplicateKeyUpdateStr);
                 }
             }
@@ -182,7 +182,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
     private static void makeInsertSql(SqlRouteInfo sqlRouteInfo, String insertClause,List<SQLInsertStatement.ValuesClause> valuesClauseList, StringBuilder columnClause, StringBuilder duplicateKeyUpdateStr) {
        StringBuilder sql=new StringBuilder();
         sql.append(insertClause)
-                .append(sqlRouteInfo.getTableName())
+                .append(sqlRouteInfo.getPrimaryTBName())
                 .append(columnClause)
                 .append(" values ");
         if(valuesClauseList != null && valuesClauseList.size() > 1){

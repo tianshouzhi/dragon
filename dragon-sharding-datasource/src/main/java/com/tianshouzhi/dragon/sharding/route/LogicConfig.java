@@ -2,7 +2,6 @@ package com.tianshouzhi.dragon.sharding.route;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -21,8 +20,6 @@ public abstract class LogicConfig {
 
     /**db 和tb 使用到的所有分区字段*/
     private Set<String> mergedShardColumns;
-
-
     public LogicConfig(String nameFormat, List<String> routeRuleStrList) {
         if(StringUtils.isBlank(nameFormat)){
             throw new RuntimeException("nameFormat can't be blank!!!");
@@ -46,7 +43,16 @@ public abstract class LogicConfig {
         return nameFormat;
     }
 
-    protected String getRouteIndex(Map<String,Object> params) {
+    protected String getRealName(Map<String,Object> params) {
+        Long caculatedIndex = getRealIndex(params);
+        return format(caculatedIndex);
+    }
+
+    public String format(Long caculatedIndex){
+        return messageFormat.format(new Object[]{caculatedIndex});
+    }
+
+    protected Long getRealIndex(Map<String, Object> params) {
         if(params==null){
             throw new NullPointerException();
         }
@@ -61,8 +67,7 @@ public abstract class LogicConfig {
             throw new RuntimeException("no matched route rule found !!!");
         }
 
-        String caculatedIndex = DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params).toString();
-        return messageFormat.format(new Object[]{NumberUtils.toLong(caculatedIndex)});
+        return (Long) DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
     }
 
     public Set<String> getMergedShardColumns() {

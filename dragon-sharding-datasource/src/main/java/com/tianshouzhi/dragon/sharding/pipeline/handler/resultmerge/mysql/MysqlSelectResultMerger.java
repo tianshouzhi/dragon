@@ -160,7 +160,7 @@ public class MysqlSelectResultMerger implements ResultMerger {
 
     /**
      * 支持的聚合函数 SUM、MAX、MIN、AVG、COUNT
-     * 其中 SUM、MAX、MIN、AVG四个可以组合使用
+     * 其中 SUM、MAX、MIN、COUNT四个可以组合使用
      * @param metaData
      * @param totalRowRecords
      * @param selectQuery
@@ -183,7 +183,7 @@ public class MysqlSelectResultMerger implements ResultMerger {
             //对分库的查询结果进行分组
             SQLSelectGroupByClause groupBy = selectQuery.getGroupBy();
             Map<Object/**group Key*/,List<RowRecord>> groupByMap=new HashMap<Object, List<RowRecord>>();
-            if(groupBy==null){//如果没有group by，则所有都是同一组，key为任意值都可以
+            if(groupBy==null){//如果没有group by，则所有都是同一组，key为任意值都可以，不一定要是*
                 groupByMap.put("*",totalRowRecords);
             }else{
                 String groupByColumnLabel = groupBy.getItems().get(0).toString();

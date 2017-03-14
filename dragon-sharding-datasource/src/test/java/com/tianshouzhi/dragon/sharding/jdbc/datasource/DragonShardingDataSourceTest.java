@@ -27,7 +27,9 @@ public class DragonShardingDataSourceTest {
         LogicDatabase logicDatabase = makeLogicDataSource();
         HashMap<String, LogicTable> logicTableMap = new HashMap<String, LogicTable>();
         LogicTable logicTable = makeLogicTable("user", logicDatabase);
+        LogicTable account = makeLogicTable("user_account", logicDatabase);
         logicTableMap.put("user",logicTable);
+        logicTableMap.put("user_account",account);
         dataSource=new DragonShardingDataSource(logicDatabase, logicTableMap);
     }
 
@@ -52,6 +54,19 @@ public class DragonShardingDataSourceTest {
         preparedStatement.setString(14,"tianhui");
         preparedStatement.setInt(15,20101);
         preparedStatement.setString(16,"tianmin");
+        boolean execute = preparedStatement.execute();
+        int updateCount = preparedStatement.getUpdateCount();
+        System.out.println(updateCount);
+    }
+
+    @Test
+    public void testBatchInsert1() throws SQLException {
+        String sql="insert into user_account(user_id,account_no,money) values(?,?,?)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10000);
+        preparedStatement.setString(2,"account_no_12344");
+        preparedStatement.setDouble(3,20000);
         boolean execute = preparedStatement.execute();
         int updateCount = preparedStatement.getUpdateCount();
         System.out.println(updateCount);
@@ -88,18 +103,63 @@ public class DragonShardingDataSourceTest {
         System.out.println("updateCount = " + updateCount);
     }
     @Test
-    public void testJoin() throws SQLException {
-        String sql="SELECT emp.name,emp.age,dept.dept_name from emp,dept where emp.deptId=emp.id and emp.id=?";
+    public void testSelectInnerJoin() throws SQLException {
+//        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id=?";
+        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id in(?,?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1,10101);
+        preparedStatement.setInt(1,10000);
+        preparedStatement.setInt(2,10101);
+        preparedStatement.setInt(3,10100);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
-            int maxId = resultSet.getInt(1);
-            int minId = resultSet.getInt(2);
-            BigDecimal sum = resultSet.getBigDecimal(3);
-            long count = resultSet.getLong(4);
-            System.out.println(" maxId="+maxId+",minId="+minId+",sum = " + sum+",count="+count);
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String account_no = resultSet.getString("account_no");
+            double money = resultSet.getDouble("money");
+            System.out.println("id = " + id+",name="+name+",account_no="+account_no+",money="+money);
+        }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+    }
+    @Test
+    public void testSelectLeftJoin() throws SQLException {
+//        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id=?";
+        String sql="SELECT u.id,u.name,ua.account_no,ua.money FROM user u LEFT JOIN user_account ua ON u.id=ua.user_id WHERE u.id in(?,?,?)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10000);
+        preparedStatement.setInt(2,10101);
+        preparedStatement.setInt(3,10100);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String account_no = resultSet.getString("account_no");
+            double money = resultSet.getDouble("money");
+            System.out.println("id = " + id+",name="+name+",account_no="+account_no+",money="+money);
+        }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+    }
+    @Test
+    public void testSelectRightJoin() throws SQLException {
+//        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id=?";
+        String sql="SELECT u.id,u.name,ua.account_no,ua.money FROM user u RIGHT JOIN user_account ua ON u.id=ua.user_id WHERE u.id in(?,?,?)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10000);
+        preparedStatement.setInt(2,10101);
+        preparedStatement.setInt(3,10100);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String account_no = resultSet.getString("account_no");
+            double money = resultSet.getDouble("money");
+            System.out.println("id = " + id+",name="+name+",account_no="+account_no+",money="+money);
         }
         resultSet.close();
         preparedStatement.close();
@@ -136,7 +196,7 @@ public class DragonShardingDataSourceTest {
     }
     @Test
     public void testOrderByLimit() throws SQLException {
-        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?) order BY id desc limit 1,2";
+        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?) order BY id desc limit 2,2";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10101);
@@ -214,6 +274,7 @@ public class DragonShardingDataSourceTest {
         String namePattern = tableName+"_{0,number,#0000}";
         ArrayList<String> routeRuleStrList = new ArrayList<String>();
         routeRuleStrList.add("${id}.toLong()%10000");
+        routeRuleStrList.add("${user_id}.toLong()%10000");
         LogicTable logicTable=new LogicTable(tableName,namePattern, routeRuleStrList,logicDatabase);
         return logicTable;
     }
@@ -221,6 +282,7 @@ public class DragonShardingDataSourceTest {
         String dbNamePattern="dragon_sharding_{0,number,#00}";
         List<String> dbRouteRules=new ArrayList<String>();
         dbRouteRules.add("${id}.toLong().intdiv(100)%100");
+        dbRouteRules.add("${user_id}.toLong().intdiv(100)%100");
         HashMap<String, DataSource> dbIndexDatasourceMap = new HashMap<String, DataSource>();
         dbIndexDatasourceMap.put("dragon_sharding_00",makeDataSource("dragon_sharding_00"));
         dbIndexDatasourceMap.put("dragon_sharding_01",makeDataSource("dragon_sharding_01"));

@@ -23,12 +23,17 @@ public class LogicTable extends LogicConfig{
         dbTbShardColumns.addAll(logicDatabase.getMergedShardColumns()) ;
         dbTbShardColumns.addAll(this.getMergedShardColumns());
     }
-    public String getRouteDBIndex(Map<String,Object> shardColumnValuesMap){
-        return logicDatabase.getRouteIndex(shardColumnValuesMap);
+    public String getRealDBName(Map<String,Object> shardColumnValuesMap){
+        return logicDatabase.getRealName(shardColumnValuesMap);
     }
-
-    public String getRouteTBIndex(Map<String,Object> shardColumnValuesMap){
-        return getRouteIndex(shardColumnValuesMap);
+    public Long getRealDBIndex(Map<String,Object> shardColumnValuesMap){
+        return logicDatabase.getRealIndex(shardColumnValuesMap);
+    }
+    public String getRealTBName(Map<String,Object> shardColumnValuesMap){
+        return getRealName(shardColumnValuesMap);
+    }
+    public Long getRealTBIndex(Map<String,Object> shardColumnValuesMap){
+        return getRealIndex(shardColumnValuesMap);
     }
     public String getLogicName() {
         return logicName;

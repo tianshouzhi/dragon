@@ -6,10 +6,9 @@ import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <pre>
@@ -71,12 +70,11 @@ public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
         }
         List<SQLExpr> whereConditionList = parseWhereConditionList(where);
         //二元操作符的分区条件
-        Map<String, Object> binaryRouteParamsMap = new HashMap<String, Object>();
-        Map<String, List<Object>> sqlInListRouteParamsMap = new HashMap<String, List<Object>>();
-        fillRouteParamsMap(whereConditionList, binaryRouteParamsMap, sqlInListRouteParamsMap);
-        makeRouteMap(binaryRouteParamsMap, sqlInListRouteParamsMap);
+        SqlRouteParams sqlRouteParams = new SqlRouteParams();
+        fillSqlRouteParams(whereConditionList, sqlRouteParams);
+        makeRouteMap(sqlRouteParams);
 //            update.getTableName();
-        makeupRealSql();
+        makeupSqlRouteInfoSqls();
 
     }
 

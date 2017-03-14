@@ -50,42 +50,74 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return (String) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return (String) value;
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
-        return (Boolean) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return false;
+        }
+        return (Boolean) value;
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
-        return(Byte) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return(Byte) value;
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
-        return (Short) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return (Short) value;
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
-        return (Integer) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return (Integer) value;
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
-        return (Long) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return (Long) value;
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
-        return (Float) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return (Float) value;
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
-        return (Double) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return 0;
+        }
+        return (Double) value;
     }
 
     @Override
@@ -95,22 +127,38 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
-        return ( byte[]) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return ( byte[]) value;
     }
 
     @Override
     public Date getDate(int columnIndex) throws SQLException {
-        return (Date) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return (Date) value;
     }
 
     @Override
     public Time getTime(int columnIndex) throws SQLException {
-        return (Time) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return (Time) value;
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
-        return (Timestamp) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return (Timestamp) value;
     }
 
     @Override
@@ -263,7 +311,11 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return (BigDecimal) rowRecords.get(nextPointer).getValue(columnIndex);
+        Object value = rowRecords.get(nextPointer).getValue(columnIndex);
+        if(value==null){
+            return null;
+        }
+        return (BigDecimal) value;
     }
 
     @Override
