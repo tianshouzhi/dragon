@@ -1,6 +1,8 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.sharding.route.LogicTable;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.util.HashMap;
@@ -19,14 +21,19 @@ public class SqlRouteInfo {
 
     private String realDBName;
     //主维度真实表名
-    private String primaryTBName;
-    //主维度表的tb Index
-    private Long primaryTBIndex;
+    private String primaryRealTBName;
+    /**
+     * 主维度逻辑表
+     */
+    private LogicTable primaryLogicTable;
 
-    public SqlRouteInfo( String realDBName, Long primaryTBIndex,String primaryTBName) {
-        this.primaryTBIndex = primaryTBIndex;
-        this.realDBName=realDBName;
-        this.primaryTBName=primaryTBName;
+    public SqlRouteInfo(LogicTable primaryLogicTable,String primaryDBName,String primaryRealTBName) {
+        if(StringUtils.isAnyBlank(primaryDBName, primaryRealTBName)){
+            throw new IllegalArgumentException("primaryDBName and primaryRealTBName both can't be blank!!!");
+        }
+        this.realDBName=primaryDBName;
+        this.primaryRealTBName = primaryRealTBName;
+        this.primaryLogicTable=primaryLogicTable;
     }
 
     public void addParam(DragonPrepareStatement.ParamSetting paramSetting) {
@@ -64,11 +71,11 @@ public class SqlRouteInfo {
         return realDBName;
     }
 
-    public String getPrimaryTBName() {
-        return primaryTBName;
+    public String getPrimaryRealTBName() {
+        return primaryRealTBName;
     }
 
-    public Long getPrimaryTBIndex() {
-        return primaryTBIndex;
+    public LogicTable getPrimaryLogicTable() {
+        return primaryLogicTable;
     }
 }

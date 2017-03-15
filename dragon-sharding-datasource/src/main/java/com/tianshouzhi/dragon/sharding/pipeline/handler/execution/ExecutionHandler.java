@@ -5,7 +5,6 @@ import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import org.apache.commons.collections.MapUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,15 +25,6 @@ public class ExecutionHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) {
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
-        if(MapUtils.isNotEmpty(sqlRouteMap)){//如果不为空，则说明进行了sql
-            executeBySqlRouteMap(context, sqlRouteMap);
-        }else{//如果为空，判断是否要到所有DB中执行  // TODO: 2017/3/13  到底是放在这里判断，还是在rewite阶段最后来判断 ?
-
-        }
-
-    }
-
-    private void executeBySqlRouteMap(HandlerContext context, Map<String, Map<String, SqlRouteInfo>> sqlRewriteResult) {
         DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
 
         boolean isPrepared=false;
@@ -46,7 +36,7 @@ public class ExecutionHandler implements Handler {
         int taskNum=0;
         try {
             if (isPrepared) {
-                for (Map.Entry<String, Map<String, SqlRouteInfo>> entry : sqlRewriteResult.entrySet()) {
+                for (Map.Entry<String, Map<String, SqlRouteInfo>> entry : sqlRouteMap.entrySet()) {
                     String dbIndex = entry.getKey();
                     final DataSource ds = context.getRouter().getDataSource(dbIndex);
                     Map<String, SqlRouteInfo> tableSqlMap = entry.getValue();
@@ -68,6 +58,7 @@ public class ExecutionHandler implements Handler {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public static class SqlExecutionTask implements Callable<Void>{

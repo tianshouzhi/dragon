@@ -150,7 +150,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     }
     protected void parseSQLInListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
         LogicTable logicTable= getLogicTable(conditionItemExpr.getExpr());
-        String columnName= getColumnName(conditionItemExpr.getExpr());
+        String columnName= DragonDruidASTUtil.getColumnName(conditionItemExpr.getExpr());
         List<Object> valueList=new ArrayList<Object>();
         if(logicTable.getDbTbShardColumns().contains(columnName)){
             List<SQLExpr> targetList = conditionItemExpr.getTargetList();
@@ -172,7 +172,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             SQLBinaryOperator operator = conditionItemExpr.getOperator();
             SQLExpr shardColumnExpr = conditionItemExpr.getLeft();
             LogicTable logicTable= getLogicTable(shardColumnExpr);
-            String columnName=getColumnName(shardColumnExpr);
+            String columnName=DragonDruidASTUtil.getColumnName(shardColumnExpr);
             DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
             if(logicTable.getDbTbShardColumns().contains(columnName)){
                 if(SQLBinaryOperator.Equality==operator){
@@ -208,30 +208,27 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         throw new RuntimeException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
     }
 
-    private String getColumnName(SQLExpr shardColumnExpr) {
-        String columnName=null;
-        if(shardColumnExpr instanceof SQLIdentifierExpr){
-            columnName=((SQLIdentifierExpr) shardColumnExpr).getName();
-        }
-        if(shardColumnExpr instanceof SQLPropertyExpr){
-            columnName=((SQLPropertyExpr) shardColumnExpr).getSimpleName();
-        }
-        return columnName;
-    }
+
     //根据主维度表生成路由规则
     private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) {
-        Long primaryTBIndex = primaryLogicTable.getRealTBIndex(binaryShardConditionMap);
         String realDBName = primaryLogicTable.getRealDBName(binaryShardConditionMap);
         String primaryTBName = primaryLogicTable.getRealTBName(binaryShardConditionMap);
-        Map<String, SqlRouteInfo> dbRouteMap = context.getSqlRouteMap().get(realDBName);
+        Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
+        if(sqlRouteMap.containsKey(realDBName)){//这个分库的分表sql已经有了，主要用于处理id in (?,?,?)多个值路由到同一个real db的情况，只需要添加一次即可
+            Map<String, SqlRouteInfo> tableRouteMap = sqlRouteMap.get(realDBName);
+            if(tableRouteMap !=null&&tableRouteMap.containsKey(primaryTBName)){
+                return ;
+            }
+        }
+        Map<String, SqlRouteInfo> dbRouteMap = sqlRouteMap.get(realDBName);
         if(dbRouteMap==null){
             dbRouteMap=new HashMap<String, SqlRouteInfo>();
-            context.getSqlRouteMap().put(realDBName,dbRouteMap);
+            sqlRouteMap.put(realDBName,dbRouteMap);
         }
         if(StringUtils.isNoneBlank(realDBName,primaryTBName)){
             SqlRouteInfo tbSqlRouteInfo = dbRouteMap.get(primaryTBName);
             if(tbSqlRouteInfo==null){
-                tbSqlRouteInfo=new SqlRouteInfo(realDBName, primaryTBIndex,primaryTBName);
+                tbSqlRouteInfo=new SqlRouteInfo(primaryLogicTable,realDBName,primaryTBName);
             }
             dbRouteMap.put(primaryTBName,tbSqlRouteInfo);
         }
@@ -286,17 +283,25 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 
     }
-    /**生成更新(U)、删除(D)语句的真实sql*/
+    /**生成更新(U)、删除(D)，查询语句的真实sql*/
     protected void makeupSqlRouteInfoSqls() {
-        //不能直接使用originSql，因为Mysql Select需要对orderBy limit部分做修改
-//        String sql = sqlAst.toString();
-        for (Map<String, SqlRouteInfo> dbRouteMap :  context.getSqlRouteMap().values()) {
+        Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
+        if(MapUtils.isEmpty(sqlRouteMap)){//没有路由参数，表示需要将sql分发到所有表，构造路由到所有分库的参数
+           makeRouteAllParamsMap();
+        }
+        //根据路由表进行重写sql
+        for (Map<String, SqlRouteInfo> dbRouteMap :   sqlRouteMap.values()) {
             for (SqlRouteInfo tbSqlRouteInfo : dbRouteMap.values()) {
+                /**主维度表的真实表名*/
+                String primaryRealTBName = tbSqlRouteInfo.getPrimaryRealTBName();
+                Long primaryTBIndex = tbSqlRouteInfo.getPrimaryLogicTable().parseRealTBIndex(primaryRealTBName);
+                //修改AST中每一个逻辑表名为真实表名
                 for (SQLIdentifierExpr sqlIdentifierExpr : sqlExprTableSourceList) {
                     String tableName = sqlIdentifierExpr.getSimpleName();
                     sqlIdentifierExpr.putAttribute("originName",tableName);
-                    sqlIdentifierExpr.setName(context.getLogicTable(tableName).format(tbSqlRouteInfo.getPrimaryTBIndex()));
+                    sqlIdentifierExpr.setName(context.getLogicTable(tableName).format(primaryTBIndex));
                 }
+                //不能直接使用originSql，因为Mysql Select需要对orderBy limit部分做修改
                 String newSql = sqlAst.toString();
                 tbSqlRouteInfo.setSql(newSql);
                 if (isPrepare) {
@@ -310,5 +315,31 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                 }
             }
         }
+
+    }
+
+    private void makeRouteAllParamsMap() {
+        Map<String, Map<String, SqlRouteInfo>> sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
+        for (LogicTable logicTable : parsedLogicTableList) { //check每个逻辑表都应该配置了真实库与表的映射关系
+            Map<String, List<String>> realDBTBMap = logicTable.getRealDBTBMap();
+            if(MapUtils.isEmpty(realDBTBMap)){
+                throw new RuntimeException("logic table '"+logicTable.getLogicTableName()+"' don't config real db and tb Map");
+            }
+        }
+        LogicTable primaryLogicTable = parsedLogicTableList.get(0);//因为没有分区条件，随机选择一个表作为主维度表，这里选择第一个
+
+        Map<String, List<String>> realDBTBMap = primaryLogicTable.getRealDBTBMap();
+
+        for (Map.Entry<String, List<String>> realDBTBListEntry : realDBTBMap.entrySet()) {
+            String realDBName = realDBTBListEntry.getKey();
+            List<String> realTBNameList = realDBTBListEntry.getValue();
+            Map<String, SqlRouteInfo> realTbRouteInfoMap=new HashMap<String, SqlRouteInfo>();
+            for (String realTBName : realTBNameList) {
+                SqlRouteInfo routeInfo=new SqlRouteInfo(primaryLogicTable,realDBName, realTBName);
+                realTbRouteInfoMap.put(realTBName,routeInfo);
+            }
+            sqlRouteMap.put(realDBName,realTbRouteInfoMap);
+        }
+        context.getSqlRouteMap().putAll(sqlRouteMap);
     }
 }

@@ -30,13 +30,14 @@ public class HandlerContext {
     //limit 信息 todo 有待完善 mysql rowCount=-1 表示从当前读取到最后
     private int offset=-1;
     private int rowCount=-1;
+    private Map<String, String> fullColumnNameAliasMap;
 
     public HandlerContext(DragonShardingStatement dragonShardingStatement) {
         if(dragonShardingStatement==null){
             throw new NullPointerException();
         }
         this.dragonShardingStatement = dragonShardingStatement;
-        this.sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
+        this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
         try {
             this.router=dragonShardingStatement.getConnection().getRouter();
         } catch (SQLException e) {
@@ -131,5 +132,13 @@ public class HandlerContext {
             }
         }
         return statementList;
+    }
+
+    public void setFullColumnNameAliasMap(Map<String, String> fullColumnNameAliasMap) {
+        this.fullColumnNameAliasMap = fullColumnNameAliasMap;
+    }
+
+    public Map<String, String> getFullColumnNameAliasMap() {
+        return fullColumnNameAliasMap;
     }
 }

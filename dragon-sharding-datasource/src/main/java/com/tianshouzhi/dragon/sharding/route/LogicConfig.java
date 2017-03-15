@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,19 @@ public abstract class LogicConfig {
         return messageFormat.format(new Object[]{caculatedIndex});
     }
 
+    public Long parseIndex(String realName){
+        try {
+            return (Long) messageFormat.parse(realName)[0];
+        } catch (ParseException e) {
+            throw new RuntimeException(realName);
+        }
+    }
+
+    /**
+     * 根据路由参数计算真实编号
+     * @param params
+     * @return
+     */
     protected Long getRealIndex(Map<String, Object> params) {
         if(params==null){
             throw new NullPointerException();

@@ -2,7 +2,7 @@ dragonShardingConfig:
     dbNameFormat: dragon_sharding_{0,number,#00}
     dbRouteRules:
             ${id}.toLong().intdiv(100)%100
-    datasourceConfig:
+    datasourceConfig: #完全由数据源定义 提供了default的配置converter，由于只解析现在druid已经存在的配置项，以后如果druid添加了配置项不能解析的话，可以基于接口再写一个，并指定converter为自定义的converter
         defaultClassName: com.alibaba.druid.pool.DruidDataSource
         defaultProperties:
             username: tiansouzhi

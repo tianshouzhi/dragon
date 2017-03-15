@@ -11,10 +11,10 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.ColumnMetaData;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonResultSetMetaData;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
-import com.tianshouzhi.dragon.sharding.jdbc.resultset.RowRecord;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge.ResultMerger;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql.DragonDruidASTUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
@@ -40,10 +40,10 @@ public class MysqlSelectResultMerger implements ResultMerger {
         }
         //  构造ResultSetMetaData 不同库返回的MetaData信息基本类似，只要取第一个就行了
         DragonResultSetMetaData metaData = makeResultSetMetaData(realResultSetList.get(0).getMetaData());
-        //合并查询结果集
-        List<RowRecord> totalRowRecords = mergeResultSets(metaData, realResultSetList);
-
-        DragonShardingResultSet shardingResultSet = new DragonShardingResultSet(dragonShardingStatement,metaData,realResultSetList);
+        //合并查询结果集，将不同的ResultSet实例的结果都合并到totalRowRecords中
+        List<DragonShardingResultSet.RowRecord> totalRowRecords=new ArrayList<DragonShardingResultSet.RowRecord>();
+        DragonShardingResultSet shardingResultSet = new DragonShardingResultSet(dragonShardingStatement,metaData,realResultSetList,totalRowRecords);
+        mergeResultSets(shardingResultSet,totalRowRecords, realResultSetList);
 
         //处理order by和limit 以及max、min、groupBy等函数
         if (!CollectionUtils.isEmpty(totalRowRecords)//没有查询到结果，不需要处理
@@ -52,39 +52,40 @@ public class MysqlSelectResultMerger implements ResultMerger {
             MySqlSelectQueryBlock selectQuery = (MySqlSelectQueryBlock) parsedSqlStatement.getSelect().getQuery();
 
             //处理order by
-            tackleOrderBy(selectQuery.getOrderBy(), totalRowRecords);
+            tackleOrderBy(selectQuery.getOrderBy(), totalRowRecords,context.getFullColumnNameAliasMap());
 
             //处理聚合函数与group by
-            tackleAggrAndGroupBy(metaData, totalRowRecords, selectQuery);
+            tackleAggrAndGroupBy(metaData, totalRowRecords, selectQuery,context.getFullColumnNameAliasMap());
 
             //处理limit
-            totalRowRecords = limit(selectQuery.getLimit(), context.getOffset(), context.getRowCount(), totalRowRecords);
+             limit(selectQuery.getLimit(), context.getOffset(), context.getRowCount(), totalRowRecords);
         }
-
-        shardingResultSet.setRowRecords(totalRowRecords);
         context.setMergedResultSet(shardingResultSet);
     }
 
-    private LinkedList<RowRecord> mergeResultSets(ResultSetMetaData metaData, List<ResultSet> realResultSetList) throws SQLException {
-        LinkedList<RowRecord> results = new LinkedList<RowRecord>();
+    /**
+     * shardingResultSet中已经包含了totalRowRecords的引用，通过修改引用的方法来修改totalRowRecords中的值，而不是直接shardingResultSet直接提供一个set方法来设置totalRowRecords
+     * 原因是基于以下考虑：shardingResultSet不提供ResultSet接口定义之外的方法，避免污染接口
+     */
+    private void mergeResultSets(DragonShardingResultSet shardingResultSet,List<DragonShardingResultSet.RowRecord> totalRowRecords, List<ResultSet> realResultSetList) throws SQLException {
+        ResultSetMetaData metaData = shardingResultSet.getMetaData();
         for (ResultSet resultSet : realResultSetList) {
             while (resultSet.next()) {
-                RowRecord rowRecord = new RowRecord();
-                for (int i = 0; i < metaData.getColumnCount(); i++) {
+                DragonShardingResultSet.RowRecord rowRecord = shardingResultSet.new RowRecord();
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
                     String columnName = metaData.getColumnName(i);
-                    Object columnValue = resultSet.getObject(i + 1);
-                    rowRecord.putColumnValue(i + 1, columnName, columnValue);
+                    Object columnValue = resultSet.getObject(i );
+                    rowRecord.putColumnValue(i, columnName, columnValue);
                 }
-                results.add(rowRecord);
+                totalRowRecords.add(rowRecord);
             }
         }
-        return results;
     }
 
     private DragonResultSetMetaData makeResultSetMetaData(ResultSetMetaData metaData) throws SQLException {
         int columnCount = metaData.getColumnCount();
-        List<ColumnMetaData> columnMetaDataList=new ArrayList<ColumnMetaData>(columnCount);
-        DragonResultSetMetaData result=new DragonResultSetMetaData(columnMetaDataList);
+        Map<Integer,ColumnMetaData> columnMetaDataMap=new TreeMap<Integer, ColumnMetaData>();
+        DragonResultSetMetaData result=new DragonResultSetMetaData(columnMetaDataMap);
         //columnIndex的索引从1开始
 
         for (int i = 1; i <= columnCount; i++) {
@@ -117,24 +118,24 @@ public class MysqlSelectResultMerger implements ResultMerger {
             columnMetaData.setSigned(metaData.isSigned(i));
             columnMetaData.setPrecision(metaData.getPrecision(i));
 
-            columnMetaDataList.add(columnMetaData);
+            columnMetaDataMap.put(i,columnMetaData);
         }
         return result;
     }
 
-    private void tackleOrderBy(SQLOrderBy orderBy, List<RowRecord> totalRowRecords) {
+    private void tackleOrderBy(SQLOrderBy orderBy, List<DragonShardingResultSet.RowRecord> totalRowRecords, final Map<String, String> fullColumnNameAliasMap) {
         if(orderBy==null){
             return ;
         }
         final List<SQLSelectOrderByItem> items = orderBy.getItems();
 
-        Comparator<RowRecord> comparator = new Comparator<RowRecord>() {
+        Comparator<DragonShardingResultSet.RowRecord> comparator = new Comparator<DragonShardingResultSet.RowRecord>() {
             @Override
-            public int compare(RowRecord o1, RowRecord o2) {
+            public int compare(DragonShardingResultSet.RowRecord o1, DragonShardingResultSet.RowRecord o2) {
                 int result=0;
                 for (SQLSelectOrderByItem item : items) {
                     boolean asc= SQLOrderingSpecification.ASC==item.getType();
-                    String columnLabel = item.getExpr().toString();
+                    String columnLabel = getColumnLabel(item.getExpr(),fullColumnNameAliasMap);
                     Object o1_value = o1.getValue(columnLabel);
                     Object o2_value = o2.getValue(columnLabel);
                     if(o1_value instanceof Comparable&&o2_value instanceof Comparable){
@@ -166,7 +167,7 @@ public class MysqlSelectResultMerger implements ResultMerger {
      * @param selectQuery
      * @throws SQLException
      */
-    private void tackleAggrAndGroupBy(DragonResultSetMetaData metaData, List<RowRecord> totalRowRecords, MySqlSelectQueryBlock selectQuery) throws SQLException {
+    private void tackleAggrAndGroupBy(DragonResultSetMetaData metaData, List<DragonShardingResultSet.RowRecord> totalRowRecords, MySqlSelectQueryBlock selectQuery,Map<String, String> fullColumnNameAliasMap) throws SQLException {
 
         //聚合函数位置与聚合函数的映射
         Map<Integer,SQLAggregateExpr> clomunIndexAggrMap=null;
@@ -182,32 +183,33 @@ public class MysqlSelectResultMerger implements ResultMerger {
         if(!MapUtils.isEmpty(clomunIndexAggrMap)){
             //对分库的查询结果进行分组
             SQLSelectGroupByClause groupBy = selectQuery.getGroupBy();
-            Map<Object/**group Key*/,List<RowRecord>> groupByMap=new HashMap<Object, List<RowRecord>>();
+            Map<Object/**group Key*/,List<DragonShardingResultSet.RowRecord>> groupByMap=new HashMap<Object, List<DragonShardingResultSet.RowRecord>>();
             if(groupBy==null){//如果没有group by，则所有都是同一组，key为任意值都可以，不一定要是*
                 groupByMap.put("*",totalRowRecords);
             }else{
-                String groupByColumnLabel = groupBy.getItems().get(0).toString();
-                for (RowRecord rowRecord : totalRowRecords) {
-                    Object groupKey = rowRecord.getValue(groupByColumnLabel);
-                    List<RowRecord> rowRecords = groupByMap.get(groupKey);
+                SQLExpr groupByColumnExpr = groupBy.getItems().get(0);
+                String groupByColumnLabel = getColumnLabel(groupByColumnExpr,fullColumnNameAliasMap);//group by只支持根据一个列，因此只取第一个
+                for (DragonShardingResultSet.RowRecord rowRecord : totalRowRecords) {
+                    Object groupKey = rowRecord.getValue(groupByColumnLabel);//把这一列当做group Key
+                    List<DragonShardingResultSet.RowRecord> rowRecords = groupByMap.get(groupKey);
                     if(rowRecords==null){
-                        rowRecords=new ArrayList<RowRecord>();
+                        rowRecords=new ArrayList<DragonShardingResultSet.RowRecord>();
                         groupByMap.put(groupKey,rowRecords);
                     }
                     rowRecords.add(rowRecord);
                 }
             }
             //针对各个分组应用聚合函数
-            List<RowRecord> returnRecordList = new ArrayList<RowRecord>();
-            for (List<RowRecord> groupByList : groupByMap.values()) {
-                RowRecord returnRecord = groupByList.get(0);//以每个分组的第一条作为返回结果
+            List<DragonShardingResultSet.RowRecord> returnRecordList = new ArrayList<DragonShardingResultSet.RowRecord>();
+            for (List<DragonShardingResultSet.RowRecord> groupByList : groupByMap.values()) {
+                DragonShardingResultSet.RowRecord returnRecord = groupByList.get(0);//以每个分组的第一条作为返回结果
                 for (Map.Entry<Integer, SQLAggregateExpr> aggregateExprEntry : clomunIndexAggrMap.entrySet()) {
                     Integer aggregateColumnIndex = aggregateExprEntry.getKey();
-                    String columnLabel = metaData.getColumnLabel(aggregateColumnIndex-1);//fixme bug，不应该减-1
+                    String columnLabel = metaData.getColumnLabel(aggregateColumnIndex);
                     SQLAggregateExpr sqlAggregateExpr = aggregateExprEntry.getValue();
                     final String methodName = sqlAggregateExpr.getMethodName();
                     for (int i = 1; i < groupByList.size(); i++) {
-                        RowRecord rowRecord=groupByList.get(i);
+                        DragonShardingResultSet.RowRecord rowRecord=groupByList.get(i);
                         if ("COUNT".equals(methodName)){
                             Long value = (Long) rowRecord.getValue(aggregateColumnIndex);
                             Long value1 = (Long) returnRecord.getValue(aggregateColumnIndex);
@@ -250,13 +252,29 @@ public class MysqlSelectResultMerger implements ResultMerger {
         }
     }
 
-    private List<RowRecord> limit(MySqlSelectQueryBlock.Limit limit, int offset, int rowcount, List<RowRecord> totalRowRecords) {
+    private void limit(MySqlSelectQueryBlock.Limit limit, int offset, int rowcount, List<DragonShardingResultSet.RowRecord> totalRowRecords) {
         if(limit==null){
-            return totalRowRecords;
+            return ;
         }
         final int start=offset;
         final int end=Math.min(offset+rowcount,totalRowRecords.size());
-        List<RowRecord> subList = totalRowRecords.subList(start, end);
-        return subList;
+        //// TODO: 2017/3/14 有什么更高效的方法，不需要这样频繁的拷贝 ，特别是在记录非常多的情况下
+        List<DragonShardingResultSet.RowRecord> resultList=new ArrayList<DragonShardingResultSet.RowRecord>();
+        for (int i = 0; i < totalRowRecords.size(); i++) {
+            if(i>=start&&i<end){
+                resultList.add(totalRowRecords.get(i));
+            }
+        }
+        totalRowRecords.clear();
+        totalRowRecords.addAll(resultList);
+
+    }
+
+    private String getColumnLabel(SQLExpr sqlExpr,Map<String, String> fullColumnNameAliasMap){
+        String key = sqlExpr.toString();
+        if(MapUtils.isNotEmpty(fullColumnNameAliasMap)&&fullColumnNameAliasMap.containsKey(key)){
+            return fullColumnNameAliasMap.get(key);
+        }
+        return DragonDruidASTUtil.getColumnName(sqlExpr);
     }
 }

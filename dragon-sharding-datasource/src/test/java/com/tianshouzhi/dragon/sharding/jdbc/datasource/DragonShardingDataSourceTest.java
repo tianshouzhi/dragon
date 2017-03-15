@@ -12,9 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/2/24.
@@ -73,6 +71,19 @@ public class DragonShardingDataSourceTest {
     }
 
     @Test
+    public void testSelectAll() throws SQLException {//不指定分区条件，分发到所有表
+        String sql="select * from user";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+
+    @Test
     public void testBatchDelete() throws SQLException {
         String sql="delete from user where id in(?,?,?,?,?,?,?,?) ";
         Connection connection = dataSource.getConnection();
@@ -105,7 +116,7 @@ public class DragonShardingDataSourceTest {
     @Test
     public void testSelectInnerJoin() throws SQLException {
 //        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id=?";
-        String sql="SELECT u.id,u.name,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id in(?,?,?)";
+        String sql="SELECT u.id as user_id,u.name as username,ua.account_no,ua.money from user u,user_account ua where u.id=ua.user_id and u.id in(?,?,?) order by user_id";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10000);
@@ -113,8 +124,8 @@ public class DragonShardingDataSourceTest {
         preparedStatement.setInt(3,10100);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
-            int id = resultSet.getInt("id");
-            String name = resultSet.getString("name");
+            int id = resultSet.getInt("user_id");
+            String name = resultSet.getString("username");
             String account_no = resultSet.getString("account_no");
             double money = resultSet.getDouble("money");
             System.out.println("id = " + id+",name="+name+",account_no="+account_no+",money="+money);
@@ -203,6 +214,8 @@ public class DragonShardingDataSourceTest {
         preparedStatement.setInt(2,10001);
         preparedStatement.setInt(3,20001);
         preparedStatement.setInt(4,10100);
+        /*preparedStatement.setInt(5,2);
+        preparedStatement.setInt(6,2);*/
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
             int id = resultSet.getInt("id");
@@ -212,13 +225,14 @@ public class DragonShardingDataSourceTest {
     }
     @Test
     public void testAggregateFunciton() throws SQLException {//limit 2,2
-        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user  WHERE id in(?,?,?,?)";
+        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user";
+//        String sql="SELECT  max(id),min(id),sum(id),count(*) FROM user  WHERE id in(?,?,?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1,10101);
+       /* preparedStatement.setInt(1,10101);
         preparedStatement.setInt(2,10001);
         preparedStatement.setInt(3,20001);
-        preparedStatement.setInt(4,10100);
+        preparedStatement.setInt(4,10100);*/
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
             int maxId = resultSet.getInt(1);
@@ -232,18 +246,16 @@ public class DragonShardingDataSourceTest {
         connection.close();
     }
     @Test
-    public void testAggrGroupBy() throws SQLException {//limit 2,2
-        String sql="SELECT  count(*),name FROM user  WHERE id in(?,?,?,?) GROUP by name";
+    public void testAggrGroupBy() throws SQLException {//验证 tddl语法是否支持
+        //fixme 已修复 group by的字段起了别名的情况下，只能按照别别名进行group by 例如以下只能用username，不能用u.name,order by也是一样
+        //todo 未修复：使用表名.列名作为select 选项，但是group by 只用列名会出错 例如以下可以用u.name、username，但是不能直接使用name
+        String sql="SELECT  count(*) as total_count,u.name as username FROM user u GROUP by u.name";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1,10101);
-        preparedStatement.setInt(2,10001);
-        preparedStatement.setInt(3,20001);
-        preparedStatement.setInt(4,10100);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()){
-            Long count = resultSet.getLong(1);
-            String name = resultSet.getString(2);
+            Long count = resultSet.getLong("total_count");
+            String name = resultSet.getString("username");
             System.out.println("name = " + name+",count="+count);
         }
         resultSet.close();
@@ -276,6 +288,18 @@ public class DragonShardingDataSourceTest {
         routeRuleStrList.add("${id}.toLong()%10000");
         routeRuleStrList.add("${user_id}.toLong()%10000");
         LogicTable logicTable=new LogicTable(tableName,namePattern, routeRuleStrList,logicDatabase);
+
+        Map<String,List<String>> map=new HashMap<String, List<String>>();
+        Set<String> realDBIndexes = logicDatabase.getRealDbIndexDatasourceMap().keySet();
+        for (String realDBName : realDBIndexes) {
+            Long realDbIndex = logicDatabase.parseIndex(realDBName);
+            List<String> realTBNames=new ArrayList<String>();
+            for (int i = 0; i < 2; i++) {
+                realTBNames.add(logicTable.format(realDbIndex*100+i));
+            }
+            map.put(realDBName,realTBNames);
+        }
+        logicTable.setRealDBTBMap(map);
         return logicTable;
     }
     private static LogicDatabase makeLogicDataSource() {
@@ -286,14 +310,14 @@ public class DragonShardingDataSourceTest {
         HashMap<String, DataSource> dbIndexDatasourceMap = new HashMap<String, DataSource>();
         dbIndexDatasourceMap.put("dragon_sharding_00",makeDataSource("dragon_sharding_00"));
         dbIndexDatasourceMap.put("dragon_sharding_01",makeDataSource("dragon_sharding_01"));
-        dbIndexDatasourceMap.put("dragon_sharding_02",makeDataSource("dragon_sharding_02"));
+/*        dbIndexDatasourceMap.put("dragon_sharding_02",makeDataSource("dragon_sharding_02"));
         dbIndexDatasourceMap.put("dragon_sharding_03",makeDataSource("dragon_sharding_03"));
         dbIndexDatasourceMap.put("dragon_sharding_04",makeDataSource("dragon_sharding_04"));
         dbIndexDatasourceMap.put("dragon_sharding_05",makeDataSource("dragon_sharding_05"));
         dbIndexDatasourceMap.put("dragon_sharding_06",makeDataSource("dragon_sharding_06"));
         dbIndexDatasourceMap.put("dragon_sharding_07",makeDataSource("dragon_sharding_07"));
         dbIndexDatasourceMap.put("dragon_sharding_08",makeDataSource("dragon_sharding_08"));
-        dbIndexDatasourceMap.put("dragon_sharding_09",makeDataSource("dragon_sharding_09"));
+        dbIndexDatasourceMap.put("dragon_sharding_09",makeDataSource("dragon_sharding_09"));*/
         return new LogicDatabase(dbNamePattern,dbRouteRules, dbIndexDatasourceMap);
     }
 

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +23,14 @@ public class DragonShardingResultSet implements ResultSet{
     private int nextPointer=-1;
     private List<ResultSet> realResultSetList;
 
-    public DragonShardingResultSet(DragonShardingStatement dragonShardingStatement, DragonResultSetMetaData metaData, List<ResultSet> realResultSetList) {
+    public DragonShardingResultSet(DragonShardingStatement dragonShardingStatement, DragonResultSetMetaData metaData, List<ResultSet> realResultSetList, List<RowRecord> rowRecords) {
         this.realResultSetList = realResultSetList;
         if(dragonShardingStatement==null||metaData==null){
             throw new NullPointerException();
         }
         this.dragonShardingStatement = dragonShardingStatement;
         this.metaData = metaData;
+        this.rowRecords=rowRecords;
     }
 
     @Override
@@ -1038,14 +1040,50 @@ public class DragonShardingResultSet implements ResultSet{
         return false;
     }
 
-    public void setRowRecords( List<RowRecord> rowRecords) {
+/*    public void setRowRecords( List<RowRecord> rowRecords) {
         this.rowRecords = rowRecords;
-    }
+    }*/
 
     @Override
     public String toString() {
         return "DragonShardingResultSet{" +
                 "rowRecords=" + rowRecords +
                 '}';
+    }
+
+    /**
+     * 代表一行记录
+     * Created by TIANSHOUZHI336 on 2017/3/10.
+     */
+    public  class RowRecord {
+        private Map<Integer,Column> resultsMap=new HashMap<Integer, Column>();
+        public void putColumnValue(Integer columnIndex, String columnLabel, Object columnValue) {
+            resultsMap.put(columnIndex,new Column(columnLabel,columnValue));
+        }
+        public Object getValue(Integer columnIndex){
+            Column column = resultsMap.get(columnIndex);
+            return column.columnValue;
+        }
+
+        public Object getValue(String columnLabel){
+            return getValue(metaData.getColumnIndex(columnLabel));
+        }
+
+        private  class Column{
+            String columnLabel;
+            Object columnValue;
+
+            public Column(String columnLabel, Object columnValue) {
+                this.columnLabel = columnLabel;
+                this.columnValue = columnValue;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "RowRecord{" +
+                    "resultsMap=" + resultsMap +
+                    '}';
+        }
     }
 }

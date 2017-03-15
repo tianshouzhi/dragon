@@ -125,11 +125,11 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
                 Map<String, SqlRouteInfo> tbIndexSpitMap = dbIndexSplitMap.get(realDBName);
                 if(tbIndexSpitMap==null){
                     tbIndexSpitMap=new HashMap<String, SqlRouteInfo>();
-                    tbIndexSpitMap.put(realTBName,new SqlRouteInfo(realDBName,realTBIndex,realTBName));
+                    tbIndexSpitMap.put(realTBName,new SqlRouteInfo(logicTable,realDBName,realTBName));
                 }
                 SqlRouteInfo sqlSplitInfo = tbIndexSpitMap.get(realTBName);
                 if(sqlSplitInfo==null){
-                    sqlSplitInfo=new SqlRouteInfo(realDBName,realTBIndex,realTBName);
+                    sqlSplitInfo=new SqlRouteInfo(logicTable,realDBName,realTBName);
                 }
 //            sqlSplitInfo.sql.append(insertClause);
                 String valueListKey = realDBName + "-" + realTBName;
@@ -169,7 +169,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
             for (Map.Entry<String, Map<String, SqlRouteInfo>> dbSqlEntry : dbIndexSplitMap.entrySet()) {
                 Map<String, SqlRouteInfo> tbSqlEntryMap = dbSqlEntry.getValue();
                 for (SqlRouteInfo sqlRouteInfo : tbSqlEntryMap.values()) {
-                    List<SQLInsertStatement.ValuesClause> valuesClauses = valueListMapByTable.get(sqlRouteInfo.getRealDBName() + "-" + sqlRouteInfo.getPrimaryTBName());
+                    List<SQLInsertStatement.ValuesClause> valuesClauses = valueListMapByTable.get(sqlRouteInfo.getRealDBName() + "-" + sqlRouteInfo.getPrimaryRealTBName());
                     makeInsertSql(sqlRouteInfo,insertClause,valuesClauses,columnClause,duplicateKeyUpdateStr);
                 }
             }
@@ -182,7 +182,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
     private static void makeInsertSql(SqlRouteInfo sqlRouteInfo, String insertClause,List<SQLInsertStatement.ValuesClause> valuesClauseList, StringBuilder columnClause, StringBuilder duplicateKeyUpdateStr) {
        StringBuilder sql=new StringBuilder();
         sql.append(insertClause)
-                .append(sqlRouteInfo.getPrimaryTBName())
+                .append(sqlRouteInfo.getPrimaryRealTBName())
                 .append(columnClause)
                 .append(" values ");
         if(valuesClauseList != null && valuesClauseList.size() > 1){
