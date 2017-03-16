@@ -83,6 +83,37 @@ public class DragonShardingDataSourceTest {
         }
     }
 
+    //= != > <  >= <= is is not like not like
+    @Test
+    public void testSelectBetween() throws SQLException {
+        String sql="select * from user where id BETWEEN ? and ?";
+//        String sql="select * from user ";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10000);
+        preparedStatement.setInt(2,20000);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+    @Test
+    public void testSelectBinaryCondition() throws SQLException {
+        String sql="select * from user where id=10000";
+//        String sql="select * from user ";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+//        preparedStatement.setInt(1,10000);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
+
     @Test
     public void testBatchDelete() throws SQLException {
         String sql="delete from user where id in(?,?,?,?,?,?,?,?) ";
@@ -99,6 +130,7 @@ public class DragonShardingDataSourceTest {
         int updateCount = preparedStatement.executeUpdate();
         System.out.println("updateCount = " + updateCount);
     }
+
 
     @Test
     public void testUpdateWhereIdIn() throws SQLException {

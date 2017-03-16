@@ -119,12 +119,21 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         }
         return sqlExpr instanceof SQLVariantRefExpr;
     }
-    protected List<SQLExpr> parseWhereConditionList(SQLExpr where){
+
+    /**
+     * 解析可作为路由条件的where条件，只支持：id=？ 或者 id in(?,?,?)
+     * 其他条件如> 、>=、 <、<=、betwwen and、!= 、not in、like、not like的条件，不会返回
+     * @param where
+     * @return
+     */
+    protected List<SQLExpr> parseRouteConditionList(SQLExpr where){
         List<SQLExpr> whereConditionList=new ArrayList<SQLExpr>();
         fillWhereConditionExprList(where,whereConditionList);
         return whereConditionList;
     }
 
+
+    //解析结果
     private static void fillWhereConditionExprList(SQLExpr where, List<SQLExpr> whereConditionExprList){
         if(where instanceof SQLIdentifierExpr//直接列名的情况
                 ||where instanceof SQLPropertyExpr){//表名.列名的情况
@@ -134,21 +143,80 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
             return;
         }
-        if(where instanceof SQLInListExpr){
+        if(where instanceof SQLInListExpr
+                || where instanceof SQLBetweenExpr){
             whereConditionExprList.add(where);
             return;
         }
+
+        //二元操作符放在最后解析
         if(where instanceof SQLBinaryOpExpr){
             SQLExpr left = ((SQLBinaryOpExpr) where).getLeft();
             SQLExpr right = ((SQLBinaryOpExpr) where).getRight();
-            if(right instanceof SQLPropertyExpr){//不解析关联查询条件，例如emp.dept_id=dept.id，这样的条件对于分区没有意义
-                return;
-            }
+
             fillWhereConditionExprList(left,whereConditionExprList);
             fillWhereConditionExprList(right,whereConditionExprList);
         }
     }
-    protected void parseSQLInListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
+
+
+    /**
+     * 二元运算符条件解析 只有=号可作为分区条件，只会把currentParamterIndex增加，所有二元操作符：SQLBinaryOperator
+     * @param sqlRouteParams
+     * @param conditionItemExpr
+     */
+    private void parseBinaryRouteConditionExpr(SqlRouteParams sqlRouteParams, SQLBinaryOpExpr conditionItemExpr) {
+            SQLExpr valueExpr = conditionItemExpr.getRight();
+            if(valueExpr instanceof SQLIdentifierExpr || valueExpr instanceof SQLPropertyExpr){
+                //处理a.id=b.id情况，这种条件不能路由路由条件，且currentParamterIndex也不需要改变
+                return;
+            }
+            SQLBinaryOperator operator = conditionItemExpr.getOperator();
+            SQLExpr shardColumnExpr = conditionItemExpr.getLeft();
+            LogicTable logicTable= getLogicTable(shardColumnExpr);
+            String columnName=DragonDruidASTUtil.getColumnName(shardColumnExpr);
+
+        /*if(!(SQLBinaryOperator.NotEqual==operator
+                    || SQLBinaryOperator.GreaterThan==operator
+                    || SQLBinaryOperator.GreaterThanOrEqual==operator
+                    ||SQLBinaryOperator.NotGreaterThan==operator
+
+                    ||SQLBinaryOperator.LessThan==operator
+                    ||SQLBinaryOperator.LessThanOrEqual==operator
+                    ||SQLBinaryOperator.NotLessThan==operator
+
+                    ||SQLBinaryOperator.LessThanOrEqualOrGreaterThan==operator
+
+                    ||SQLBinaryOperator.Like==operator
+                    ||SQLBinaryOperator.NotLike==operator
+                    ||SQLBinaryOperator.NotRLike==operator
+
+                    ||SQLBinaryOperator.Is==operator  //一般与null 连用 is null  is not null
+                    ||SQLBinaryOperator.IsNot==operator)
+                    ){
+                throw new RuntimeException("unsupported binary operator :"+operator+" in sql :"+originSql);
+            }*/
+            //以上二元操作符，虽然不能作为路由条件，但是有可能有占位符，所以将currentParamterIndex+1；
+            if(isJdbcPlaceHolder(valueExpr)) {
+               ++currentParamterIndex;
+            }
+             //只将=号作为路由条件，其他二进制操作符不可作为路由条件
+             if(SQLBinaryOperator.Equality==operator){
+                 DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(currentParamterIndex);
+                 if(logicTable.getDbTbShardColumns().contains(columnName)){
+                     Object shardColumnValue=valueExpr.toString(); //// TODO: 2017/3/16 支持子查询
+                     if(isJdbcPlaceHolder(valueExpr)){
+                         shardColumnValue=  paramSetting.values[0];
+                     }
+                     sqlRouteParams.putBinaryRouteParams(logicTable,columnName,shardColumnValue);
+                 }
+            }
+
+
+
+
+    }
+    private void parseSQLInRouteListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
         LogicTable logicTable= getLogicTable(conditionItemExpr.getExpr());
         String columnName= DragonDruidASTUtil.getColumnName(conditionItemExpr.getExpr());
         List<Object> valueList=new ArrayList<Object>();
@@ -158,33 +226,13 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                 Object shardColumnValue=sqlExpr.toString();
                 if(isJdbcPlaceHolder(sqlExpr)){
                     DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-                     shardColumnValue= paramSetting.values[0];
+                    shardColumnValue= paramSetting.values[0];
                 }
                 valueList.add(shardColumnValue);
             }
             sqlRouteParams.putInListRouteParams(logicTable,columnName,valueList);
         }
     }
-
-    protected void parseBinaryConditionExpr(SqlRouteParams sqlRouteParams, SQLBinaryOpExpr conditionItemExpr) {
-        SQLExpr valueExpr = conditionItemExpr.getRight();
-        if(isJdbcPlaceHolder(valueExpr)){
-            SQLBinaryOperator operator = conditionItemExpr.getOperator();
-            SQLExpr shardColumnExpr = conditionItemExpr.getLeft();
-            LogicTable logicTable= getLogicTable(shardColumnExpr);
-            String columnName=DragonDruidASTUtil.getColumnName(shardColumnExpr);
-            DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-            if(logicTable.getDbTbShardColumns().contains(columnName)){
-                if(SQLBinaryOperator.Equality==operator){
-                    Object shardColumnValue=  paramSetting.values[0];
-                    sqlRouteParams.putBinaryRouteParams(logicTable,columnName,shardColumnValue);
-                }else{
-                    throw new RuntimeException("二元操作符的分区条件，只支持=号!!!");
-                }
-            }
-        }
-    }
-
     private LogicTable getLogicTable(SQLExpr shardColumnExpr) {
         if(parsedLogicTableList.size()==1){
             return parsedLogicTableList.get(0);
@@ -261,27 +309,47 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
         }
     }
+
+    /**
+     * whereConditionList中包含了所有的条件，需要过滤出id = ？、in (?，?，?)类似这两种类型作为路由参数
+     * 对于其他的条件，例如like ，> ，not in (？？？)等，只需要根据实际情况，确定是否将currentParamterIndex++即可
+     * @param whereConditionList
+     * @param sqlRouteParams
+     */
     protected void fillSqlRouteParams(List<SQLExpr> whereConditionList, SqlRouteParams sqlRouteParams) {
 //            Set<String> dbTbShardColumns = parsedLogicTableList.get(0).getDbTbShardColumns();
             for (SQLExpr conditionItemExpr : whereConditionList) {
+                //对所有的二元操作符进行处理，参见SQLBinaryOperator枚举类定义的二元操作符
                 if (conditionItemExpr instanceof SQLBinaryOpExpr) {
-                    parseBinaryConditionExpr(sqlRouteParams, (SQLBinaryOpExpr) conditionItemExpr);
+                    parseBinaryRouteConditionExpr(sqlRouteParams, (SQLBinaryOpExpr) conditionItemExpr);
                     continue;
                 }
+                //对 in (?,?,?)和not in(?,?,?)进行处理
                 if (conditionItemExpr instanceof SQLInListExpr) {
-                    parseSQLInListExpr(sqlRouteParams, (SQLInListExpr) conditionItemExpr);
+                    parseSQLInRouteListExpr(sqlRouteParams, (SQLInListExpr) conditionItemExpr);
                     continue;
                 }
-                if (conditionItemExpr instanceof SQLBetweenExpr) {
-//                conditionItemExpr.
+
+                //对between...and 进行处理，肯定不能作为路由条件，判断是否将currentParamterIndex++即可
+                if(conditionItemExpr instanceof SQLBetweenExpr){
+                     //column名
+//                    SQLExpr columnExpr = ((SQLBetweenExpr) conditionItemExpr).getTestExpr();
+                    //分别表示开始，结束的值
+                    SQLExpr beginExpr = ((SQLBetweenExpr) conditionItemExpr).getBeginExpr();
+                    SQLExpr endExpr = ((SQLBetweenExpr) conditionItemExpr).getEndExpr();
+                    if(beginExpr instanceof SQLVariantRefExpr){
+                        currentParamterIndex++;
+                    }
+                    if(endExpr instanceof SQLVariantRefExpr){
+                        currentParamterIndex++;
+                    }
+                    return;
                 }
 
-                if (conditionItemExpr instanceof SQLInSubQueryExpr) {
+                //没有考虑到其他的条件操作符类型
+                throw new UnsupportedOperationException("unsupport where condition :"+conditionItemExpr+" ,in sql:"+originSql);
 
-                }
             }
-
-
     }
     /**生成更新(U)、删除(D)，查询语句的真实sql*/
     protected void makeupSqlRouteInfoSqls() {

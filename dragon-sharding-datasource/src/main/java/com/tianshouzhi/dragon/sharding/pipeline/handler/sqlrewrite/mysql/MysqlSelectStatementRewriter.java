@@ -74,8 +74,8 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         parseLogicTableList(tableSource);
 
         SQLExpr where = query.getWhere();
-        //解析where条件，会忽略关联查询条件，例如emp.dept_id=dept.id and emp.id=？，只会得到emp.id=？
-        List<SQLExpr> whereConditionList = parseWhereConditionList(where);
+        //解析where条件，只解析可作为路由条件的参数，例如emp.dept_id=dept.id and emp.id=？，只会得到emp.id=？
+        List<SQLExpr> whereConditionList = parseRouteConditionList(where);
         SqlRouteParams sqlRouteParams = new SqlRouteParams();
         fillSqlRouteParams(whereConditionList, sqlRouteParams);
         makeRouteMap(sqlRouteParams);

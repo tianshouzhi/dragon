@@ -49,7 +49,7 @@ public class MysqlDeleteStatementRewriter extends AbstractMysqlSqlRewriter {
         parseLogicTableList(tableSource);
 
         //获得where中包含的所有条件
-        List<SQLExpr> whereConditionList = parseWhereConditionList(where);
+        List<SQLExpr> whereConditionList = parseRouteConditionList(where);
         SqlRouteParams sqlRouteParams = new SqlRouteParams();
         //填充路由参数map
         fillSqlRouteParams(whereConditionList, sqlRouteParams);
