@@ -210,7 +210,7 @@ public class DragonShardingDataSourceTest {
     }
     @Test
     public void testSelectIn() throws SQLException {
-        String sql="SELECT  * FROM user  WHERE id in(?,?,?,?)";
+        String sql="SELECT  * FROM user  WHERE id not in(?,?,?,?)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1,10101);

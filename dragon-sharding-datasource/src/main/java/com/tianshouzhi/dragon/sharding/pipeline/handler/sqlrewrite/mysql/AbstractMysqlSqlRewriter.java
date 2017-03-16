@@ -211,12 +211,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                      sqlRouteParams.putBinaryRouteParams(logicTable,columnName,shardColumnValue);
                  }
             }
-
-
-
-
     }
     private void parseSQLInRouteListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
+        // not in 不支持作为路由条件
+        if(conditionItemExpr.isNot()){
+            return;
+        }
         LogicTable logicTable= getLogicTable(conditionItemExpr.getExpr());
         String columnName= DragonDruidASTUtil.getColumnName(conditionItemExpr.getExpr());
         List<Object> valueList=new ArrayList<Object>();
