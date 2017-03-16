@@ -83,14 +83,17 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         //如果同时不为空，说明需要对limit语句进行修改 ,特别的，如果只分到一个库，不需要设置limit为0，查询结果的limit就是正确的
         //需要在merge的时候配合，单库的情况不考虑order by和limit
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
-        if(needAlterLimit(query, sqlRouteMap)){
+        if(needAlterLimit(query, sqlRouteMap)){ //limt 2,2 从第二位开始，查询2个 也就是 2、3两条记录，start要改为0，end要改为start+end
             //// FIXME: 2017/3/14  limit参数支持占位符
             MySqlSelectQueryBlock.Limit limit = query.getLimit();
             //记录原始的offset和rowcount
-            context.setOffset(((SQLIntegerExpr)limit.getOffset()).getNumber().intValue());
-            context.setRowCount(((SQLIntegerExpr)limit.getRowCount()).getNumber().intValue());
+            int originStart = ((SQLIntegerExpr) limit.getOffset()).getNumber().intValue();
+            context.setOffset(originStart);
+            int originEnd = ((SQLIntegerExpr) limit.getRowCount()).getNumber().intValue();
+            context.setRowCount(originEnd);
 
             limit.setOffset(new SQLIntegerExpr(0));
+            limit.setRowCount(new SQLIntegerExpr(originStart+originEnd));
 
         }
         makeupSqlRouteInfoSqls();

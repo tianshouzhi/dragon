@@ -72,7 +72,7 @@ public class DragonShardingDataSourceTest {
 
     @Test
     public void testSelectAll() throws SQLException {//不指定分区条件，分发到所有表
-        String sql="select * from user";
+        String sql="select * from user ORDER by id ";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ResultSet resultSet = preparedStatement.executeQuery();

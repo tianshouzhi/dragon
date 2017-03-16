@@ -134,7 +134,10 @@ public class MysqlSelectResultMerger implements ResultMerger {
             public int compare(DragonShardingResultSet.RowRecord o1, DragonShardingResultSet.RowRecord o2) {
                 int result=0;
                 for (SQLSelectOrderByItem item : items) {
-                    boolean asc= SQLOrderingSpecification.ASC==item.getType();
+                    boolean asc=true;
+                    if(item.getType() != null){
+                        asc= SQLOrderingSpecification.ASC==item.getType();
+                    }
                     String columnLabel = getColumnLabel(item.getExpr(),fullColumnNameAliasMap);
                     Object o1_value = o1.getValue(columnLabel);
                     Object o2_value = o2.getValue(columnLabel);
