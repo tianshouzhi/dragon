@@ -1,0 +1,50 @@
+sharding-config:
+    logic_db_name: dragon_sharding #用于监控
+    db_name_format: dragon_sharding_{0,number,#00} #MessageFormat
+    real_db_name_range: [dragon_sharding_00,dragon_sharding_01] #表示dragon_sharding_00、dragon_sharding_01
+    logic_table_config_list: #每个 -{...}之间为对一个逻辑表的配置，如以下配置了user 和user_account两个逻辑表
+        - {
+            logic_table_name: user, #必填，其他几个选项可以省略，如user_account
+            name_format: user_{0,number,#0000},
+            db_route_rules:
+                  ${id}.toLong().intdiv(100)%100
+            tb_route_rules:
+                  ${id}.toLong()%10000
+            real_db_tb_mapping:{ #key 是real db name，必须在real_db_name_range之内
+                  dragon_sharding_00: [user_0000,user_0009] #表示user_0000、user_0001、user_0002
+                  dragon_sharding_01: [user_0100,user_0101]
+              }
+          }
+        - {logic_table_name: user_device}
+    default_logic_table_config: #可以省略，但是logic_table_config_list中的每一个逻辑表都要配置全
+          defualt_name_format: ${logic_table_name}_{0,number,#0000},
+          default_db_route_rules:
+              ${id}.toLong().intdiv(100)%100
+          default_tb_route_rules:
+              ${id}.toLong()%10000
+          default_real_db_tb_mapping: { #key 是real db name，必须在real_db_name_range之内
+               dragon_sharding_00: ${logic_table_name}_[0000,0001],
+               dragon_sharding_01: ${logic_table_name}_[0100,0101]
+          }
+    realdb_datasource_config_mapping: #真实数据库与数据源的对应关系
+          defaultClassName: com.alibaba.druid.pool.DruidDataSource
+          defaultProperties:
+                      username: tiansouzhi
+                      password: shxx12151022
+                      driverClassName: com.mysql.jdbc.Driver
+                      initialSize: 10
+                      maxActive: 50
+                      maxIdle: 8
+                      validationQuery: select 'x'
+                      testOnBorrow: false
+                      testWhileIdle: true
+          dataSourceList: #必选，至少配置一个，有多少个url，说明有多少个真实库
+                 - dragon_sharding_00: {
+                     url: jdbc:mysql://10.20.153.104:3306/dragon_sharding_00, #url一般是不同的，因此一般不使用默认值
+                     initialSize: 5 #覆盖默认配置initialSize为0
+                 }
+                 - dragon_sharding_01: {
+                     url: jdbc:mysql://10.20.153.104:3306/dragon_sharding_00                   #不覆盖任何默认配置
+
+                }
+
