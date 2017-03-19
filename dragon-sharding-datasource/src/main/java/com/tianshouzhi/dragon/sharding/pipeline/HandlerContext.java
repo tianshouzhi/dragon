@@ -117,6 +117,10 @@ public class HandlerContext {
         this.rowCount = rowCount;
     }
 
+    /**
+     * todo 优化，不需要每一次都计算
+     * @return
+     */
     public List<Statement> getRealStatementList() {
         Iterator<Map.Entry<String, Map<String, SqlRouteInfo>>> dbIterator = sqlRouteMap.entrySet().iterator();
         List<Statement> statementList = new ArrayList<Statement>();
@@ -141,4 +145,5 @@ public class HandlerContext {
     public Map<String, String> getFullColumnNameAliasMap() {
         return fullColumnNameAliasMap;
     }
+
 }

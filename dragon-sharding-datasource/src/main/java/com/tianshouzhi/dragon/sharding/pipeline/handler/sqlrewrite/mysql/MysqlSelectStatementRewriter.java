@@ -103,12 +103,11 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         if(query.getLimit()==null){
             return false;
         }
-
-        int realSqlSize=0;
+        int realSqlNum=0;
         for (Map<String, SqlRouteInfo> sqlRouteInfoMap : sqlRouteMap.values()) {
-            realSqlSize+=sqlRouteInfoMap.size();
+            realSqlNum+=sqlRouteInfoMap.size();
         }
-        if(realSqlSize==1){//只有一条sql要路由，数据库直接完成，不需要，可以不修改
+        if(realSqlNum==1){//只有一条sql要路由，数据库直接完成，不需要，可以不修改
             return false;
         }
         //realSqlSize>1 ,需要到多个表查询，order by应该是必须指定的，否则只指定limit，因为多个表查出来的结果是随机合并的，会导致每次显示的结果不同

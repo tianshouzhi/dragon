@@ -6,15 +6,17 @@ import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.route.Router;
 
 import java.sql.*;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public class DragonShardingConnection extends DragonConnection {
-
     private Router router;
-
+    private Map<String,Set<Connection>> realConnectionMap=new ConcurrentHashMap<String, Set<Connection>>();
     public DragonShardingConnection(String username, String password, Router router) throws SQLException {
         super(username, password);
         if(router ==null){
@@ -110,17 +112,43 @@ public class DragonShardingConnection extends DragonConnection {
 
     @Override
     public void commit() throws SQLException {
-
+        checkClosed();
+        if(autoCommit){
+            throw new SQLException("This method should be used only when auto-commit mode has been disabled");
+        }
+        for (Set<Connection> connections : realConnectionMap.values()) {
+            for (Connection connection : connections) {
+                if(!connection.getAutoCommit()){
+                    connection.commit();
+                }
+            }
+        }
     }
 
     @Override
     public void rollback() throws SQLException {
-
+        checkClosed();
+        if(autoCommit){
+            throw new SQLException("This method should be used only when auto-commit mode has been disabled");
+        }
+        for (Set<Connection> connections : realConnectionMap.values()) {
+            for (Connection connection : connections) {
+                if(!connection.getAutoCommit()){
+                    connection.rollback();
+                }
+            }
+        }
     }
 
     @Override
     public void close() throws SQLException {
-
+        for (Set<Connection> connections : realConnectionMap.values()) {
+            for (Connection connection : connections) {
+                if(!connection.getAutoCommit()){
+                    connection.close();
+                }
+            }
+        }
     }
 
     @Override
@@ -141,42 +169,43 @@ public class DragonShardingConnection extends DragonConnection {
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("setSavepoint");
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("setSavepoint(String name)");
     }
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-
+        throw new UnsupportedOperationException("rollback");
     }
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-
+        throw new UnsupportedOperationException("releaseSavepoint");
     }
 
     @Override
     public Clob createClob() throws SQLException {
-        return null;
+        //真实连接还没有，不知道到哪个库创建Clob
+        throw new UnsupportedOperationException("createClob");
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("createBlob");
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("createNClob");
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("SQLXML");
     }
 
     @Override
@@ -196,15 +225,18 @@ public class DragonShardingConnection extends DragonConnection {
 
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("createArrayOf");
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException("createStruct");
     }
 
     public Router getRouter() {
         return router;
+    }
+    public Map<String, Set<Connection>> getRealConnectionMap() {
+        return realConnectionMap;
     }
 }

@@ -273,13 +273,13 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             dbRouteMap=new HashMap<String, SqlRouteInfo>();
             sqlRouteMap.put(realDBName,dbRouteMap);
         }
-        if(StringUtils.isNoneBlank(realDBName,primaryTBName)){
-            SqlRouteInfo tbSqlRouteInfo = dbRouteMap.get(primaryTBName);
-            if(tbSqlRouteInfo==null){
-                tbSqlRouteInfo=new SqlRouteInfo(primaryLogicTable,realDBName,primaryTBName);
-            }
-            dbRouteMap.put(primaryTBName,tbSqlRouteInfo);
+//        if(StringUtils.isNoneBlank(realDBName,primaryTBName)){
+        SqlRouteInfo tbSqlRouteInfo = dbRouteMap.get(primaryTBName);
+        if (tbSqlRouteInfo == null) {
+            tbSqlRouteInfo = new SqlRouteInfo(primaryLogicTable, realDBName, primaryTBName);
         }
+        dbRouteMap.put(primaryTBName, tbSqlRouteInfo);
+//        }
 
     }
 
@@ -307,6 +307,11 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                     addRouteInfo(primaryLogicTable,routeConditionMap);
                 }
             }
+        }
+
+        //没有路由参数，表示需要将sql分发到所有表，构造路由到所有分库的参数
+        if(MapUtils.isEmpty(context.getSqlRouteMap())){
+            makeRouteAllParamsMap();
         }
     }
 
@@ -354,9 +359,6 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     /**生成更新(U)、删除(D)，查询语句的真实sql*/
     protected void makeupSqlRouteInfoSqls() {
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
-        if(MapUtils.isEmpty(sqlRouteMap)){//没有路由参数，表示需要将sql分发到所有表，构造路由到所有分库的参数
-           makeRouteAllParamsMap();
-        }
         //根据路由表进行重写sql
         for (Map<String, SqlRouteInfo> dbRouteMap :   sqlRouteMap.values()) {
             for (SqlRouteInfo tbSqlRouteInfo : dbRouteMap.values()) {

@@ -72,7 +72,7 @@ public class DragonShardingDataSourceTest {
 
     @Test
     public void testSelectAll() throws SQLException {//不指定分区条件，分发到所有表
-        String sql="select * from user ORDER by id ";
+        String sql="select * from user";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -312,7 +312,31 @@ public class DragonShardingDataSourceTest {
         int updateCount = preparedStatement.executeUpdate();
         System.out.println("updateCount = " + updateCount);
     }
+    @Test
+    public void testTransaction() throws SQLException {
+        String sql="UPDATE user SET name=? where id=?";
+//        String sql="select * from user ";
+        Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,"transaction-success");
+            preparedStatement.setInt(2,10000);
+            int i = preparedStatement.executeUpdate();
+            System.out.println(i);
+            PreparedStatement statement = connection.prepareStatement("insert into user(id,name) VALUES (?,?)");
+            statement.setInt(1,40000);
+            statement.setString(2,"transaction2");
+            int i1 = statement.executeUpdate();
+            System.out.println(i1);
+//            int dd=1/0;
+            connection.commit();
+        }catch (Exception e){
+            e.printStackTrace();
+            connection.rollback();
+        }
 
+    }
 
     public static LogicTable makeLogicTable(String tableName, LogicDatabase logicDatabase){
         String namePattern = tableName+"_{0,number,#0000}";
