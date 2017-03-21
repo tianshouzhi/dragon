@@ -35,6 +35,5 @@ public class SqlRewriteHandler implements Handler {
             }
         }
         context.setIsQuery(isQuery);
-
     }
 }

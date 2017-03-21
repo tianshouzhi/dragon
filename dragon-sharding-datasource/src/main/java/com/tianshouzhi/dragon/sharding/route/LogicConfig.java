@@ -1,12 +1,9 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -17,36 +14,21 @@ public abstract class LogicConfig {
     public static final Pattern routeRuleVariablePattern =Pattern.compile("(\\$\\{.+?\\})",Pattern.CASE_INSENSITIVE);
     private String nameFormat;
     protected MessageFormat messageFormat;//eg table_{00}
-    protected List<RouteRule> routeRuleList;//eg:${user_id}.toLong().intdiv(100)%100
 
-    /**db 和tb 使用到的所有分区字段*/
-    private Set<String> mergedShardColumns;
-    public LogicConfig(String nameFormat, List<String> routeRuleStrList) {
+
+    public LogicConfig(String nameFormat) {
         if(StringUtils.isBlank(nameFormat)){
             throw new RuntimeException("nameFormat can't be blank!!!");
         }
-        if(CollectionUtils.isEmpty(routeRuleStrList)){
-            throw new RuntimeException("tbRouteRuleStrList can't be empty!!!");
-        }
+
         this.nameFormat=nameFormat;
         this.messageFormat = new MessageFormat(nameFormat);
-        routeRuleList =new ArrayList<RouteRule>();
-        for (String tbRuleStr : routeRuleStrList) {
-            routeRuleList.add(new RouteRule(tbRuleStr));
-        }
-        mergedShardColumns=new HashSet<String>();
-        for (RouteRule routeRule : routeRuleList) {
-            mergedShardColumns.addAll(routeRule.shardColumns);
-        }
+
+
     }
 
     public String getNameFormat(){
         return nameFormat;
-    }
-
-    protected String getRealName(Map<String,Object> params) {
-        Long caculatedIndex = getRealIndex(params);
-        return format(caculatedIndex);
     }
 
     public String format(Long caculatedIndex){
@@ -61,70 +43,6 @@ public abstract class LogicConfig {
         }
     }
 
-    /**
-     * 根据路由参数计算真实编号
-     * @param params
-     * @return
-     */
-    protected Long getRealIndex(Map<String, Object> params) {
-        if(params==null){
-            throw new NullPointerException();
-        }
-        RouteRule selectedRouteRule=null;
-        for (RouteRule routeRule : routeRuleList) {
-            if(params.keySet().containsAll(routeRule.getShardColumns())){
-                selectedRouteRule=routeRule;
-                break;
-            }
-        }
-        if(selectedRouteRule==null){
-            throw new RuntimeException("no matched route rule found !!!");
-        }
 
-        return (Long) DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
-    }
 
-    public Set<String> getMergedShardColumns() {
-        return mergedShardColumns;
-    }
-
-    protected static class RouteRule{
-        private String originRouteRuleStr;//eg:${user_id}.toLong().intdiv(100)%100
-        private String replacedRouteRuleStr;//eg:user_id.toLong().intdiv(100)%100
-        private List<String> shardColumns;
-
-        public RouteRule(String originRouteRuleStr) {
-            if(StringUtils.isBlank(originRouteRuleStr)){
-                throw new IllegalArgumentException("'originRouteRuleStr' can't be blank");
-            }
-
-            this.originRouteRuleStr = originRouteRuleStr;
-            this.shardColumns = new ArrayList<String>();
-            Matcher matcher = routeRuleVariablePattern.matcher(originRouteRuleStr);
-            StringBuffer sb = new StringBuffer();
-            while (matcher.find()) {
-                String varible = matcher.group(1);// 脚本中的变量名${xxx}
-                String column = varible.substring(varible.indexOf("{")+1,varible.indexOf("}"));//变量名：xxx
-                shardColumns.add(column);
-                matcher.appendReplacement(sb,column);
-            }
-            if(CollectionUtils.isEmpty(shardColumns)){
-                throw new IllegalArgumentException("'originRouteRuleStr' must contains shard column!!!");
-            }
-            matcher.appendTail(sb);
-            this. replacedRouteRuleStr=sb.toString();
-        }
-
-        public String getOriginRouteRuleStr() {
-            return originRouteRuleStr;
-        }
-
-        public String getReplacedRouteRuleStr() {
-            return replacedRouteRuleStr;
-        }
-
-        public List<String> getShardColumns() {
-            return shardColumns;
-        }
-    }
 }

@@ -68,7 +68,7 @@ public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
                 }
             }
         }
-        List<SQLExpr> whereConditionList = parseRouteConditionList(where);
+        List<SQLExpr> whereConditionList = parseWhereRouteConditionList(where);
         //二元操作符的分区条件
         SqlRouteParams sqlRouteParams = new SqlRouteParams();
         fillSqlRouteParams(whereConditionList, sqlRouteParams);

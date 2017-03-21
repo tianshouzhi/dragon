@@ -63,8 +63,6 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
         }
 
         LogicTable logicTable =context.getLogicTable(logicTableName);
-        /**用户针对逻辑表配置的分区字段*/
-        Set<String> configShardColumns = logicTable.getDbTbShardColumns();
         //sql中包含的分区字段出现的位置和名称的映射关系
         Map<Integer,String> shardColumnIndexNameMap=new HashMap<Integer, String>();
         //添加列名
@@ -76,7 +74,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
             if(i < columns.size() - 1){
                 columnClause.append(",");
             }
-            if(configShardColumns.contains(columnName)){
+            if(logicTable.isShardColumn(columnName)){
                 shardColumnIndexNameMap.put(i,columnName);
             }
         }
@@ -115,7 +113,7 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
                     }
                     routeParams.put(shardColumnName,shardColumnValue);
                 }
-                Long realTBIndex=logicTable.getRealTBIndex(routeParams);
+//                Long realTBIndex=logicTable.getRealTBIndex(routeParams);
                 String realDBName=logicTable.getRealDBName(routeParams);
                 String realTBName=logicTable.getRealTBName(routeParams);
 

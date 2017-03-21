@@ -70,4 +70,5 @@ public class DragonShardingConfig {
     public void setLogiTableConfigList(List<LogicTableConfig> logiTableConfigList) {
         this.logiTableConfigList = logiTableConfigList;
     }
+
 }

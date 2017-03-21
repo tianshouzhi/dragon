@@ -126,7 +126,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
      * @param where
      * @return
      */
-    protected List<SQLExpr> parseRouteConditionList(SQLExpr where){
+    protected List<SQLExpr> parseWhereRouteConditionList(SQLExpr where){
         List<SQLExpr> whereConditionList=new ArrayList<SQLExpr>();
         fillWhereConditionExprList(where,whereConditionList);
         return whereConditionList;
@@ -161,7 +161,8 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 
     /**
-     * 二元运算符条件解析 只有=号可作为分区条件，只会把currentParamterIndex增加，所有二元操作符：SQLBinaryOperator
+     * 二元运算符条件解析 只有=号可作为分区条件，只会把currentParamterIndex增加。
+     * 所有二元操作符参见：SQLBinaryOperator
      * @param sqlRouteParams
      * @param conditionItemExpr
      */
@@ -203,7 +204,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
              //只将=号作为路由条件，其他二进制操作符不可作为路由条件
              if(SQLBinaryOperator.Equality==operator){
                  DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(currentParamterIndex);
-                 if(logicTable.getDbTbShardColumns().contains(columnName)){
+                 if(logicTable.isShardColumn(columnName)){
                      Object shardColumnValue=valueExpr.toString(); //// TODO: 2017/3/16 支持子查询
                      if(isJdbcPlaceHolder(valueExpr)){
                          shardColumnValue=  paramSetting.values[0];
@@ -220,7 +221,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         LogicTable logicTable= getLogicTable(conditionItemExpr.getExpr());
         String columnName= DragonDruidASTUtil.getColumnName(conditionItemExpr.getExpr());
         List<Object> valueList=new ArrayList<Object>();
-        if(logicTable.getDbTbShardColumns().contains(columnName)){
+        if(logicTable.isShardColumn(columnName)){
             List<SQLExpr> targetList = conditionItemExpr.getTargetList();
             for (SQLExpr sqlExpr : targetList) {
                 Object shardColumnValue=sqlExpr.toString();

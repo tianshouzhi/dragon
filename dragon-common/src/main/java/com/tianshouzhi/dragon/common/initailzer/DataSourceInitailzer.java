@@ -12,5 +12,5 @@ public interface DataSourceInitailzer {
      * @return
      */
     public String initDatasouceClassName();
-    public DataSource init(Map<String,String> config);
+    public DataSource init(Map<String,String> config) throws Exception;
 }

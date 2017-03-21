@@ -21,7 +21,7 @@ public abstract class DataSourceInitailzerAdapter {
             classNameInitailzerMap.put(className,dataSourceInitailzer);
         }
     }
-    public DataSource init(String datasourceClass,Map<String,String> config){
+    public static DataSource init(String datasourceClass,Map<String,String> config) throws Exception {
         DataSourceInitailzer dataSourceInitailzer = classNameInitailzerMap.get(datasourceClass);
         if(dataSourceInitailzer==null){
             throw new RuntimeException("can't init datasource type:"+datasourceClass+",you should custom a DataSourceInitailzer and add in the classpath");

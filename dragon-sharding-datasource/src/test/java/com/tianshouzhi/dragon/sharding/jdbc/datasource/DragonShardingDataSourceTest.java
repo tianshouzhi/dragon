@@ -1,36 +1,25 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.tianshouzhi.dragon.sharding.route.LogicDatabase;
-import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/2/24.
  */
 public class DragonShardingDataSourceTest {
     private static DataSource dataSource;
-
     @BeforeClass
-    public static void before(){
-        LogicDatabase logicDatabase = makeLogicDataSource();
-        HashMap<String, LogicTable> logicTableMap = new HashMap<String, LogicTable>();
-        LogicTable logicTable = makeLogicTable("user", logicDatabase);
-        LogicTable account = makeLogicTable("user_account", logicDatabase);
-        logicTableMap.put("user",logicTable);
-        logicTableMap.put("user_account",account);
-        dataSource=new DragonShardingDataSource(logicDatabase, logicTableMap);
+    public static void before() throws IOException {
+        dataSource=new DragonShardingDataSource("dragon-sharding.yml");
     }
-
     @Test
     public void testBatchInsert() throws SQLException {
         String sql="insert into user(id,name) values(?,?),(?,?),(?,?),(?,?),(?,?),(?,?),(?,?),(?,?)";
@@ -338,51 +327,12 @@ public class DragonShardingDataSourceTest {
 
     }
 
-    public static LogicTable makeLogicTable(String tableName, LogicDatabase logicDatabase){
-        String namePattern = tableName+"_{0,number,#0000}";
-        ArrayList<String> routeRuleStrList = new ArrayList<String>();
-        routeRuleStrList.add("${id}.toLong()%10000");
-        routeRuleStrList.add("${user_id}.toLong()%10000");
-        LogicTable logicTable=new LogicTable(tableName,namePattern, routeRuleStrList,logicDatabase);
-
-        Map<String,List<String>> map=new HashMap<String, List<String>>();
-        Set<String> realDBIndexes = logicDatabase.getRealDbIndexDatasourceMap().keySet();
-        for (String realDBName : realDBIndexes) {
-            Long realDbIndex = logicDatabase.parseIndex(realDBName);
-            List<String> realTBNames=new ArrayList<String>();
-            for (int i = 0; i < 2; i++) {
-                realTBNames.add(logicTable.format(realDbIndex*100+i));
-            }
-            map.put(realDBName,realTBNames);
-        }
-        logicTable.setRealDBTBMap(map);
-        return logicTable;
-    }
-    private static LogicDatabase makeLogicDataSource() {
-        String dbNamePattern="dragon_sharding_{0,number,#00}";
-        List<String> dbRouteRules=new ArrayList<String>();
-        dbRouteRules.add("${id}.toLong().intdiv(100)%100");
-        dbRouteRules.add("${user_id}.toLong().intdiv(100)%100");
-        HashMap<String, DataSource> dbIndexDatasourceMap = new HashMap<String, DataSource>();
-        dbIndexDatasourceMap.put("dragon_sharding_00",makeDataSource("dragon_sharding_00"));
-        dbIndexDatasourceMap.put("dragon_sharding_01",makeDataSource("dragon_sharding_01"));
-/*        dbIndexDatasourceMap.put("dragon_sharding_02",makeDataSource("dragon_sharding_02"));
-        dbIndexDatasourceMap.put("dragon_sharding_03",makeDataSource("dragon_sharding_03"));
-        dbIndexDatasourceMap.put("dragon_sharding_04",makeDataSource("dragon_sharding_04"));
-        dbIndexDatasourceMap.put("dragon_sharding_05",makeDataSource("dragon_sharding_05"));
-        dbIndexDatasourceMap.put("dragon_sharding_06",makeDataSource("dragon_sharding_06"));
-        dbIndexDatasourceMap.put("dragon_sharding_07",makeDataSource("dragon_sharding_07"));
-        dbIndexDatasourceMap.put("dragon_sharding_08",makeDataSource("dragon_sharding_08"));
-        dbIndexDatasourceMap.put("dragon_sharding_09",makeDataSource("dragon_sharding_09"));*/
-        return new LogicDatabase(dbNamePattern,dbRouteRules, dbIndexDatasourceMap);
+    @Test
+    public void testWhereSubQuery(){
+        /**
+         * 找出余额最多的账户的信息
+         */
+        String sql="select * from user where id in (select user_id from user_account order by money limit 0,3))";
     }
 
-    private static DataSource makeDataSource(String dbName){
-        DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        druidDataSource.setUrl("jdbc:mysql://localhost:3306/"+dbName);
-        druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
-        return druidDataSource;
-    }
 }
