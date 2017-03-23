@@ -44,7 +44,7 @@ public class MysqlSelectResultMerger implements ResultMerger {
         List<DragonShardingResultSet.RowRecord> totalRowRecords=new ArrayList<DragonShardingResultSet.RowRecord>();
         DragonShardingResultSet shardingResultSet = new DragonShardingResultSet(dragonShardingStatement,metaData,realResultSetList,totalRowRecords);
         mergeResultSets(shardingResultSet,totalRowRecords, realResultSetList);
-
+        context.setOriginQueryCount(totalRowRecords.size());
         //处理order by和limit 以及max、min、groupBy等函数
         if (!CollectionUtils.isEmpty(totalRowRecords)//没有查询到结果，不需要处理
                 &&realResultSetList.size() > 1) {//只有一个statement，数据库已经排序好，不需要再次排序和解析limit

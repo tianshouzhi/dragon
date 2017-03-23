@@ -27,6 +27,9 @@ public class SqlRouteInfo {
      */
     private LogicTable primaryLogicTable;
 
+    //记录这个sql的执行时间
+    private long executionTimeMillis;
+
     public SqlRouteInfo(LogicTable primaryLogicTable,String primaryDBName,String primaryRealTBName) {
         if(StringUtils.isAnyBlank(primaryDBName, primaryRealTBName)){
             throw new IllegalArgumentException("primaryDBName and primaryRealTBName both can't be blank!!!");
@@ -77,5 +80,13 @@ public class SqlRouteInfo {
 
     public LogicTable getPrimaryLogicTable() {
         return primaryLogicTable;
+    }
+
+    public long getExecutionTimeMillis() {
+        return executionTimeMillis;
+    }
+
+    public void setExecutionTimeMillis(long executionTimeMillis) {
+        this.executionTimeMillis = executionTimeMillis;
     }
 }

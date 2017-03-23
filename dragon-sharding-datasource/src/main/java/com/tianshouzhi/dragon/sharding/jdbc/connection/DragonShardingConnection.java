@@ -1,9 +1,9 @@
 package com.tianshouzhi.dragon.sharding.jdbc.connection;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
+import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
-import com.tianshouzhi.dragon.sharding.route.Router;
 
 import java.sql.*;
 import java.util.Map;
@@ -15,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public class DragonShardingConnection extends DragonConnection {
-    private Router router;
+    private DragonShardingDataSource shardingDataSource;
     private Map<String,Set<Connection>> realConnectionMap=new ConcurrentHashMap<String, Set<Connection>>();
-    public DragonShardingConnection(String username, String password, Router router) throws SQLException {
+    public DragonShardingConnection(String username, String password, DragonShardingDataSource shardingDataSource) throws SQLException {
         super(username, password);
-        if(router ==null){
-            throw new SQLException("parameter 'router' can't be null");
+        if(shardingDataSource ==null){
+            throw new SQLException("parameter 'shardingDataSource' can't be null");
         }
-        this.router=router;
+        this.shardingDataSource = shardingDataSource;
     }
 
     @Override
@@ -233,8 +233,8 @@ public class DragonShardingConnection extends DragonConnection {
         throw new UnsupportedOperationException("createStruct");
     }
 
-    public Router getRouter() {
-        return router;
+    public DragonShardingDataSource getShardingDataSource() {
+        return shardingDataSource;
     }
     public Map<String, Set<Connection>> getRealConnectionMap() {
         return realConnectionMap;

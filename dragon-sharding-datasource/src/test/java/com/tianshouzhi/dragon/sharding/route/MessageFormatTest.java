@@ -14,6 +14,7 @@ public class MessageFormatTest {
         String pattern = "welcome {0},current time is {1}";
         Object[] arguments = {"tianshouzhi", new Date()};
         MessageFormat messageFormat=new MessageFormat(pattern, Locale.CHINA);
+        System.out.println(messageFormat.toPattern());
         String format = messageFormat.format(pattern, arguments);
         System.out.println(format);
         String source="welcome tianshouzhi,current time is 1972";

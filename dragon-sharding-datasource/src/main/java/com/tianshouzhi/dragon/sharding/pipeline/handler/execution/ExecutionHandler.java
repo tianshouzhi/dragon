@@ -22,13 +22,13 @@ public class ExecutionHandler implements Handler {
 
     @Override
     public void invoke(HandlerContext context) throws SQLException {
+        long start=System.currentTimeMillis();
         //判断是否开启了事务，如果开启了事务，sql只能路由到一个库中
         DragonShardingConnection shardingConnection = context.getDragonShardingStatement().getConnection();
         boolean autoCommit = shardingConnection.getAutoCommit();
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
 
-
-        ExecutorService executor = DragonExecutorFactory.getInstance(context.getRouter().getLogicDatabase().getNameFormat());
+        ExecutorService executor = DragonExecutorFactory.getInstance(context.getLogicDataSource().getNameFormat());
         CompletionService<String> ecs = new ExecutorCompletionService<String>(executor);
         int taskNum=0;
 
@@ -44,7 +44,7 @@ public class ExecutionHandler implements Handler {
                     if(realConnectionMap.containsKey(realDBName)){//fixme 这样会导致一直只用一个connection
                         connection=realConnectionMap.get(realDBName).iterator().next();
                     }
-                    final DataSource ds = context.getRouter().getDataSource(realDBName);
+                    final DataSource ds = context.getRealDataSource(realDBName);
 
                     if (autoCommit) {//不开启事务 每个sql各自使用一个连接去执行，不管操作的表是不是位于同一个库中，并行执行效率高
                         Map<String, SqlRouteInfo> tableSqlMap = entry.getValue();
@@ -66,7 +66,7 @@ public class ExecutionHandler implements Handler {
                 }
                 Map.Entry<String, Map<String, SqlRouteInfo>> next = sqlRouteMap.entrySet().iterator().next();
                 String realDBName = next.getKey();
-                final DataSource ds = context.getRouter().getDataSource(realDBName);
+                final DataSource ds = context.getRealDataSource(realDBName);
                 Connection connection=null;
                 if(realConnectionMap.containsKey(realDBName)){//总是拿第一个connection当做事务连接
                     connection=realConnectionMap.get(realDBName).iterator().next();
@@ -79,11 +79,12 @@ public class ExecutionHandler implements Handler {
                 taskNum++;
             }
 
-
+            context.setParallelExecutionTaskNum(taskNum);
             //等待所有的task执行完成
             for (int i = 0; i < taskNum; i++) {
                 ecs.take().get();
             }
+
             //将真实connection封装到sharding connection中 // TODO: 2017/3/19 是否需要精确到表
             for (Map.Entry<String, Map<String, SqlRouteInfo>> mapEntry : sqlRouteMap.entrySet()) {
                 String realDBName = mapEntry.getKey();
@@ -98,7 +99,7 @@ public class ExecutionHandler implements Handler {
                     realConnectionMap.put(realDBName,connections);
                 }
             }
-
+            context.setParallelExecutionTimeMillis(System.currentTimeMillis()-start);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -6,7 +6,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.hint.HintParseHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge.ResultMergeHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlparse.SqlParseHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriteHandler;
-import com.tianshouzhi.dragon.sharding.route.Router;
+import com.tianshouzhi.dragon.sharding.pipeline.handler.statics.StaticsHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class Pipeline {
     private List<Handler> handlerChains;
     private HandlerContext handlerContext;
 
-    public Pipeline(DragonShardingStatement dragonShardingStatement, Router router) {
+    public Pipeline(DragonShardingStatement dragonShardingStatement) {
         this.handlerContext = new HandlerContext(dragonShardingStatement);
         this.handlerChains = new ArrayList<Handler>();
         this.handlerChains.add(new HintParseHandler());
@@ -30,12 +30,22 @@ public class Pipeline {
 
     //执行调用链
     public void execute() {
-        for (Handler handler : handlerChains) {
-            try {
+
+        try {
+            for (Handler handler : handlerChains) {
                 handler.invoke(handlerContext);
+            }
+        } catch (Exception e) {
+            handlerContext.setThrowable(e);
+            throw new RuntimeException(e);
+        } finally {
+            //不管成功还是失败，最终都走要StaticsHandler
+            try {
+                new StaticsHandler().invoke(handlerContext);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
         }
     }
 

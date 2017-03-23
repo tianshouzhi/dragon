@@ -11,6 +11,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge.mysql.MysqlU
 public class ResultMergeHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) throws Exception {
+        long start=System.currentTimeMillis();
         ResultMerger resultMerger=null;
         if (!context.isQuery()) {//如果是增删改
             resultMerger=new MysqlUpdateResultMerger();
@@ -18,6 +19,6 @@ public class ResultMergeHandler implements Handler {
             resultMerger=new MysqlSelectResultMerger();
         }
         resultMerger.merge(context);
+        context.setResultMergeTime(System.currentTimeMillis()-start);
     }
-
 }

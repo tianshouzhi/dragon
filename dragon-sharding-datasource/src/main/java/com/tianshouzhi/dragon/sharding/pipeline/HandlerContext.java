@@ -1,13 +1,15 @@
 package com.tianshouzhi.dragon.sharding.pipeline;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
+import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
+import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
+import com.tianshouzhi.dragon.sharding.route.LogicDataSource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import com.tianshouzhi.dragon.sharding.route.Router;
 
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
@@ -18,13 +20,12 @@ import java.util.*;
 public class HandlerContext {
     private DragonShardingStatement dragonShardingStatement;
     private SQLStatement parsedSqlStatement;
-    private Router router;
     private Map<String/**dbIndex*/,Set<String/**tbIndex*/>> hintMap=new HashMap<String, Set<String>>();
     private Map<String/**dbIndex*/, Map<String/*tbIndex*/, SqlRouteInfo>> sqlRouteMap;
 
     //存储执行结果
     private int totalUpdateCount =-1;
-    private ResultSet mergedResultSet;
+    private DragonShardingResultSet mergedResultSet;
     private boolean isQuery;
 
     //limit 信息 todo 有待完善 mysql rowCount=-1 表示从当前读取到最后
@@ -32,29 +33,29 @@ public class HandlerContext {
     private int rowCount=-1;
     private Map<String, String> fullColumnNameAliasMap;
 
+    //sql执行的开始时间 ，用于统计
+    private long beginTime=System.currentTimeMillis();
+    private int originQueryCount;
+    private Throwable throwable;
+    private boolean hitSqlParserCache;
+    private long sqlParseTimeMillis;
+    private long resultMergeTime;
+    private long sqlRewriteTimeMillis;
+    private long parallelExecutionTimeMillis;
+    private int parallelExecutionTaskNum;
+
     public HandlerContext(DragonShardingStatement dragonShardingStatement) {
         if(dragonShardingStatement==null){
             throw new NullPointerException();
         }
         this.dragonShardingStatement = dragonShardingStatement;
         this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
-        try {
-            this.router=dragonShardingStatement.getConnection().getRouter();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
-
+    public DataSource getRealDataSource(String realDBName){
+        return getShardingDataSource().getDataSource(realDBName);
+    }
     public DragonShardingStatement getDragonShardingStatement() {
         return dragonShardingStatement;
-    }
-
-    public LogicTable getLogicTable(String logicTableName) {
-        return getRouter().getLogicTable(logicTableName);
-    }
-
-    public Router getRouter() {
-        return router;
     }
 
     public SQLStatement getParsedSqlStatement() {
@@ -77,11 +78,11 @@ public class HandlerContext {
         this.totalUpdateCount = totalUpdateCount;
     }
 
-    public ResultSet getMergedResultSet() {
+    public DragonShardingResultSet getMergedResultSet() {
         return mergedResultSet;
     }
 
-    public void setMergedResultSet(ResultSet mergedResultSet) {
+    public void setMergedResultSet(DragonShardingResultSet mergedResultSet) {
         this.mergedResultSet = mergedResultSet;
     }
 
@@ -146,4 +147,87 @@ public class HandlerContext {
         return fullColumnNameAliasMap;
     }
 
+    public long getBeginTime() {
+        return beginTime;
+    }
+
+    public void setOriginQueryCount(int originQueryCount) {
+        this.originQueryCount = originQueryCount;
+    }
+
+    public int getOriginQueryCount() {
+        return originQueryCount;
+    }
+
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public void setHitSqlParserCache(boolean hitSqlParserCache) {
+        this.hitSqlParserCache = hitSqlParserCache;
+    }
+
+    public boolean isHitSqlParserCache() {
+        return hitSqlParserCache;
+    }
+
+    public long getSqlParseTimeMillis() {
+        return sqlParseTimeMillis;
+    }
+
+    public void setSqlParseTimeMillis(long sqlParseTimeMillis) {
+        this.sqlParseTimeMillis = sqlParseTimeMillis;
+    }
+
+    public void setResultMergeTime(long resultMergeTime) {
+        this.resultMergeTime = resultMergeTime;
+    }
+
+    public long getResultMergeTimeMillis() {
+        return resultMergeTime;
+    }
+
+    public void setSqlRewriteTimeMillis(long sqlRewriteTimeMillis) {
+        this.sqlRewriteTimeMillis = sqlRewriteTimeMillis;
+    }
+
+    public long getSqlRewriteTimeMillis() {
+        return sqlRewriteTimeMillis;
+    }
+
+    public void setParallelExecutionTimeMillis(long parallelExecutionTimeMillis) {
+        this.parallelExecutionTimeMillis = parallelExecutionTimeMillis;
+    }
+
+    public long getParallelExecutionTimeMillis() {
+        return parallelExecutionTimeMillis;
+    }
+
+    public int getParallelExecutionTaskNum() {
+        return parallelExecutionTaskNum;
+    }
+
+    public void setParallelExecutionTaskNum(int tarallelExecutionTaskNum) {
+        this.parallelExecutionTaskNum = tarallelExecutionTaskNum;
+    }
+
+    public LogicDataSource getLogicDataSource() {
+        return getShardingDataSource().getLogicDataSource();
+    }
+
+    public DragonShardingDataSource getShardingDataSource(){
+        try {
+            return dragonShardingStatement.getConnection().getShardingDataSource();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public LogicTable getLogicTable(String logicTableName) {
+        return getShardingDataSource().getLogicTable(logicTableName);
+    }
 }

@@ -25,8 +25,13 @@ public class SqlParseHandler implements Handler {
             DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
             String sql = dragonShardingStatement.getSql();
 
+            boolean hitCache=true;
+
             SQLStatement sqlStatement = dragonCache.get(sql);//先从cache中获取，如果没有，则解析
+
             if(sqlStatement==null){
+                hitCache=false;
+                long start=System.currentTimeMillis();
                 SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);
                 List<SQLStatement> sqlStatements = sqlStatementParser.parseStatementList();
                 if(sqlStatements.size()==1){
@@ -34,9 +39,10 @@ public class SqlParseHandler implements Handler {
                 }else{
                     throw new RuntimeException("only support one sql!!");
                 }
-
+                context.setSqlParseTimeMillis(System.currentTimeMillis()-start);
                 dragonCache.put(sql,sqlStatement); //解析完成之后，翻入cache中
             }
+            context.setHitSqlParserCache(hitCache);
             context.setParsedSqlStatement(sqlStatement);
         }
     }

@@ -34,7 +34,7 @@ public class DragonShardingStatement extends DragonStatement{
 
     @Override
     protected boolean doExecute() throws SQLException {
-        pipeline = new Pipeline(this, dragonShardingConnection.getRouter());
+        pipeline = new Pipeline(this);
         pipeline.execute();
         HandlerContext handlerContext = pipeline.getHandlerContext();
         this.realStatementList=handlerContext.getRealStatementList();

@@ -28,9 +28,10 @@ defaultLogicTableConfig:
            dragon_sharding_01: ${logic_table_name}_[0100,0101]
 logiTableConfigList: #每个 -之间为对一个逻辑表的配置，如以下配置了user 和user_account两个逻辑表
        - logicTbName: user #逻辑表名,其他几个选项可以省略，如user_account,user_device
-         tbNameFormat:  user_{0,number,#0000}
          dbRouteRules: #一行一个rule
                - ${id}.toLong().intdiv(100)%100
+         #如果不分表，以下三项可以不配置
+         tbNameFormat:  user_{0,number,#0000}
          tbRouteRules: #一行一个rule
                - ${id}.toLong()%10000
          realDbTbMapping:  #key 是real db name，必须在real_db_name_range之内

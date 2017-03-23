@@ -397,7 +397,7 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
-
+        throw new UnsupportedOperationException("setFetchSize");
     }
 
     @Override
@@ -432,222 +432,222 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public void updateNull(int columnIndex) throws SQLException {
-
+        throw new UnsupportedOperationException("updateNull");
     }
 
     @Override
     public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBoolean");
     }
 
     @Override
     public void updateByte(int columnIndex, byte x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateByte");
     }
 
     @Override
     public void updateShort(int columnIndex, short x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateShort");
     }
 
     @Override
     public void updateInt(int columnIndex, int x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateInt");
     }
 
     @Override
     public void updateLong(int columnIndex, long x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateLong");
     }
 
     @Override
     public void updateFloat(int columnIndex, float x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateFloat");
     }
 
     @Override
     public void updateDouble(int columnIndex, double x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateDouble");
     }
 
     @Override
     public void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBigDecimal");
     }
 
     @Override
     public void updateString(int columnIndex, String x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateString");
     }
 
     @Override
     public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBytes");
     }
 
     @Override
     public void updateDate(int columnIndex, Date x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateDate");
     }
 
     @Override
     public void updateTime(int columnIndex, Time x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateTime");
     }
 
     @Override
     public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateTimestamp");
     }
 
     @Override
     public void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateAsciiStream");
     }
 
     @Override
     public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBinaryStream");
     }
 
     @Override
     public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateCharacterStream");
     }
 
     @Override
     public void updateObject(int columnIndex, Object x, int scaleOrLength) throws SQLException {
-
+        throw new UnsupportedOperationException("updateObject");
     }
 
     @Override
     public void updateObject(int columnIndex, Object x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateObject");
     }
 
     @Override
     public void updateNull(String columnLabel) throws SQLException {
-
+        throw new UnsupportedOperationException("updateNull");
     }
 
     @Override
     public void updateBoolean(String columnLabel, boolean x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBoolean");
     }
 
     @Override
     public void updateByte(String columnLabel, byte x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateByte");
     }
 
     @Override
     public void updateShort(String columnLabel, short x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateShort");
     }
 
     @Override
     public void updateInt(String columnLabel, int x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateInt");
     }
 
     @Override
     public void updateLong(String columnLabel, long x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateLong");
     }
 
     @Override
     public void updateFloat(String columnLabel, float x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateFloat");
     }
 
     @Override
     public void updateDouble(String columnLabel, double x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateDouble");
     }
 
     @Override
     public void updateBigDecimal(String columnLabel, BigDecimal x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBigDecimal");
     }
 
     @Override
     public void updateString(String columnLabel, String x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateString");
     }
 
     @Override
     public void updateBytes(String columnLabel, byte[] x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBytes");
     }
 
     @Override
     public void updateDate(String columnLabel, Date x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateDate");
     }
 
     @Override
     public void updateTime(String columnLabel, Time x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateTime");
     }
 
     @Override
     public void updateTimestamp(String columnLabel, Timestamp x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateTimestamp");
     }
 
     @Override
     public void updateAsciiStream(String columnLabel, InputStream x, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateAsciiStream");
     }
 
     @Override
     public void updateBinaryStream(String columnLabel, InputStream x, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateBinaryStream");
     }
 
     @Override
     public void updateCharacterStream(String columnLabel, Reader reader, int length) throws SQLException {
-
+        throw new UnsupportedOperationException("updateCharacterStream");
     }
 
     @Override
     public void updateObject(String columnLabel, Object x, int scaleOrLength) throws SQLException {
-
+        throw new UnsupportedOperationException("updateObject");
     }
 
     @Override
     public void updateObject(String columnLabel, Object x) throws SQLException {
-
+        throw new UnsupportedOperationException("updateObject");
     }
 
     @Override
     public void insertRow() throws SQLException {
-
+        throw new UnsupportedOperationException("insertRow");
     }
 
     @Override
     public void updateRow() throws SQLException {
-
+        throw new UnsupportedOperationException("updateRow");
     }
 
     @Override
     public void deleteRow() throws SQLException {
-
+        throw new UnsupportedOperationException("deleteRow");
     }
 
     @Override
     public void refreshRow() throws SQLException {
-
+        throw new UnsupportedOperationException("refreshRow");
     }
 
     @Override
     public void cancelRowUpdates() throws SQLException {
-
+        throw new UnsupportedOperationException("cancelRowUpdates");
     }
 
     @Override
     public void moveToInsertRow() throws SQLException {
-
+        throw new UnsupportedOperationException("moveToInsertRow");
     }
 
     @Override
@@ -657,7 +657,7 @@ public class DragonShardingResultSet implements ResultSet{
 
     @Override
     public Statement getStatement() throws SQLException {
-        return null;
+        return dragonShardingStatement;
     }
 
     @Override
@@ -1049,6 +1049,10 @@ public class DragonShardingResultSet implements ResultSet{
         return "DragonShardingResultSet{" +
                 "rowRecords=" + rowRecords +
                 '}';
+    }
+
+    public int size() {
+        return rowRecords.size();
     }
 
     /**

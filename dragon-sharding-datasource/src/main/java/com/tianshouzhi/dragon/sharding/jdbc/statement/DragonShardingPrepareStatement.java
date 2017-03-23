@@ -9,23 +9,19 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.ParamType.*;
-import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.ParamType.setBlob;
-import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.ParamType.setNClob;
 import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.PrepareCreateType.*;
-import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE;
-import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE_QUERY;
-import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.PrepareExecuteType.PREPARE_EXECUTE_UPDATE;
+import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement.PrepareExecuteType.*;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/16.
  */
 public class DragonShardingPrepareStatement extends DragonShardingStatement implements DragonPrepareStatement{
 
-    protected Map<Integer,DragonPrepareStatement.ParamSetting> params=new LinkedHashMap<Integer, ParamSetting>();
+    protected Map<Integer,DragonPrepareStatement.ParamSetting> params=new TreeMap<Integer, ParamSetting>();
     protected DragonPrepareStatement.PrepareExecuteType prepareExcuteType;
     protected DragonPrepareStatement.PrepareCreateType prepareCreateType;
 

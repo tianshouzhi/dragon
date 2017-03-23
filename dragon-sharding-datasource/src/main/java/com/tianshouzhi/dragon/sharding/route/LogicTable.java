@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
  * 每个逻辑表 管理了 物理表 ，每个物理表 对应一个读写分离数据源编号
  */
 public class LogicTable extends LogicConfig{
-    private LogicDatabase logicDatabase;
+    private LogicDataSource logicDataSource;
     private final Set<RouteRule> dbRouteRules;
     private String logicTableName;
     private final Set<RouteRule> tbRouteRules;//eg:${user_id}.toLong().intdiv(100)%100
@@ -21,15 +21,15 @@ public class LogicTable extends LogicConfig{
      * @param logicTableName
      * @param tableNameFormat
      * @param tbRouteRuleStrs
-     * @param logicDatabase
+     * @param logicDataSource
      * @param realDBTBMap
      */
-    public LogicTable(String logicTableName,String tableNameFormat, Set<String> tbRouteRuleStrs, Set<String> dbRouteRuleStrs,LogicDatabase logicDatabase,Map<String,List<String>> realDBTBMap) {
+    public LogicTable(String logicTableName, String tableNameFormat, Set<String> tbRouteRuleStrs, Set<String> dbRouteRuleStrs, LogicDataSource logicDataSource, Map<String,List<String>> realDBTBMap) {
         super(tableNameFormat);
         if(CollectionUtils.isEmpty(tbRouteRuleStrs)){
             throw new RuntimeException("tbRouteRuleStrList can't be empty!!!");
         }
-        if(logicDatabase==null){
+        if(logicDataSource ==null){
             throw new NullPointerException();
         }
 
@@ -44,7 +44,7 @@ public class LogicTable extends LogicConfig{
             this.dbRouteRules.add(routeRule);
         }
         this.logicTableName =logicTableName;
-        this.logicDatabase=logicDatabase;
+        this.logicDataSource = logicDataSource;
         this.realDBTBMap = realDBTBMap;
     }
 
@@ -55,7 +55,7 @@ public class LogicTable extends LogicConfig{
      */
     public String getRealDBName(Map<String,Object> shardColumnValuesMap){
         Long realDBIndex = getRealIndex(shardColumnValuesMap,dbRouteRules);
-        return logicDatabase.format(realDBIndex);
+        return logicDataSource.format(realDBIndex);
     }
 
     public String getRealTBName(Map<String,Object> shardColumnValuesMap){
@@ -73,7 +73,7 @@ public class LogicTable extends LogicConfig{
         return super.parseIndex(realTBName);
     }
     public Long parseRealDBIndex(String realDBName) {
-        return logicDatabase.parseIndex(realDBName);
+        return logicDataSource.parseIndex(realDBName);
     }
 
     /**

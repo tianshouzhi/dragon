@@ -1,0 +1,25 @@
+{
+  "name": "dragon-console",
+  "homepage": "https://github.com/tianshouzhi/dragon",
+  "authors": [
+    "tianshouzhi@126.com"
+  ],
+  "description": "dragon 管理控制台",
+  "main": "",
+  "keywords": [
+    "dragon",
+    "console",
+    "jdbc",
+    "datasource",
+    "sharding"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -41,6 +41,7 @@ public class ExecutionTask implements Callable<String>{
     @Override
     public String call() {
         try {
+            long start=System.currentTimeMillis();
             Connection realConnection =connection;
             if(realConnection==null){
                 realConnection=ds.getConnection();
@@ -60,6 +61,7 @@ public class ExecutionTask implements Callable<String>{
                 }
                 preparedStatement.execute();
                 sqlRouteInfo.setTargetStatement(preparedStatement);
+                sqlRouteInfo.setExecutionTimeMillis(System.currentTimeMillis()-start);
             }
 
         } catch (SQLException e) {

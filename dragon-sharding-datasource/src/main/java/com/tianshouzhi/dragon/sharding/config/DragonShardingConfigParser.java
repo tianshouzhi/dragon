@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.config;
 
 import com.tianshouzhi.dragon.common.initailzer.DataSourceInitailzerAdapter;
-import com.tianshouzhi.dragon.sharding.route.LogicDatabase;
+import com.tianshouzhi.dragon.sharding.route.LogicDataSource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -25,7 +25,7 @@ import java.util.*;
  */
 public  class DragonShardingConfigParser {
     private static final Logger LOGGER= LoggerFactory.getLogger(DragonShardingConfigParser.class);
-    private LogicDatabase logicDatabase;
+    private LogicDataSource logicDataSource;
     private HashMap<String, LogicTable> logicTableMap;
     public DragonShardingConfigParser(String configFileClassPath) throws IOException {
         if(StringUtils.isBlank(configFileClassPath)){
@@ -44,7 +44,7 @@ public  class DragonShardingConfigParser {
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug(yaml.dump(config));
         }
-        this.logicDatabase=makeLogicDatabase(config);
+        this.logicDataSource =makeLogicDatabase(config);
         this.logicTableMap= makeLogicTableMap(config);
     }
 
@@ -53,12 +53,12 @@ public  class DragonShardingConfigParser {
         LogicTableConfig defaultLogicTableConfig = config.getDefaultLogicTableConfig();
         List<LogicTableConfig> logiTableConfigList = config.getLogiTableConfigList();
         for (LogicTableConfig logicTableConfig : logiTableConfigList) {
-            resultMap.put(logicTableConfig.getLogicTbName(),makeLogicTable(defaultLogicTableConfig,logicTableConfig,logicDatabase));
+            resultMap.put(logicTableConfig.getLogicTbName(),makeLogicTable(defaultLogicTableConfig,logicTableConfig, logicDataSource));
         }
         return resultMap;
     }
 
-    private  LogicTable makeLogicTable(LogicTableConfig defaultLogicTableConfig, LogicTableConfig logicTableConfig, LogicDatabase logicDatabase) {
+    private  LogicTable makeLogicTable(LogicTableConfig defaultLogicTableConfig, LogicTableConfig logicTableConfig, LogicDataSource logicDataSource) {
         List<String> defaultDbRouteRules = defaultLogicTableConfig.getDbRouteRules();
         Map<String, String> defaultRealDbTbMapping = defaultLogicTableConfig.getRealDbTbMapping();
         String defaultTbNameFormat = defaultLogicTableConfig.getTbNameFormat();
@@ -85,8 +85,7 @@ public  class DragonShardingConfigParser {
         Set<String> tbRouteRules=new HashSet<String>();
         if(CollectionUtils.isNotEmpty(defaultTbRouteRules)){
             tbRouteRules.addAll(defaultTbRouteRules);
-        }
-        if(CollectionUtils.isNotEmpty(logicTableConfig.getTbRouteRules())){
+        }else if(CollectionUtils.isNotEmpty(logicTableConfig.getTbRouteRules())){
             tbRouteRules.addAll(logicTableConfig.getTbRouteRules());
         }
 
@@ -102,7 +101,7 @@ public  class DragonShardingConfigParser {
             throw new RuntimeException("must config realDbTbMapping");
         }
 
-        return new LogicTable(logicTbName,tbNameFormat,tbRouteRules,dbRouteRules,logicDatabase,realDbTbMapping);
+        return new LogicTable(logicTbName,tbNameFormat,tbRouteRules,dbRouteRules, logicDataSource,realDbTbMapping);
     }
 
     private Map<String, List<String>> caculateRealDBTBMapping(Map<String, String> defaultRealDbTbMapping, MessageFormat messageFomart) {
@@ -123,8 +122,9 @@ public  class DragonShardingConfigParser {
         return realDbTbMapping;
     }
 
-    private  LogicDatabase makeLogicDatabase(DragonShardingConfig config) {
+    private LogicDataSource makeLogicDatabase(DragonShardingConfig config) {
         String logicDSNameFormat=config.getLogicDSNameFormat();
+        String logicDSName = config.getLogicDSName();
         String realDSClass = config.getRealDSClass();
         Map<String, String> defaultDSConfig = config.getDefaultDSConfig();
         HashMap<String, DataSource> dbIndexDatasourceMap = new HashMap<String, DataSource>();
@@ -134,7 +134,7 @@ public  class DragonShardingConfigParser {
             Map<String, String> currentConfig = entry.getValue();
             dbIndexDatasourceMap.put(realDSName,makeRealDatasouce(realDSClass,defaultDSConfig,currentConfig));
         }
-        return new LogicDatabase(logicDSNameFormat, dbIndexDatasourceMap);
+        return new LogicDataSource(logicDSName,logicDSNameFormat, dbIndexDatasourceMap);
     }
 
     private  DataSource makeRealDatasouce(String realDSClass, Map<String, String> defaultDSConfig, Map<String, String> currentConfig) {
@@ -154,8 +154,8 @@ public  class DragonShardingConfigParser {
         return logicTableMap;
     }
 
-    public LogicDatabase getLogicDatabase() {
-        return logicDatabase;
+    public LogicDataSource getLogicDataSource() {
+        return logicDataSource;
     }
 
     public static void main(String[] args) throws IOException {
