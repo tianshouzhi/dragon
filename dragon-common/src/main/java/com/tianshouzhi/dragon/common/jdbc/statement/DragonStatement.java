@@ -323,6 +323,4 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
             throw new SQLException("No operations allowed after connection closed.");
         }
     }
-
-
 }

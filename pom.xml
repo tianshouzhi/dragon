@@ -15,6 +15,7 @@
         <module>dragon-common</module>
         <module>dragon-idgen</module>
         <module>dragon-console</module>
+        <module>dragon-demo</module>
     </modules>
 
     <dependencyManagement>

@@ -12,23 +12,19 @@ import java.util.regex.Pattern;
 public abstract class LogicConfig {
     //route rule中变量的命名规则
     public static final Pattern routeRuleVariablePattern =Pattern.compile("(\\$\\{.+?\\})",Pattern.CASE_INSENSITIVE);
-    private String nameFormat;
+    private String namePattern;
     protected MessageFormat messageFormat;//eg table_{00}
 
-
-    public LogicConfig(String nameFormat) {
-        if(StringUtils.isBlank(nameFormat)){
-            throw new RuntimeException("nameFormat can't be blank!!!");
+    public LogicConfig(String namePattern) {
+        if(StringUtils.isBlank(namePattern)){
+            throw new RuntimeException("namePattern can't be blank!!!");
         }
-
-        this.nameFormat=nameFormat;
-        this.messageFormat = new MessageFormat(nameFormat);
-
-
+        this.namePattern = namePattern;
+        this.messageFormat = new MessageFormat(namePattern);
     }
 
-    public String getNameFormat(){
-        return nameFormat;
+    public String getNamePattern(){
+        return namePattern;
     }
 
     public String format(Long caculatedIndex){
@@ -42,7 +38,4 @@ public abstract class LogicConfig {
             throw new RuntimeException(realName);
         }
     }
-
-
-
 }

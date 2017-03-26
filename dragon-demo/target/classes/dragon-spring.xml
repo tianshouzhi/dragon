@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dragonShardingDatasource" class="com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource">
+        <property name="datasourceNamePattern" value="dragon_sharding_{0,number,#00}"></property>
+        <property name="realDataSouceMap">
+            <map>
+                <entry key="dragon_sharding_00" value-ref="dragon_sharding_00"/>
+                <entry key="dragon_sharding_01" value-ref="dragon_sharding_01"/>
+            </map>
+        </property>
+        <property name="logicTableMap">
+            <map>
+                <entry key="user" value-ref="user"/>
+                <entry key="user_account" value-ref="user_account"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="druidDataSourceParent" class="com.alibaba.druid.pool.DruidDataSource" abstract="true">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_sharing_00"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="shxx12151022"></property>
+    </bean>
+    <bean id="dragon_sharding_00"  parent="druidDataSourceParent">
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_sharing_00"></property>
+    </bean>
+    <bean id="dragon_sharding_01" parent="druidDataSourceParent">
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_sharing_01"></property>
+    </bean>
+
+    <bean id="logicTableParent" class="com.tianshouzhi.dragon.sharding.route.LogicTable" abstract="true">
+
+    </bean>
+    <bean id="user" parent="logicTableParent">
+        <property name="tableNamePattern" value="user_{0,number,#00}"></property>
+        <property name="dbRouteRules">
+            <set>
+                <value></value>
+            </set>
+        </property>
+        <property name="realDBTBMap">
+            <map>
+                <entry key="dragon_sharding_00">
+                    <list>
+                        <value></value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    <bean id="user_account" parent="logicTableParent"></bean>
+</beans>

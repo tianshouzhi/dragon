@@ -28,7 +28,7 @@ public class ExecutionHandler implements Handler {
         boolean autoCommit = shardingConnection.getAutoCommit();
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
 
-        ExecutorService executor = DragonExecutorFactory.getInstance(context.getLogicDataSource().getNameFormat());
+        ExecutorService executor = context.getDragonShardingConfig().getExecutor();
         CompletionService<String> ecs = new ExecutorCompletionService<String>(executor);
         int taskNum=0;
 

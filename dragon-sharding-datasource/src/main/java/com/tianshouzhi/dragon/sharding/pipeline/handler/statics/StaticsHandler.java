@@ -22,6 +22,9 @@ public class StaticsHandler implements Handler{
     private static final Logger LOGGER= LoggerFactory.getLogger(StaticsHandler.class);
     @Override
     public void invoke(HandlerContext context) throws Exception {
+        if(true){
+            return;
+        }
         DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
         //原始sql执行时间
         String originSql = dragonShardingStatement.getSql();
@@ -50,7 +53,6 @@ public class StaticsHandler implements Handler{
                 }
             }
         }
-
         //更新记录数
         int totalUpdateCount=context.getTotalUpdateCount();
         //原始查询结果集记录数
@@ -115,7 +117,7 @@ public class StaticsHandler implements Handler{
         sqlExecutionStatics.setParallelExecutionTimeMillis(parallelExecutionTimeMillis);
         sqlExecutionStatics.setResultMergeTimeMillis(parallelExecutionTimeMillis);
         sqlExecutionStatics.setRouteDetails(routeDetails);
-        sqlExecutionStatics.setLogicDataBaseName(context.getLogicDataSource().getLogicDSName());
+        sqlExecutionStatics.setLogicDataBaseName(context.getDragonShardingConfig().getAppName());
         LOGGER.debug("sql execute details:\n{}",JSON.toJSONString(sqlExecutionStatics,true));
     }
 

@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.sharding.route;
 
+import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -11,9 +12,14 @@ import java.util.Locale;
  */
 public class MessageFormatTest {
     public static void main(String[] args) throws ParseException {
-        String pattern = "welcome {0},current time is {1}";
+        String pattern = "welcome ,current time is ";
         Object[] arguments = {"tianshouzhi", new Date()};
         MessageFormat messageFormat=new MessageFormat(pattern, Locale.CHINA);
+        Format[] formats = messageFormat.getFormats();
+        System.out.println(formats.length);
+        for (Format format : formats) {
+
+        }
         System.out.println(messageFormat.toPattern());
         String format = messageFormat.format(pattern, arguments);
         System.out.println(format);

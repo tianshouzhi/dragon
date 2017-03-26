@@ -4,7 +4,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,8 +16,8 @@ import java.sql.SQLException;
 public class DragonShardingDataSourceTest {
     private static DataSource dataSource;
     @BeforeClass
-    public static void before() throws IOException {
-        dataSource=new DragonShardingDataSource("dragon-sharding.yml");
+    public static void before() throws Exception {
+        dataSource=new DragonShardingDataSource("dragon-sharding.properties");
     }
     @Test
     public void testBatchInsert() throws SQLException {

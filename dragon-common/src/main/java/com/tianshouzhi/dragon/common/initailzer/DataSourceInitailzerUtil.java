@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 /**
  * Created by TIANSHOUZHI336 on 2017/3/20.
  */
-public abstract class DataSourceInitailzerAdapter {
+public abstract class DataSourceInitailzerUtil {
     private static ServiceLoader<DataSourceInitailzer> serviceLoader=ServiceLoader.load(DataSourceInitailzer.class);;
     private static Map<String,DataSourceInitailzer> classNameInitailzerMap=new HashMap<String, DataSourceInitailzer>();
     static {

@@ -1,11 +1,12 @@
 package com.tianshouzhi.dragon.sharding.pipeline;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
+import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingConfig;
 import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.route.LogicDataSource;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import javax.sql.DataSource;
@@ -52,7 +53,7 @@ public class HandlerContext {
         this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
     }
     public DataSource getRealDataSource(String realDBName){
-        return getShardingDataSource().getDataSource(realDBName);
+        return getDragonShardingConfig().getLogicDatasouce().getDatasource(realDBName);
     }
     public DragonShardingStatement getDragonShardingStatement() {
         return dragonShardingStatement;
@@ -215,19 +216,19 @@ public class HandlerContext {
         this.parallelExecutionTaskNum = tarallelExecutionTaskNum;
     }
 
-    public LogicDataSource getLogicDataSource() {
-        return getShardingDataSource().getLogicDataSource();
+    public LogicDatasouce getLogicDataSource() {
+        return getDragonShardingConfig().getLogicDatasouce();
     }
 
-    public DragonShardingDataSource getShardingDataSource(){
+    public DragonShardingConfig getDragonShardingConfig(){
         try {
-            return dragonShardingStatement.getConnection().getShardingDataSource();
+            return dragonShardingStatement.getConnection().getDragonShardingConfig();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public LogicTable getLogicTable(String logicTableName) {
-        return getShardingDataSource().getLogicTable(logicTableName);
+        return getDragonShardingConfig().getLogicTableMap().get(logicTableName);
     }
 }

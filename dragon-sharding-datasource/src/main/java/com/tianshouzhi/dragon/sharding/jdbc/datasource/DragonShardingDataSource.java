@@ -1,63 +1,48 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
-import com.tianshouzhi.dragon.sharding.config.DragonShardingConfigParser;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
-import com.tianshouzhi.dragon.sharding.route.LogicDataSource;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.sql.DataSource;
-import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public class DragonShardingDataSource extends DragonDataSource {
-    private LogicDataSource logicDataSource;
-    /**
-     * key为逻辑表名，value是对应的逻辑表对象
-     */
-    private Map<String,LogicTable> logicTableMap;
+    //原始配置信息
+    private Properties configProperties;
+    private DragonShardingConfig dragonShardingConfig;
 
-    public DragonShardingDataSource(String configFileClassPath) {
-        try {
-            DragonShardingConfigParser dragonShardingConfigParser = new DragonShardingConfigParser(configFileClassPath);
-            this.logicDataSource = dragonShardingConfigParser.getLogicDataSource();
-            this.logicTableMap = dragonShardingConfigParser.getLogicTableMap();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public DragonShardingDataSource(String configFileClassPath) throws Exception {
+        if (StringUtils.isBlank(configFileClassPath)) {
+            throw new IllegalArgumentException("configFileClassPath can't be blank");
         }
+        InputStream inputStream = ClassLoader.getSystemClassLoader().getResource(configFileClassPath).openStream();
+        configProperties = new Properties();
+        configProperties.load(inputStream);
+        String appName = DragonShardingConfigParser.parseAppName(configProperties);
+        LogicDatasouce logicDatasouce = DragonShardingConfigParser.parseLogicDatasouce(configProperties);
+        Map<String, LogicTable> logicTableMap = DragonShardingConfigParser.parseLogicTableMap(logicDatasouce, configProperties);
+        ExecutorService executor = DragonShardingConfigParser.makeExecutorService(appName, logicDatasouce, logicTableMap, configProperties);
+        int executionTimeout = DragonShardingConfigParser.parseExecutionTimeout(configProperties);
+        this.dragonShardingConfig = new DragonShardingConfig(appName, logicDatasouce, logicTableMap, executor, executionTimeout);
     }
 
-    public DragonShardingDataSource(LogicDataSource logicDataSource, Map<String,LogicTable> logicTableMap) {
-        if(logicDataSource ==null||logicTableMap==null){
-            throw new NullPointerException();
-        }
-        this.logicDataSource = logicDataSource;
-        this.logicTableMap = logicTableMap;
-    }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new DragonShardingConnection(username,password,this);
-    }
-    public LogicDataSource getLogicDataSource() {
-        return logicDataSource;
+        return new DragonShardingConnection(username, password, dragonShardingConfig);
     }
 
-    public Map<String, LogicTable> getLogicTableMap() {
-        return logicTableMap;
+    public DragonShardingConfig getDragonShardingConfig() {
+        return dragonShardingConfig;
     }
-
-    public LogicTable getLogicTable(String logicTableName) {
-        return logicTableMap.get(logicTableName);
-    }
-
-    public DataSource getDataSource(String dbIndex) {
-        return logicDataSource.getDatasource(dbIndex);
-    }
-
 }
