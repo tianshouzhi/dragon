@@ -1,12 +1,13 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLNumberExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
@@ -87,14 +88,27 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
             //// FIXME: 2017/3/14  limit参数支持占位符
             MySqlSelectQueryBlock.Limit limit = query.getLimit();
             //记录原始的offset和rowcount
-            int originStart = ((SQLIntegerExpr) limit.getOffset()).getNumber().intValue();
-            context.setOffset(originStart);
-            int originEnd = ((SQLIntegerExpr) limit.getRowCount()).getNumber().intValue();
-            context.setRowCount(originEnd);
+            SQLExpr offset = limit.getOffset();
+            Number originOffset=null;
+            if(isJdbcPlaceHolder(offset)){
+                DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
+                originOffset= (Number) paramSetting.values[0];
+            }else{
+                originOffset = ((SQLNumberExpr)offset).getNumber();
+                limit.setOffset(new SQLNumberExpr(0));
+            }
+            context.setOffset(originOffset.longValue());
 
-            limit.setOffset(new SQLIntegerExpr(0));
-            limit.setRowCount(new SQLIntegerExpr(originStart+originEnd));
-
+            SQLExpr rowCount = limit.getRowCount();
+            Number originRowCount=null;
+            if(isJdbcPlaceHolder(offset)){
+                DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
+                originRowCount= (Number) paramSetting.values[0];
+            }else{
+                originRowCount = ((SQLNumberExpr)rowCount).getNumber();
+                limit.setRowCount(new SQLNumberExpr(originOffset.longValue()+originRowCount.longValue()));
+            }
+            context.setRowCount(originRowCount.longValue());
         }
         makeupSqlRouteInfoSqls();
     }

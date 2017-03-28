@@ -29,8 +29,10 @@ public class DragonShardingDataSource extends DragonDataSource {
         configProperties = new Properties();
         configProperties.load(inputStream);
         String appName = DragonShardingConfigParser.parseAppName(configProperties);
+
         LogicDatasouce logicDatasouce = DragonShardingConfigParser.parseLogicDatasouce(configProperties);
         Map<String, LogicTable> logicTableMap = DragonShardingConfigParser.parseLogicTableMap(logicDatasouce, configProperties);
+
         ExecutorService executor = DragonShardingConfigParser.makeExecutorService(appName, logicDatasouce, logicTableMap, configProperties);
         int executionTimeout = DragonShardingConfigParser.parseExecutionTimeout(configProperties);
         this.dragonShardingConfig = new DragonShardingConfig(appName, logicDatasouce, logicTableMap, executor, executionTimeout);
@@ -41,8 +43,8 @@ public class DragonShardingDataSource extends DragonDataSource {
     public Connection getConnection(String username, String password) throws SQLException {
         return new DragonShardingConnection(username, password, dragonShardingConfig);
     }
-
+/*
     public DragonShardingConfig getDragonShardingConfig() {
         return dragonShardingConfig;
-    }
+    }*/
 }

@@ -42,9 +42,9 @@ public class MysqlDeleteStatementRewriter extends AbstractMysqlSqlRewriter {
             throw new RuntimeException("don't support Multiple-table delete syntax!!!sql:" + originSql);
         }
         SQLExpr where = deleteAst.getWhere();
-        if(where==null){
+       /* if(where==null){
             throw new RuntimeException("delete sql must contains where!!!sql:" + originSql);
-        }
+        }*/
 
         parseLogicTableList(tableSource);
 

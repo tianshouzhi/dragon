@@ -6,7 +6,6 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -30,8 +29,8 @@ public class ExecutionTask implements Callable<String>{
      * 如果提供了connection，则使用指定的connection；如果没有提供connection，则从ds中获取一个新的connection
      * @param autoCommit
      * @param sqlRouteInfos
-     */
-    public ExecutionTask(Connection connection,DataSource ds, boolean autoCommit,SqlRouteInfo ... sqlRouteInfos) {
+     */ //
+    public ExecutionTask(boolean autoCommit, Connection connection, DataSource ds, SqlRouteInfo ... sqlRouteInfos) {
         this.connection=connection;
         this.sqlRouteInfos = sqlRouteInfos;
         this.ds = ds;
@@ -39,8 +38,7 @@ public class ExecutionTask implements Callable<String>{
     }
 
     @Override
-    public String call() {
-        try {
+    public String call() throws Exception{
             long start=System.currentTimeMillis();
             Connection realConnection =connection;
             if(realConnection==null){
@@ -49,6 +47,7 @@ public class ExecutionTask implements Callable<String>{
             for (SqlRouteInfo sqlRouteInfo : sqlRouteInfos) {
                 realConnection.setAutoCommit(autoCommit);
                 PreparedStatement preparedStatement = realConnection.prepareStatement(sqlRouteInfo.getSql().toString());
+                sqlRouteInfo.setTargetStatement(preparedStatement);
                 Map<Integer, DragonPrepareStatement.ParamSetting> parameters = sqlRouteInfo.getParameters();
                 Iterator<Map.Entry<Integer, DragonPrepareStatement.ParamSetting>> iterator = parameters.entrySet().iterator();
                 while (iterator.hasNext()){
@@ -60,13 +59,9 @@ public class ExecutionTask implements Callable<String>{
                     DragonPrepareStatement.ParamType.setPrepareStatementParams(preparedStatement,parameterIndex,values,paramType);
                 }
                 preparedStatement.execute();
-                sqlRouteInfo.setTargetStatement(preparedStatement);
                 sqlRouteInfo.setExecutionTimeMillis(System.currentTimeMillis()-start);
             }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
         return sqlRouteInfos[0].getRealDBName();
     }
 }

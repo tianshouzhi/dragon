@@ -255,12 +255,12 @@ public class MysqlSelectResultMerger implements ResultMerger {
         }
     }
 
-    private void limit(MySqlSelectQueryBlock.Limit limit, int offset, int rowcount, List<DragonShardingResultSet.RowRecord> totalRowRecords) {
+    private void limit(MySqlSelectQueryBlock.Limit limit, long offset, long rowcount, List<DragonShardingResultSet.RowRecord> totalRowRecords) {
         if(limit==null){
             return ;
         }
-        final int start=offset;
-        final int end=Math.min(offset+rowcount,totalRowRecords.size());
+        final long start=offset;
+        final long end=Math.min(offset+rowcount,totalRowRecords.size());
         //// TODO: 2017/3/14 有什么更高效的方法，不需要这样频繁的拷贝 ，特别是在记录非常多的情况下
         List<DragonShardingResultSet.RowRecord> resultList=new ArrayList<DragonShardingResultSet.RowRecord>();
         for (int i = 0; i < totalRowRecords.size(); i++) {

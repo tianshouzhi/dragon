@@ -49,9 +49,12 @@ public class DragonShardingStatement extends DragonStatement{
 
     @Override
     public void close() throws SQLException {
-        for (Statement statement : realStatementList) {
-            statement.close();
+        if(realStatementList!=null){//fixme 出现异常时，还没来得及设置真实statement，就关闭了，导致这里的statementList为空，但是实际上有sql在执行
+            for (Statement statement : realStatementList) {
+                statement.close();
+            }
         }
+
     }
 
     @Override

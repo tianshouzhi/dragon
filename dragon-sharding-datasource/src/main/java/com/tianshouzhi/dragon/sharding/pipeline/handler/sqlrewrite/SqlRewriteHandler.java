@@ -58,12 +58,11 @@ public class SqlRewriteHandler implements Handler {
         while (iterator.hasNext()){
             Map.Entry<String, Map<String, SqlRouteInfo>> entry = iterator.next();
             String realDBIndex = entry.getKey();
-            sb.append("\n-------"+realDBIndex+"---------\n");
+            sb.append("\n-------"+realDBIndex+"---------");
             Map<String, SqlRouteInfo> tbSqlInfoMap = entry.getValue();
             for (Map.Entry<String, SqlRouteInfo> sqlRouteInfoEntry : tbSqlInfoMap.entrySet()) {
-                String realTBIndex = sqlRouteInfoEntry.getKey();
                 SqlRouteInfo sqlRouteInfo = sqlRouteInfoEntry.getValue();
-                sb.append(realTBIndex+"\nsql:"+sqlRouteInfo.getSql()+"\n");//sql不要格式化
+                sb.append("\nsql:"+sqlRouteInfo.getSql()+"\n");//sql不要格式化
                 Map<Integer, DragonPrepareStatement.ParamSetting> parameters = sqlRouteInfo.getParameters();
                 sb.append("params:");
                 for (Map.Entry<Integer, DragonPrepareStatement.ParamSetting> paramSettingEntry : parameters.entrySet()) {

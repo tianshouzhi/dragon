@@ -2,7 +2,6 @@ package com.tianshouzhi.dragon.sharding.pipeline;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingConfig;
-import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
@@ -30,8 +29,8 @@ public class HandlerContext {
     private boolean isQuery;
 
     //limit 信息 todo 有待完善 mysql rowCount=-1 表示从当前读取到最后
-    private int offset=-1;
-    private int rowCount=-1;
+    private long offset=-1;
+    private long rowCount=-1;
     private Map<String, String> fullColumnNameAliasMap;
 
     //sql执行的开始时间 ，用于统计
@@ -103,19 +102,19 @@ public class HandlerContext {
         this.hintMap = hintMap;
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return offset;
     }
 
-    public void setOffset(int offset) {
+    public void setOffset(long offset) {
         this.offset = offset;
     }
 
-    public int getRowCount() {
+    public long getRowCount() {
         return rowCount;
     }
 
-    public void setRowCount(int rowCount) {
+    public void setRowCount(long rowCount) {
         this.rowCount = rowCount;
     }
 

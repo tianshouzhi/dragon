@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * 解析出sql中的参数和参数值(主要是找出分区字段和分区字段的值)
  */
 public class SqlParseHandler implements Handler {
-    private  static  DragonCache<String,SQLStatement> dragonCache= DragonCacheBuilder.build(100,1000,50,10, TimeUnit.MINUTES);
+    private  static  DragonCache<String,SQLStatement> sqlAstCache = DragonCacheBuilder.build(100,1000,50,10, TimeUnit.MINUTES);
     @Override
     public void invoke(HandlerContext context) {
         if(MapUtils.isEmpty(context.getHintMap())){//说明没有hint
@@ -27,7 +27,7 @@ public class SqlParseHandler implements Handler {
 
             boolean hitCache=true;
 
-            SQLStatement sqlStatement = dragonCache.get(sql);//先从cache中获取，如果没有，则解析
+            SQLStatement sqlStatement = sqlAstCache.get(sql);//先从cache中获取，如果没有，则解析
 
             if(sqlStatement==null){
                 hitCache=false;
@@ -40,7 +40,7 @@ public class SqlParseHandler implements Handler {
                     throw new RuntimeException("only support one sql!!");
                 }
                 context.setSqlParseTimeMillis(System.currentTimeMillis()-start);
-                dragonCache.put(sql,sqlStatement); //解析完成之后，翻入cache中
+                sqlAstCache.put(sql,sqlStatement); //解析完成之后，翻入cache中
             }
             context.setHitSqlParserCache(hitCache);
             context.setParsedSqlStatement(sqlStatement);
