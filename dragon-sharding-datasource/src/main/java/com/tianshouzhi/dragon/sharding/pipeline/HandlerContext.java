@@ -18,7 +18,7 @@ import java.util.*;
  * Created by TIANSHOUZHI336 on 2017/2/24.
  */
 public class HandlerContext {
-    private DragonShardingStatement dragonShardingStatement;
+    private DragonShardingStatement shardingStatement;
     private SQLStatement parsedSqlStatement;
     private Map<String/**dbIndex*/,Set<String/**tbIndex*/>> hintMap=new HashMap<String, Set<String>>();
     private Map<String/**dbIndex*/, Map<String/*tbIndex*/, SqlRouteInfo>> sqlRouteMap;
@@ -44,18 +44,18 @@ public class HandlerContext {
     private long parallelExecutionTimeMillis;
     private int parallelExecutionTaskNum;
 
-    public HandlerContext(DragonShardingStatement dragonShardingStatement) {
-        if(dragonShardingStatement==null){
+    public HandlerContext(DragonShardingStatement shardingStatement) {
+        if(shardingStatement ==null){
             throw new NullPointerException();
         }
-        this.dragonShardingStatement = dragonShardingStatement;
+        this.shardingStatement = shardingStatement;
         this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
     }
     public DataSource getRealDataSource(String realDBName){
         return getDragonShardingConfig().getLogicDatasouce().getDatasource(realDBName);
     }
-    public DragonShardingStatement getDragonShardingStatement() {
-        return dragonShardingStatement;
+    public DragonShardingStatement getShardingStatement() {
+        return shardingStatement;
     }
 
     public SQLStatement getParsedSqlStatement() {
@@ -221,7 +221,7 @@ public class HandlerContext {
 
     public DragonShardingConfig getDragonShardingConfig(){
         try {
-            return dragonShardingStatement.getConnection().getDragonShardingConfig();
+            return shardingStatement.getConnection().getDragonShardingConfig();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -229,5 +229,24 @@ public class HandlerContext {
 
     public LogicTable getLogicTable(String logicTableName) {
         return getDragonShardingConfig().getLogicTableMap().get(logicTableName);
+        /*if(logicTable!=null){
+            return logicTable;
+        }
+
+        //没有找到对应的逻辑表的情况下，这张表可能要走默认库
+        boolean hasDefaultDB= StringUtils.isNotBlank(getDragonShardingConfig().getLogicDatasouce().getDefaultDSName());
+        if(!hasDefaultDB){
+            //如果没有默认库，抛出异常
+            throw new RuntimeException("unkown table name'"+logicTableName+"' in sql:"+shardingStatement.getSql()+",may be you should config datasource.defaultDSName in your properties config file");
+        }
+        //如果有默认库
+        String tableNameFormat = logicTableName;
+        HashSet<String> tbRouteRuleStrs = new HashSet<String>();
+        HashSet<String> dbRouteRuleStrs = new HashSet<String>();
+        HashMap<String, List<String>> realDBTBMap = new HashMap<String, List<String>>();
+        LogicTable temp=new LogicTable(logicTableName, tableNameFormat, tbRouteRuleStrs, dbRouteRuleStrs,getLogicDataSource(), realDBTBMap);
+        return getDragonShardingConfig().getLogicTableMap().get(hasDefaultDB);*/
     }
+
+
 }

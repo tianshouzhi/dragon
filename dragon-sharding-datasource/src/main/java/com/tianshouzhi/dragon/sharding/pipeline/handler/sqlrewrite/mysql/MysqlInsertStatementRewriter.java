@@ -53,8 +53,9 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
     public void doRewrite(HandlerContext context) throws SQLException{
         MySqlInsertStatement sqlStatement= (MySqlInsertStatement) context.getParsedSqlStatement();
         String insertClause="insert into ";
+
         String logicTableName = sqlStatement.getTableName().getSimpleName().toString();
-//        insertClause.append().append(logicTableName);
+//        insertClause..append(logicTableName);
 
         List<SQLExpr> columns = sqlStatement.getColumns();
         // insert into table_xxx values(，，)语法不支持
@@ -80,13 +81,13 @@ public class MysqlInsertStatementRewriter extends AbstractMysqlSqlRewriter {
         }
         //insert 语句中必须包含分区字段
         if(shardColumnIndexNameMap==null){
-            throw new SQLException("insert sql("+ context.getDragonShardingStatement().getSql()+") must contains shard column!!!");
+            throw new SQLException("insert sql("+ context.getShardingStatement().getSql()+") must contains shard column!!!");
         }
         columnClause.append(")");
 
-        if(CollectionUtils.isEmpty(context.getDragonShardingStatement().getBatchExecuteInfoList())){//非批处理
+        if(CollectionUtils.isEmpty(context.getShardingStatement().getBatchExecuteInfoList())){//非批处理
             List<SQLInsertStatement.ValuesClause> valuesList = sqlStatement.getValuesList();
-            DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
+            DragonShardingStatement dragonShardingStatement = context.getShardingStatement();
             Map<String,List<SQLInsertStatement.ValuesClause>> valueListMapByTable=new HashMap<String, List<SQLInsertStatement.ValuesClause>>();
             Map<String,Map<String,SqlRouteInfo>> dbIndexSplitMap=context.getSqlRouteMap();
             for (int i = 0; i < valuesList.size(); i++) {

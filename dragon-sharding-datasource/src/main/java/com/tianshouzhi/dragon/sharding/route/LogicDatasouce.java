@@ -15,33 +15,36 @@ public class LogicDatasouce extends LogicConfig{
     /**
      * 数据库名称与对应的数据源的映射关系,TreeMap会根据key排序
      */
-    private Map<String,DataSource> dbIndexDatasourceMap=new TreeMap<String, DataSource>();
-    public LogicDatasouce(String dbNameFormat, Map<String,DataSource> dbIndexDatasourceMap) {
+    private Map<String,DataSource> dsNameDatasourceMap =new TreeMap<String, DataSource>();
+    public LogicDatasouce(String dbNameFormat, Map<String,DataSource> dsNameDatasourceMap,String defaultDSName) {
         super(dbNameFormat);
-        if(MapUtils.isEmpty(dbIndexDatasourceMap)){
-            throw new IllegalArgumentException("dbIndexDatasourceMap can't be null or empty!!!");
+        if(MapUtils.isEmpty(dsNameDatasourceMap)){
+            throw new IllegalArgumentException("dsNameDatasourceMap can't be null or empty!!!");
         }
-        this.dbIndexDatasourceMap.putAll(dbIndexDatasourceMap);
-        //如果defaultRealDSName！=null，但是dbIndexDatasourceMap不包含defaultRealDSName，说明配置错误
-        if(StringUtils.isNoneEmpty(defaultDSName)&&!dbIndexDatasourceMap.containsKey(defaultDSName)){
-            throw new IllegalArgumentException("dbIndexDatasourceMap doesn't contains defaultDSName:"+ defaultDSName);
+        this.dsNameDatasourceMap.putAll(dsNameDatasourceMap);
+        //如果defaultDSName！=null，但是dsNameDatasourceMap不包含defaultDSName，说明配置错误
+        if(StringUtils.isNotBlank(defaultDSName)){
+            if(!dsNameDatasourceMap.containsKey(defaultDSName)){
+                throw new IllegalArgumentException("dsNameDatasourceMap doesn't contains defaultDSName:"+ defaultDSName);
+            }
+            this.defaultDSName=defaultDSName;
+        }else{//如果没有提供defaultDSName，并且dsNameDatasourceMap只有一个元素，说明只分表，不分库，则将defaultDSName设置为这个库名
+            if(dsNameDatasourceMap.size()==1){
+                this.defaultDSName=dsNameDatasourceMap.keySet().iterator().next();
+            }
         }
         //todo 检查dbIndex(即map的key)和namePattern是否匹配
     }
 
     public DataSource getDatasource(String dbIndex){
-        return dbIndexDatasourceMap.get(dbIndex);
+        return dsNameDatasourceMap.get(dbIndex);
     }
 
     public Map<String, DataSource> getRealDbIndexDatasourceMap() {
-        return dbIndexDatasourceMap;
+        return dsNameDatasourceMap;
     }
 
     public String getDefaultDSName() {
         return defaultDSName;
-    }
-
-    public void setDefaultDSName(String defaultDSName) {
-        this.defaultDSName = defaultDSName;
     }
 }

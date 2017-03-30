@@ -31,7 +31,7 @@ import java.util.*;
 public class MysqlSelectResultMerger implements ResultMerger {
     @Override
     public void merge(HandlerContext context) throws SQLException {
-        DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
+        DragonShardingStatement dragonShardingStatement = context.getShardingStatement();
         List<Statement> realStatementList = context.getRealStatementList();
        //获得各个分库的结果集
         List<ResultSet> realResultSetList=new ArrayList<ResultSet>(realStatementList.size());
@@ -44,6 +44,7 @@ public class MysqlSelectResultMerger implements ResultMerger {
         List<DragonShardingResultSet.RowRecord> totalRowRecords=new ArrayList<DragonShardingResultSet.RowRecord>();
         DragonShardingResultSet shardingResultSet = new DragonShardingResultSet(dragonShardingStatement,metaData,realResultSetList,totalRowRecords);
         mergeResultSets(shardingResultSet,totalRowRecords, realResultSetList);
+
         context.setOriginQueryCount(totalRowRecords.size());
         //处理order by和limit 以及max、min、groupBy等函数
         if (!CollectionUtils.isEmpty(totalRowRecords)//没有查询到结果，不需要处理

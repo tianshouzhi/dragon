@@ -6,7 +6,6 @@ import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 
 import java.util.List;
 
@@ -40,9 +39,6 @@ public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
 
         parseLogicTableList(tableSource);
         SQLExpr where = update.getWhere();
-        if (where == null) {
-            throw new RuntimeException("update sql must contains where!!!sql:" + originSql);
-        }
         List<SQLUpdateSetItem> items = update.getItems();
         for (SQLUpdateSetItem sqlUpdateSetItem : items) {
             SQLExpr value = sqlUpdateSetItem.getValue();
@@ -51,32 +47,33 @@ public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
             }
             //如果是case when更新
             if(value instanceof SQLCaseExpr){
-                List<SQLCaseExpr.Item> itemList = ((SQLCaseExpr) value).getItems();
-                for (SQLCaseExpr.Item item : itemList) {
-                    SQLExpr conditionExpr = item.getConditionExpr();
-                    if(isJdbcPlaceHolder(conditionExpr)){
-                        currentParamterIndex++;
-                    }
-                    SQLExpr valueExpr = item.getValueExpr();
-                    if(isJdbcPlaceHolder(valueExpr)){
-                        currentParamterIndex++;
-                    }
-                }
-                SQLExpr elseExpr = ((SQLCaseExpr) value).getElseExpr();
-                if(isJdbcPlaceHolder(elseExpr)){
-                    currentParamterIndex++;
-                }
+                parseCaseWhen((SQLCaseExpr) value);
             }
         }
-        List<SQLExpr> whereConditionList = parseWhereRouteConditionList(where);
+        parseWhereRouteConditionList(where);
         //二元操作符的分区条件
-        SqlRouteParams sqlRouteParams = new SqlRouteParams();
-        fillSqlRouteParams(whereConditionList, sqlRouteParams);
-        makeRouteMap(sqlRouteParams);
+        fillSqlRouteParams();
+        makeRouteMap();
 //            update.getTableName();
         makeupSqlRouteInfoSqls();
 
     }
 
-
+    private void parseCaseWhen(SQLCaseExpr value) {
+        List<SQLCaseExpr.Item> itemList = value.getItems();
+        for (SQLCaseExpr.Item item : itemList) {
+            SQLExpr conditionExpr = item.getConditionExpr();
+            if(isJdbcPlaceHolder(conditionExpr)){
+                currentParamterIndex++;
+            }
+            SQLExpr valueExpr = item.getValueExpr();
+            if(isJdbcPlaceHolder(valueExpr)){
+                currentParamterIndex++;
+            }
+        }
+        SQLExpr elseExpr = value.getElseExpr();
+        if(isJdbcPlaceHolder(elseExpr)){
+            currentParamterIndex++;
+        }
+    }
 }

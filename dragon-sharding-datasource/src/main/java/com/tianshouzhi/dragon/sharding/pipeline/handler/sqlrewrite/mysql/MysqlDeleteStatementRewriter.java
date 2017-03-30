@@ -5,10 +5,8 @@ import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * <pre>
@@ -49,12 +47,12 @@ public class MysqlDeleteStatementRewriter extends AbstractMysqlSqlRewriter {
         parseLogicTableList(tableSource);
 
         //获得where中包含的所有条件
-        List<SQLExpr> whereConditionList = parseWhereRouteConditionList(where);
-        SqlRouteParams sqlRouteParams = new SqlRouteParams();
+        parseWhereRouteConditionList(where);
+//        SqlRouteParams sqlRouteParams = new SqlRouteParams();
         //填充路由参数map
-        fillSqlRouteParams(whereConditionList, sqlRouteParams);
+        fillSqlRouteParams();
         //构造路由表
-        makeRouteMap(sqlRouteParams);
+        makeRouteMap();
         //生成路由表中每个SqlRouteInfo的sql
         makeupSqlRouteInfoSqls();
     }

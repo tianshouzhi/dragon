@@ -3,18 +3,14 @@ package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLNumberExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,62 +51,50 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
 
         MySqlSelectQueryBlock query = (MySqlSelectQueryBlock) select.getQuery();
 
-        //解析select item中有别名的情况，主要用于处理order by、group by时使用的不是别名的情况，因为获取值是根据columnLabel来的，如果有alias，columnLabel就是alias，如果没有columnLabel就是columnName
-        List<SQLSelectItem> selectList = query.getSelectList();
-        Map<String,String> fullColumnAliasMap=null;
-        for (SQLSelectItem sqlSelectItem : selectList) {
-            String alias = sqlSelectItem.getAlias();
-            if(alias !=null){
-                //可能直接是列名，也可能是表名.列名
-                String fullColumnName = sqlSelectItem.getExpr().toString();
-                if(fullColumnAliasMap==null){
-                    fullColumnAliasMap=new HashMap<String, String>();
-                }
-                fullColumnAliasMap.put(fullColumnName,alias);
-            }
-        }
-        context.setFullColumnNameAliasMap(fullColumnAliasMap);
+        fillColumnAliasMap(context, query.getSelectList());
 
         SQLTableSource tableSource = query.getFrom();
         parseLogicTableList(tableSource);
 
         SQLExpr where = query.getWhere();
         //解析where条件，只解析可作为路由条件的参数，例如emp.dept_id=dept.id and emp.id=？，只会得到emp.id=？
-        List<SQLExpr> whereConditionList = parseWhereRouteConditionList(where);
-        SqlRouteParams sqlRouteParams = new SqlRouteParams();
-        fillSqlRouteParams(whereConditionList, sqlRouteParams);
-        makeRouteMap(sqlRouteParams);
+        parseWhereRouteConditionList(where);
+        fillSqlRouteParams();
+        makeRouteMap();
 
         //如果同时不为空，说明需要对limit语句进行修改 ,特别的，如果只分到一个库，不需要设置limit为0，查询结果的limit就是正确的
         //需要在merge的时候配合，单库的情况不考虑order by和limit
-        Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
-        if(needAlterLimit(query, sqlRouteMap)){ //limt 2,2 从第二位开始，查询2个 也就是 2、3两条记录，start要改为0，end要改为start+end
-            //// FIXME: 2017/3/14  limit参数支持占位符
-            MySqlSelectQueryBlock.Limit limit = query.getLimit();
-            //记录原始的offset和rowcount
-            SQLExpr offset = limit.getOffset();
-            Number originOffset=null;
-            if(isJdbcPlaceHolder(offset)){
-                DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-                originOffset= (Number) paramSetting.values[0];
-            }else{
-                originOffset = ((SQLNumberExpr)offset).getNumber();
-                limit.setOffset(new SQLNumberExpr(0));
-            }
-            context.setOffset(originOffset.longValue());
-
-            SQLExpr rowCount = limit.getRowCount();
-            Number originRowCount=null;
-            if(isJdbcPlaceHolder(offset)){
-                DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
-                originRowCount= (Number) paramSetting.values[0];
-            }else{
-                originRowCount = ((SQLNumberExpr)rowCount).getNumber();
-                limit.setRowCount(new SQLNumberExpr(originOffset.longValue()+originRowCount.longValue()));
-            }
-            context.setRowCount(originRowCount.longValue());
+        if(needAlterLimit(query, context.getSqlRouteMap())){
+            alterLimit(context, query);
         }
         makeupSqlRouteInfoSqls();
+    }
+
+    //修改limit起始语句：limt 2,2 从第二位开始，查询2个 也就是 2、3两条记录，originOffset要改为0，rowCount要改为originOffset+rowCount
+    private void alterLimit(HandlerContext context, MySqlSelectQueryBlock query) {
+        MySqlSelectQueryBlock.Limit limit = query.getLimit();
+        //记录原始的offset和rowcount
+        SQLExpr offset = limit.getOffset();
+        Number originOffset=null;
+        if(isJdbcPlaceHolder(offset)){
+            DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
+            originOffset= (Number) paramSetting.values[0];
+        }else{
+            originOffset = ((SQLNumberExpr)offset).getNumber();
+            limit.setOffset(new SQLNumberExpr(0));
+        }
+        context.setOffset(originOffset.longValue());
+
+        SQLExpr rowCount = limit.getRowCount();
+        Number originRowCount=null;
+        if(isJdbcPlaceHolder(offset)){
+            DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
+            originRowCount= (Number) paramSetting.values[0];
+        }else{
+            originRowCount = ((SQLNumberExpr)rowCount).getNumber();
+            limit.setRowCount(new SQLNumberExpr(originOffset.longValue()+originRowCount.longValue()));
+        }
+        context.setRowCount(originRowCount.longValue());
     }
 
     private boolean needAlterLimit(MySqlSelectQueryBlock query, Map<String, Map<String, SqlRouteInfo>> sqlRouteMap) {

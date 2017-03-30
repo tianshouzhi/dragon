@@ -4,10 +4,9 @@ package com.tianshouzhi.dragon.demo.domain;
  * Created by TIANSHOUZHI336 on 2017/3/28.
  */
 public class User {
-
     private Integer id;
     private String name;
-
+    private UserAccount userAccount;
     public User() {
     }
 
@@ -32,11 +31,20 @@ public class User {
         this.name = name;
     }
 
+    public UserAccount getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", userAccount=" + userAccount +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.demo;
 
+import com.tianshouzhi.dragon.demo.domain.City;
 import com.tianshouzhi.dragon.demo.domain.User;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,11 @@ public class DragonSpringMybatisTest {
         ApplicationContext context=new ClassPathXmlApplicationContext("dragon-spring.xml");
         SqlSessionFactory sqlSessionFactory= (SqlSessionFactory) context.getBean("sqlSessionFactory");
         sqlSession=sqlSessionFactory.openSession();
+    }
+    @Test
+    public void testDeleteById(){
+        int num=sqlSession.delete("com.tianshouzhi.mybatis.dao.User.deleteById",10001);
+        System.out.println(num);
     }
     @Test
     public void testDeleteAll(){
@@ -92,6 +99,26 @@ public class DragonSpringMybatisTest {
         List<User> userList=sqlSession.selectList("com.tianshouzhi.mybatis.dao.User.selectWhereIdIn",selectIds);
         printList(userList);
     }
+    @Test
+    public void testInnerJoin(){//selectWithAccount
+        List<User> userList=sqlSession.selectList("com.tianshouzhi.mybatis.dao.User.selectInnerJoinAccount");
+        printList(userList);
+    }
+    @Test
+    public void testLeftJoin(){//selectWithAccount
+        List<User> userList=sqlSession.selectList("com.tianshouzhi.mybatis.dao.User.selectLeftJoinAccount");
+        printList(userList);
+    }
+    /**
+     * todo 尚未实现
+     * city表只在dragon_shard_00库存在
+     * dragon_shard_00为defaultDBIndex
+     */
+    @Test
+    public void testSelectDefaultDB(){
+        List<City> cityList=sqlSession.selectList("com.tianshouzhi.dragon.demo.domain.City.selectAll");
+        printList(cityList);
+    }
 
     @Test
     public void testUpdateById(){
@@ -102,8 +129,13 @@ public class DragonSpringMybatisTest {
         System.out.println(num);
     }
     @Test
-    public void testDeleteById(){
-        int num=sqlSession.delete("com.tianshouzhi.mybatis.dao.User.deleteById",10001);
+    public void testUpdateCaseWhen() throws SQLException {
+        List<User> userList=new ArrayList<User>();
+        userList.add(new User(10000,"case when"));
+        userList.add(new User(10001,"case when"));
+        userList.add(new User(10100,"case when"));
+        userList.add(new User(20100,"case when"));
+        int num=sqlSession.update("com.tianshouzhi.mybatis.dao.User.updateCaseWhen",userList);
         System.out.println(num);
     }
 

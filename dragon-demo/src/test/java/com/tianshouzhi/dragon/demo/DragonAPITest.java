@@ -1,5 +1,6 @@
-package com.tianshouzhi.dragon.sharding.jdbc.datasource;
+package com.tianshouzhi.dragon.demo;
 
+import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -11,9 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by TIANSHOUZHI336 on 2017/2/24.
+ * Created by TIANSHOUZHI336 on 2017/3/30.
  */
-public class DragonShardingDataSourceTest {
+public class DragonAPITest {
     private static DataSource dataSource;
     @BeforeClass
     public static void before() throws Exception {
@@ -283,13 +284,13 @@ public class DragonShardingDataSourceTest {
         connection.close();
     }
     @Test
-    public void testUpdateCaseWhen() throws SQLException {
+    public void testUpdateCaseWhen() throws SQLException {//mysql 规定case when 必须加where条件 否则会抛出Column 'name' cannot be null
         String sql="UPDATE user" +
                 "    SET name = CASE id " +
                 "        WHEN 10101 THEN ?" +
                 "        WHEN 10001 THEN ?" +
                 "        WHEN 20001 THEN ?" +
-                "    END " +
+                "    END "+
                 "WHERE id IN (10101,10001,20001)";
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -327,11 +328,34 @@ public class DragonShardingDataSourceTest {
     }
 
     @Test
-    public void testWhereSubQuery(){
+    public void testWhereInSubQuery() throws SQLException {
         /**
          * 找出余额最多的账户的信息
          */
-        String sql="select * from user where id in (select user_id from user_account order by money limit 0,3))";
+        String sql="select * from user where id in (select user_id from user_account order by money)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
     }
-
+    @Test
+    public void testWhereEqualSubQuery() throws SQLException {
+        /**
+         * 找出余额最多的账户的信息
+         */
+        String sql="select * from user where id = (select user_id from user_account WHERE user_id=?)";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1,10001);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id="+id+",name = " + name);
+        }
+    }
 }

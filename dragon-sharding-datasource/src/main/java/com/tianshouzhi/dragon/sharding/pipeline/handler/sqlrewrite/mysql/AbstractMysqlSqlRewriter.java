@@ -4,6 +4,7 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
@@ -12,6 +13,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,12 +34,14 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     protected List<Object> batchExecuteInfoList;
     protected List<LogicTable> parsedLogicTableList;
     protected Map<String,String> aliasTableNameMap=new HashMap<String, String>();
-    private List<SQLIdentifierExpr> sqlExprTableSourceList=new ArrayList<SQLIdentifierExpr>();
-
+    protected List<SQLIdentifierExpr> sqlExprTableSourceList=new ArrayList<SQLIdentifierExpr>();
+    /**这个list中会包含查询语句，或者子查询语句中的所有where条件*/
+    protected List<SQLExpr> whereConditionList;
+    protected SqlRouteParams sqlRouteParams=new SqlRouteParams();
     @Override
     public void rewrite(HandlerContext context) throws SQLException {
         this.context=context;
-        this.dragonShardingStatement = context.getDragonShardingStatement();
+        this.dragonShardingStatement = context.getShardingStatement();
         this.sqlAst=context.getParsedSqlStatement();
         this.originSql=dragonShardingStatement.getSql();
         this.batchExecuteInfoList = dragonShardingStatement.getBatchExecuteInfoList();
@@ -65,6 +69,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     protected abstract void doRewrite(HandlerContext context)  throws SQLException;
 
     protected void parseLogicTableList(SQLTableSource tableSource) {
+
          parsedLogicTableList=new LinkedList<LogicTable>();
         if(tableSource instanceof SQLExprTableSource){
             String logicTableName = ((SQLExprTableSource) tableSource).getExpr().toString();
@@ -104,12 +109,15 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
             return ;
         }
-        if(tableSource instanceof SQLUnionQueryTableSource){
 
+
+        if(tableSource instanceof SQLUnionQueryTableSource){
+            throw new RuntimeException("don't support union operate,sql:"+originSql);
         }
         if(tableSource instanceof SQLSubqueryTableSource){
-
+            throw new RuntimeException("don't support subQuery,sql:"+originSql);
         }
+        throw new RuntimeException("don't support sql:"+originSql);
 
     }
     //判断是否是jdbc ？占位符
@@ -126,47 +134,82 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
      * @param where
      * @return
      */
-    protected List<SQLExpr> parseWhereRouteConditionList(SQLExpr where){
-        List<SQLExpr> whereConditionList=new ArrayList<SQLExpr>();
-        fillWhereConditionExprList(where,whereConditionList);
-        return whereConditionList;
+    protected void parseWhereRouteConditionList(SQLExpr where){
+        if(where ==null){
+            return ;
+        }
+        if(whereConditionList==null){
+            whereConditionList=new ArrayList<SQLExpr>();
+        }
+        fillWhereConditionExprList(where);
     }
 
 
     //解析结果
-    private static void fillWhereConditionExprList(SQLExpr where, List<SQLExpr> whereConditionExprList){
+    private  void fillWhereConditionExprList(SQLExpr where){
         if(where instanceof SQLIdentifierExpr//直接列名的情况
                 ||where instanceof SQLPropertyExpr){//表名.列名的情况
             SQLExpr parent = (SQLExpr) where.getParent();
-            if(!whereConditionExprList.contains(parent)){
-                whereConditionExprList.add(parent);
+            if(!whereConditionList.contains(parent)){
+                whereConditionList.add(parent);
             }
             return;
         }
+
         if(where instanceof SQLInListExpr
                 || where instanceof SQLBetweenExpr){
-            whereConditionExprList.add(where);
+            whereConditionList.add(where);
             return;
         }
-
+        //where 条件中包含了子查询
+        if(where instanceof SQLInSubQueryExpr //where 条件中in 子查询
+                || where instanceof SQLQueryExpr){
+            SQLSelect subQuery=null;
+            if(where instanceof SQLInSubQueryExpr){
+                subQuery = ((SQLInSubQueryExpr) where).getSubQuery();
+            }
+            if(where instanceof SQLQueryExpr){
+                subQuery = ((SQLQueryExpr) where).getSubQuery();
+            }
+            MySqlSelectQueryBlock query = (MySqlSelectQueryBlock)  subQuery.getQuery();
+            fillColumnAliasMap(context, query.getSelectList());
+            SQLTableSource tableSource = query.getFrom();
+            parseLogicTableList(tableSource);
+            SQLExpr subQueryWhere = query.getWhere();
+            parseWhereRouteConditionList(subQueryWhere);
+            return;
+        }
         //二元操作符放在最后解析
         if(where instanceof SQLBinaryOpExpr){
             SQLExpr left = ((SQLBinaryOpExpr) where).getLeft();
             SQLExpr right = ((SQLBinaryOpExpr) where).getRight();
 
-            fillWhereConditionExprList(left,whereConditionExprList);
-            fillWhereConditionExprList(right,whereConditionExprList);
+            fillWhereConditionExprList(left);
+            fillWhereConditionExprList(right);
         }
     }
-
-
+    //解析select item中有别名的情况，主要用于处理order by、group by时使用的不是别名的情况，因为获取值是根据columnLabel来的，如果有alias，columnLabel就是alias，如果没有columnLabel就是columnName
+    protected void fillColumnAliasMap(HandlerContext context, List<SQLSelectItem> selectList) {
+        Map<String,String> fullColumnAliasMap=null;
+        for (SQLSelectItem sqlSelectItem : selectList) {
+            String alias = sqlSelectItem.getAlias();
+            if(alias !=null){
+                //可能直接是列名，也可能是表名.列名
+                String fullColumnName = sqlSelectItem.getExpr().toString();
+                if(fullColumnAliasMap==null){
+                    fullColumnAliasMap=new HashMap<String, String>();
+                }
+                fullColumnAliasMap.put(fullColumnName,alias);
+            }
+        }
+        context.setFullColumnNameAliasMap(fullColumnAliasMap);
+    }
     /**
      * 二元运算符条件解析 只有=号可作为分区条件，只会把currentParamterIndex增加。
      * 所有二元操作符参见：SQLBinaryOperator
-     * @param sqlRouteParams
      * @param conditionItemExpr
      */
-    private void parseBinaryRouteConditionExpr(SqlRouteParams sqlRouteParams, SQLBinaryOpExpr conditionItemExpr) {
+    private void parseBinaryRouteConditionExpr(SQLBinaryOpExpr conditionItemExpr) {
             SQLExpr valueExpr = conditionItemExpr.getRight();
             if(valueExpr instanceof SQLIdentifierExpr || valueExpr instanceof SQLPropertyExpr){
                 //处理a.id=b.id情况，这种条件不能路由路由条件，且currentParamterIndex也不需要改变
@@ -205,7 +248,10 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
              if(SQLBinaryOperator.Equality==operator){
                  DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(currentParamterIndex);
                  if(logicTable.isShardColumn(columnName)){
-                     Object shardColumnValue=valueExpr.toString(); //// TODO: 2017/3/16 支持子查询
+                     if(valueExpr instanceof SQLQueryExpr){//如果值为子查询，直接返回
+                         return ;
+                     }
+                     Object shardColumnValue=valueExpr.toString();
                      if(isJdbcPlaceHolder(valueExpr)){
                          shardColumnValue=  paramSetting.values[0];
                      }
@@ -213,7 +259,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                  }
             }
     }
-    private void parseSQLInRouteListExpr(SqlRouteParams sqlRouteParams, SQLInListExpr conditionItemExpr) {
+    private void parseSQLInRouteListExpr(SQLInListExpr conditionItemExpr) {
         // not in 不支持作为路由条件
         if(conditionItemExpr.isNot()){
             return;
@@ -245,7 +291,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 //            return context.getLogicTable(shardColumnName);
         }
-        if(shardColumnExpr instanceof SQLPropertyExpr){//表名.列名的情况
+        if(shardColumnExpr instanceof SQLPropertyExpr){//fie me 表名.列名的情况
             String logicTableName = ((SQLPropertyExpr) shardColumnExpr).getOwner().toString();
             LogicTable logicTable = context.getLogicTable(logicTableName);
             if(logicTable==null){//表名可能使用的是别名
@@ -284,7 +330,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     }
 
-    protected void makeRouteMap(SqlRouteParams sqlRouteParams) {
+    protected void makeRouteMap() {
         //如果sql中只包含一个表，则可以执行
         //主维度表
         LogicTable primaryLogicTable = sqlRouteParams.getPrimaryLogicTable();
@@ -317,22 +363,25 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
     }
 
     /**
-     * whereConditionList中包含了所有的条件，需要过滤出id = ？、in (?，?，?)类似这两种类型作为路由参数
+     * whereConditionList中包含了所有的条件，只有部分能够作为路由参数
+     * 需要过滤出id = ？、in (?，?，?)类似这两种类型作为路由参数
      * 对于其他的条件，例如like ，> ，not in (？？？)等，只需要根据实际情况，确定是否将currentParamterIndex++即可
-     * @param whereConditionList
-     * @param sqlRouteParams
      */
-    protected void fillSqlRouteParams(List<SQLExpr> whereConditionList, SqlRouteParams sqlRouteParams) {
+    protected void fillSqlRouteParams() {
+            if(CollectionUtils.isEmpty(whereConditionList)){
+                return ;
+            }
+
 //            Set<String> dbTbShardColumns = parsedLogicTableList.get(0).getDbTbShardColumns();
             for (SQLExpr conditionItemExpr : whereConditionList) {
                 //对所有的二元操作符进行处理，参见SQLBinaryOperator枚举类定义的二元操作符
                 if (conditionItemExpr instanceof SQLBinaryOpExpr) {
-                    parseBinaryRouteConditionExpr(sqlRouteParams, (SQLBinaryOpExpr) conditionItemExpr);
+                    parseBinaryRouteConditionExpr((SQLBinaryOpExpr) conditionItemExpr);
                     continue;
                 }
                 //对 in (?,?,?)和not in(?,?,?)进行处理
                 if (conditionItemExpr instanceof SQLInListExpr) {
-                    parseSQLInRouteListExpr(sqlRouteParams, (SQLInListExpr) conditionItemExpr);
+                    parseSQLInRouteListExpr((SQLInListExpr) conditionItemExpr);
                     continue;
                 }
 
@@ -349,7 +398,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                     if(endExpr instanceof SQLVariantRefExpr){
                         currentParamterIndex++;
                     }
-                    return;
+                    return ;
                 }
 
                 //没有考虑到其他的条件操作符类型
@@ -393,7 +442,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
         for (LogicTable logicTable : parsedLogicTableList) { //check每个逻辑表都应该配置了真实库与表的映射关系
             Map<String, List<String>> realDBTBMap = logicTable.getRealDBTBMap();
-            if(MapUtils.isEmpty(realDBTBMap)){
+            if(MapUtils.isEmpty(realDBTBMap)){//全局路由必须要配置 realDBTBMap
                 throw new RuntimeException("logic table '"+logicTable.getLogicTableName()+"' don't config real db and tb Map");
             }
         }

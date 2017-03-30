@@ -24,7 +24,7 @@ public class ExecutionHandler implements Handler {
     public void invoke(HandlerContext context) throws Exception {
         long start=System.currentTimeMillis();
         //判断是否开启了事务，如果开启了事务，sql只能路由到一个库中
-        DragonShardingConnection dragonShardingConnection = context.getDragonShardingStatement().getConnection();
+        DragonShardingConnection dragonShardingConnection = context.getShardingStatement().getConnection();
         boolean autoCommit = dragonShardingConnection.getAutoCommit();
         ExecutorService executor = context.getDragonShardingConfig().getExecutor();
         CompletionService<String> ecs = new ExecutorCompletionService<String>(executor);
@@ -60,7 +60,7 @@ public class ExecutionHandler implements Handler {
     }
     private int submitTask(HandlerContext context, CompletionService<String> ecs) throws SQLException {
         int taskNum=0;
-        Map<String, Set<Connection>> realConnectionMap = context.getDragonShardingStatement().getConnection().getRealConnectionMap();
+        Map<String, Set<Connection>> realConnectionMap = context.getShardingStatement().getConnection().getRealConnectionMap();
         for (Map.Entry<String, Map<String, SqlRouteInfo>> entry : context.getSqlRouteMap().entrySet()) {
             String realDBName = entry.getKey();
             //尝试复用connection，因为之前这个connection执行过statment的话，其肯定包含部分真实connection的引用
@@ -86,10 +86,10 @@ public class ExecutionHandler implements Handler {
 
     private int submitTransactionTask(HandlerContext context,  CompletionService<String> ecs) throws SQLException {
         int taskNum=0;
-        Map<String, Set<Connection>> realConnectionMap = context.getDragonShardingStatement().getConnection().getRealConnectionMap();
+        Map<String, Set<Connection>> realConnectionMap = context.getShardingStatement().getConnection().getRealConnectionMap();
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
         if(sqlRouteMap.size()>1){//多个库肯定不能使用事务
-            String originSql = context.getDragonShardingStatement().getSql();
+            String originSql = context.getShardingStatement().getSql();
             Set<String> dbNames = sqlRouteMap.keySet();
             throw new UnsupportedOperationException("only support transaction in one db,sql:"+ originSql+" route to :"+ dbNames);
         }

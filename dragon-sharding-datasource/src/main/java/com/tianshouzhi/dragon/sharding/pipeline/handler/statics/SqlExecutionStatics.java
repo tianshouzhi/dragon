@@ -1,12 +1,15 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.statics;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by TIANSHOUZHI336 on 2017/3/22.
  */
 public class SqlExecutionStatics {
 
     private String originSql;
-    private Object[] originParamters;
+    private String originParamters;
     private boolean query;
     private boolean prepare;
     private boolean success;
@@ -23,7 +26,7 @@ public class SqlExecutionStatics {
     private int parallelExecutionTaskNum;
     private long parallelExecutionTimeMillis;
     private long resultMergeTimeMillis;
-    private String routeDetails;
+    private Map<String, List<SqlRouteDetail>> routeDetailMap;
     private String ip;
     private String appName;
 
@@ -35,11 +38,11 @@ public class SqlExecutionStatics {
         return originSql;
     }
 
-    public void setOriginParamters(Object[] originParamters) {
+    public void setOriginParamters(String originParamters) {
         this.originParamters = originParamters;
     }
 
-    public Object[] getOriginParamters() {
+    public String getOriginParamters() {
         return originParamters;
     }
 
@@ -171,12 +174,16 @@ public class SqlExecutionStatics {
         return resultMergeTimeMillis;
     }
 
-    public void setRouteDetails(String routeDetails) {
-        this.routeDetails = routeDetails;
+    public Map<String, List<SqlRouteDetail>> getRouteDetailMap() {
+        return routeDetailMap;
     }
 
-    public String getRouteDetails() {
-        return routeDetails;
+    public void setRouteDetailMap(Map<String, List<SqlRouteDetail>> routeDetailMap) {
+        this.routeDetailMap = routeDetailMap;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public void setIp(String ip) {
@@ -187,9 +194,6 @@ public class SqlExecutionStatics {
         return ip;
     }
 
-    public void setLogicDataBaseName(String appName) {
-        this.appName = appName;
-    }
 
     public String getAppName() {
         return appName;

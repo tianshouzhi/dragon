@@ -40,16 +40,20 @@ public class SqlRewriteHandler implements Handler {
             }else if(sqlStatement instanceof SQLSelectStatement){
                 new MysqlSelectStatementRewriter().rewrite(context);
                 isQuery=true;
+            }else {
+                throw new RuntimeException("only support insert、delete、update、select statement，current sql："+context.getShardingStatement().getSql());
             }
         }
         context.setIsQuery(isQuery);
         context.setSqlRewriteTimeMillis(System.currentTimeMillis()-start);
-      if(LOGGER.isDebugEnabled()){
-          String sql = context.getDragonShardingStatement().getSql();
-          Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
-
-          LOGGER.debug("sql:{} route map:\n{}",sql, makeRouteDebugInfo(sqlRouteMap));
-      }
+        //statics handler会打印出所有的route信息，这里主要是为了开发调试用，因为有些sql重写后，可能执行失败了。
+     /* if(LOGGER.isDebugEnabled()){
+          LOGGER.debug("\n" +
+                  "===============================route map begin================================:" +
+                  "{}\n" +
+                  "=================================route map end================================",
+                  makeRouteDebugInfo(context.getSqlRouteMap()));
+      }*/
     }
 
     private static String makeRouteDebugInfo( Map<String, Map<String, SqlRouteInfo>> sqlRouteMap){

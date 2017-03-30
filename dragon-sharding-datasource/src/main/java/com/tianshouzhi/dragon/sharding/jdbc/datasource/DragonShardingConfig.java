@@ -4,6 +4,7 @@ import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -16,14 +17,14 @@ public class DragonShardingConfig {
     /**
      * key为逻辑表名，value是对应的逻辑表对象
      */
-    private Map<String,LogicTable> logicTableMap;
+    private Map<String,LogicTable> logicTableMap=new ConcurrentHashMap<String, LogicTable>();
     private ExecutorService executor;
     private int executionTimeout;
 
     public DragonShardingConfig(String appName, LogicDatasouce logicDatasouce, Map<String, LogicTable> logicTableMap, ExecutorService executor, int executionTimeout) {
         this.appName = appName;
         this.logicDatasouce = logicDatasouce;
-        this.logicTableMap = logicTableMap;
+        this.logicTableMap .putAll(logicTableMap);
         this.executor = executor;
         this.executionTimeout = executionTimeout;
     }

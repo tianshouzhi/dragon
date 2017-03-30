@@ -44,12 +44,10 @@ public abstract class DragonShardingConfigParser {
             dsNameDatasourceMap.put(datasourceName,dataSource);
         }
 
-        LogicDatasouce logicDatasouce = new LogicDatasouce(dsNamePattern, dsNameDatasourceMap);
-
         String defaultDSName = properties.getProperty("datasource.defaultDSName");
-        if(StringUtils.isNotBlank(defaultDSName)){
-            logicDatasouce.setDefaultDSName(defaultDSName);
-        }
+        LogicDatasouce logicDatasouce = new LogicDatasouce(dsNamePattern, dsNameDatasourceMap,defaultDSName);
+
+
         return logicDatasouce;
     }
     //解析数据源的默认配置
@@ -92,7 +90,7 @@ public abstract class DragonShardingConfigParser {
     public static Map<String, LogicTable> parseLogicTableMap(LogicDatasouce logicDatasouce, Properties properties) {
         Map<String, LogicTable> result=new HashMap<String, LogicTable>();
         String logicTableNames=properties.getProperty("logicTable.list");
-        if(StringUtils.isBlank(properties.getProperty("logicTable.list"))){
+        if(StringUtils.isBlank(logicTableNames)){
             throw new RuntimeException("logicTable.list can't be null");
         }
 
@@ -147,18 +145,23 @@ public abstract class DragonShardingConfigParser {
         }
 
         Set<String> dbRouteRules = new HashSet<String>();
-        if (CollectionUtils.isNotEmpty(defaultDbRouteRules)) {
-            dbRouteRules.addAll(defaultDbRouteRules);
-        }
         if (CollectionUtils.isNotEmpty(logicTableConfig.dbRouteRules)) {
             dbRouteRules.addAll(logicTableConfig.dbRouteRules);
+        }else if (CollectionUtils.isNotEmpty(defaultDbRouteRules)) {
+            dbRouteRules.addAll(defaultDbRouteRules);
+        }
+        if (dbRouteRules == null) {
+            throw new RuntimeException("no default dbRouteRules config ,'"+logicTbName+"'must config dbRouteRules");
         }
 
         Set<String> tbRouteRules = new HashSet<String>();
-        if (CollectionUtils.isNotEmpty(defaultTbRouteRules)) {
-            tbRouteRules.addAll(defaultTbRouteRules);
-        } else if (CollectionUtils.isNotEmpty(logicTableConfig.tbRouteRules)) {
+        if(CollectionUtils.isNotEmpty(logicTableConfig.tbRouteRules)) {
             tbRouteRules.addAll(logicTableConfig.tbRouteRules);
+        } else if (CollectionUtils.isNotEmpty(defaultTbRouteRules)) {
+            tbRouteRules.addAll(defaultTbRouteRules);
+        }
+        if (tbRouteRules == null) {
+            throw new RuntimeException("no default tbRouteRules config ,'"+logicTbName+"'must config tbRouteRules");
         }
 
         Map<String, List<String>> realDbTbMapping = null;
@@ -166,11 +169,11 @@ public abstract class DragonShardingConfigParser {
         MessageFormat messageFomart = new MessageFormat(tbNameFormat);
         if (MapUtils.isNotEmpty(logicTableConfig.realDbTbMapping)) {
             realDbTbMapping = caculateRealDBTBMapping(logicTableConfig.realDbTbMapping, messageFomart);
-        } else if (MapUtils.isNotEmpty(defaultRealDbTbMapping)) {
+        }else if (MapUtils.isNotEmpty(defaultRealDbTbMapping)) {
             realDbTbMapping = caculateRealDBTBMapping(defaultRealDbTbMapping, messageFomart);
         }
         if (realDbTbMapping == null) {
-            throw new RuntimeException("must config realDbTbMapping");
+            throw new RuntimeException("no default realDbTbMapping config ,'"+logicTbName+"'must config realDbTbMapping");
         }
 
         return new LogicTable(logicTbName, tbNameFormat, tbRouteRules, dbRouteRules, logicDatasouce, realDbTbMapping);

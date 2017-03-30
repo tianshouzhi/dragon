@@ -22,7 +22,7 @@ public class SqlParseHandler implements Handler {
     @Override
     public void invoke(HandlerContext context) {
         if(MapUtils.isEmpty(context.getHintMap())){//说明没有hint
-            DragonShardingStatement dragonShardingStatement = context.getDragonShardingStatement();
+            DragonShardingStatement dragonShardingStatement = context.getShardingStatement();
             String sql = dragonShardingStatement.getSql();
 
             boolean hitCache=true;
