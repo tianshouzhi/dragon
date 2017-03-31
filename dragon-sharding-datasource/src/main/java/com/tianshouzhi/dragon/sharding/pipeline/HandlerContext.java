@@ -18,6 +18,7 @@ import java.util.*;
  * Created by TIANSHOUZHI336 on 2017/2/24.
  */
 public class HandlerContext {
+    private final boolean isPrepare;
     private DragonShardingStatement shardingStatement;
     private SQLStatement parsedSqlStatement;
     private Map<String/**dbIndex*/,Set<String/**tbIndex*/>> hintMap=new HashMap<String, Set<String>>();
@@ -39,7 +40,7 @@ public class HandlerContext {
     private Throwable throwable;
     private boolean hitSqlParserCache;
     private long sqlParseTimeMillis;
-    private long resultMergeTime;
+    private long resultMergeTimeMillis;
     private long sqlRewriteTimeMillis;
     private long parallelExecutionTimeMillis;
     private int parallelExecutionTaskNum;
@@ -49,6 +50,7 @@ public class HandlerContext {
             throw new NullPointerException();
         }
         this.shardingStatement = shardingStatement;
+        this.isPrepare=shardingStatement instanceof PreparedStatement;
         this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
     }
     public DataSource getRealDataSource(String realDBName){
@@ -132,7 +134,7 @@ public class HandlerContext {
             Iterator<Map.Entry<String, SqlRouteInfo>> tbIterator = tbSqlMap.entrySet().iterator();
             while (tbIterator.hasNext()) {
                 Map.Entry<String, SqlRouteInfo> tableResult = tbIterator.next();
-                PreparedStatement targetStatement = tableResult.getValue().getTargetStatement();
+                Statement targetStatement = tableResult.getValue().getTargetStatement();
                 statementList.add(targetStatement);
             }
         }
@@ -183,12 +185,12 @@ public class HandlerContext {
         this.sqlParseTimeMillis = sqlParseTimeMillis;
     }
 
-    public void setResultMergeTime(long resultMergeTime) {
-        this.resultMergeTime = resultMergeTime;
+    public void setResultMergeTimeMillis(long resultMergeTimeMillis) {
+        this.resultMergeTimeMillis = resultMergeTimeMillis;
     }
 
     public long getResultMergeTimeMillis() {
-        return resultMergeTime;
+        return resultMergeTimeMillis;
     }
 
     public void setSqlRewriteTimeMillis(long sqlRewriteTimeMillis) {
@@ -245,8 +247,11 @@ public class HandlerContext {
         HashSet<String> dbRouteRuleStrs = new HashSet<String>();
         HashMap<String, List<String>> realDBTBMap = new HashMap<String, List<String>>();
         LogicTable temp=new LogicTable(logicTableName, tableNameFormat, tbRouteRuleStrs, dbRouteRuleStrs,getLogicDataSource(), realDBTBMap);
-        return getDragonShardingConfig().getLogicTableMap().get(hasDefaultDB);*/
+        return getDragonShardingConfig().getLogicTableMap().getCache(hasDefaultDB);*/
     }
 
+    public boolean isPrepare() {
+        return isPrepare;
+    }
 
 }

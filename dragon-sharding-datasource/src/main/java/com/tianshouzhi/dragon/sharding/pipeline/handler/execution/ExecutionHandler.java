@@ -7,8 +7,8 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
@@ -46,7 +46,7 @@ public class ExecutionHandler implements Handler {
             for (Map.Entry<String, Map<String, SqlRouteInfo>> mapEntry : context.getSqlRouteMap().entrySet()) {
                 String realDBName = mapEntry.getKey();
                 for (SqlRouteInfo routeInfo : mapEntry.getValue().values()) {
-                    PreparedStatement targetStatement = routeInfo.getTargetStatement();
+                    Statement targetStatement = routeInfo.getTargetStatement();
                     Connection connection = targetStatement.getConnection();
                     Set<Connection> connections = realConnectionMap.get(realDBName);
                     if(connections==null){
@@ -76,7 +76,7 @@ public class ExecutionHandler implements Handler {
             while (iterator.hasNext()) {
                 Map.Entry<String, SqlRouteInfo> next = iterator.next();
                 final SqlRouteInfo sqlRouteInfo = next.getValue();
-                ExecutionTask sqlExecutionTask = new ExecutionTask( true,connection,ds, sqlRouteInfo);
+                ExecutionTask sqlExecutionTask = new ExecutionTask(context.isPrepare(),true,connection,ds, sqlRouteInfo);
                 Future<String> future = ecs.submit(sqlExecutionTask);
                 taskNum++;
             }
@@ -103,7 +103,7 @@ public class ExecutionHandler implements Handler {
         Collection<SqlRouteInfo> values = next.getValue().values();
         SqlRouteInfo[] sqlRouteInfos=new SqlRouteInfo[values.size()];
         values.toArray(sqlRouteInfos);
-        ExecutionTask sqlExecutionTask = new ExecutionTask(false,connection,ds,sqlRouteInfos);
+        ExecutionTask sqlExecutionTask = new ExecutionTask(context.isPrepare(),false,connection,ds,sqlRouteInfos);
         Future<String> future = ecs.submit(sqlExecutionTask);
         taskNum++;
         return taskNum;

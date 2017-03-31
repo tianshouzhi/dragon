@@ -19,6 +19,6 @@ public class ResultMergeHandler implements Handler {
             resultMerger=new MysqlSelectResultMerger();
         }
         resultMerger.merge(context);
-        context.setResultMergeTime(System.currentTimeMillis()-start);
+        context.setResultMergeTimeMillis(System.currentTimeMillis()-start);
     }
 }

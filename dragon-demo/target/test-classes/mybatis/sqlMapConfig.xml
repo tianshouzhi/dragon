@@ -4,10 +4,14 @@
 <configuration>
     <typeAliases >
         <typeAlias type="com.tianshouzhi.dragon.demo.domain.User" alias="User"/>
+        <typeAlias type="com.tianshouzhi.dragon.demo.domain.City" alias="City"/>
+        <typeAlias type="com.tianshouzhi.dragon.demo.domain.UserAccount" alias="UserAccount"/>
     </typeAliases>
 
     <mappers>
         <mapper resource="mybatis/mappers/UserMapper.xml" />
+        <mapper resource="mybatis/mappers/CityMapper.xml" />
+        <mapper resource="mybatis/mappers/UserAccountMapper.xml" />
     </mappers>
 
 </configuration>

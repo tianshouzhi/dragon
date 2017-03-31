@@ -4,7 +4,7 @@ import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  * 代表一条sql信息
  */
 public class SqlRouteInfo {
-    private PreparedStatement targetStatement;
+    private Statement targetStatement;
     /**参数位置与参数的映射关系*/
     private Map<Integer, DragonPrepareStatement.ParamSetting> parameters=new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
 
@@ -62,11 +62,11 @@ public class SqlRouteInfo {
         this.parameters = parameters;
     }
 
-    public void setTargetStatement(PreparedStatement targetStatement) {
+    public void setTargetStatement(Statement targetStatement) {
         this.targetStatement = targetStatement;
     }
 
-    public PreparedStatement getTargetStatement() {
+    public Statement getTargetStatement() {
         return targetStatement;
     }
 

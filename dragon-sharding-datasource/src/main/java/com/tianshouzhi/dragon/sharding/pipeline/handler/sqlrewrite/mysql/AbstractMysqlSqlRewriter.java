@@ -70,7 +70,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     protected void parseLogicTableList(SQLTableSource tableSource) {
 
-         parsedLogicTableList=new LinkedList<LogicTable>();
+        parsedLogicTableList=new LinkedList<LogicTable>();
         if(tableSource instanceof SQLExprTableSource){
             String logicTableName = ((SQLExprTableSource) tableSource).getExpr().toString();
             LogicTable logicTable = context.getLogicTable(logicTableName);
@@ -372,7 +372,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                 return ;
             }
 
-//            Set<String> dbTbShardColumns = parsedLogicTableList.get(0).getDbTbShardColumns();
+//            Set<String> dbTbShardColumns = parsedLogicTableList.getCache(0).getDbTbShardColumns();
             for (SQLExpr conditionItemExpr : whereConditionList) {
                 //对所有的二元操作符进行处理，参见SQLBinaryOperator枚举类定义的二元操作符
                 if (conditionItemExpr instanceof SQLBinaryOpExpr) {

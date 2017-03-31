@@ -6,6 +6,7 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -21,6 +22,7 @@ import java.util.concurrent.Callable;
 public class ExecutionTask implements Callable<String>{
     private SqlRouteInfo[] sqlRouteInfos;
     private DataSource ds;
+    private boolean isPrepare;
     private Connection connection;
     private boolean autoCommit;
 
@@ -30,7 +32,8 @@ public class ExecutionTask implements Callable<String>{
      * @param autoCommit
      * @param sqlRouteInfos
      */ //
-    public ExecutionTask(boolean autoCommit, Connection connection, DataSource ds, SqlRouteInfo ... sqlRouteInfos) {
+    public ExecutionTask(boolean isPrepare,boolean autoCommit, Connection connection, DataSource ds, SqlRouteInfo ... sqlRouteInfos) {
+        this.isPrepare = isPrepare;
         this.connection=connection;
         this.sqlRouteInfos = sqlRouteInfos;
         this.ds = ds;
@@ -46,19 +49,27 @@ public class ExecutionTask implements Callable<String>{
             }
             for (SqlRouteInfo sqlRouteInfo : sqlRouteInfos) {
                 realConnection.setAutoCommit(autoCommit);
-                PreparedStatement preparedStatement = realConnection.prepareStatement(sqlRouteInfo.getSql().toString());
-                sqlRouteInfo.setTargetStatement(preparedStatement);
-                Map<Integer, DragonPrepareStatement.ParamSetting> parameters = sqlRouteInfo.getParameters();
-                Iterator<Map.Entry<Integer, DragonPrepareStatement.ParamSetting>> iterator = parameters.entrySet().iterator();
-                while (iterator.hasNext()){
-                    Map.Entry<Integer, DragonPrepareStatement.ParamSetting> next = iterator.next();
-                    Integer parameterIndex = next.getKey();
-                    DragonPrepareStatement.ParamSetting paramSetting = next.getValue();
-                    Object[] values = paramSetting.values;
-                    DragonPrepareStatement.ParamType paramType = paramSetting.paramType;
-                    DragonPrepareStatement.ParamType.setPrepareStatementParams(preparedStatement,parameterIndex,values,paramType);
+                Statement statement=null;
+                String sql = sqlRouteInfo.getSql().toString();
+                if(isPrepare){//如果是prepareStatement
+                    statement=realConnection.prepareStatement(sql); //// FIXME: 2017/3/31 传入用户创建statement传入的参数
+                    Map<Integer, DragonPrepareStatement.ParamSetting> parameters = sqlRouteInfo.getParameters();
+                    Iterator<Map.Entry<Integer, DragonPrepareStatement.ParamSetting>> iterator = parameters.entrySet().iterator();
+                    while (iterator.hasNext()){
+                        Map.Entry<Integer, DragonPrepareStatement.ParamSetting> next = iterator.next();
+                        Integer parameterIndex = next.getKey();
+                        DragonPrepareStatement.ParamSetting paramSetting = next.getValue();
+                        Object[] values = paramSetting.values;
+                        DragonPrepareStatement.ParamType paramType = paramSetting.paramType;
+                        DragonPrepareStatement.ParamType.setPrepareStatementParams((PreparedStatement) statement,parameterIndex,values,paramType);
+                    }
+                    ((PreparedStatement)statement).execute();
+                }else{//如果是statement // FIXME: 2017/3/31 传入用户创建statement的参数
+                    statement = realConnection.createStatement();
+                    statement.execute(sql);
                 }
-                preparedStatement.execute();
+//                PreparedStatement preparedStatement = realConnection.prepareStatement(sql);
+                sqlRouteInfo.setTargetStatement(statement);
                 sqlRouteInfo.setExecutionTimeMillis(System.currentTimeMillis()-start);
             }
 
