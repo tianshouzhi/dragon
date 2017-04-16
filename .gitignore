@@ -1,1 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea/
+dragon-common/dragon-common.iml
+dragon-console/dragon-console.iml
+dragon-demo/dragon-demo.iml
+dragon-dynamic-datasource/dragon-dynamic-datasource.iml
+dragon-ha-datasource/dragon-ha-datasource.iml
+dragon-idgen/dragon-idgen.iml
+dragon-sharding-datasource/dragon-sharding-datasource.iml
