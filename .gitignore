@@ -7,3 +7,6 @@ dragon-dynamic-datasource/dragon-dynamic-datasource.iml
 dragon-ha-datasource/dragon-ha-datasource.iml
 dragon-idgen/dragon-idgen.iml
 dragon-sharding-datasource/dragon-sharding-datasource.iml
+dragon-common/target/
+dragon-demo/target/
+dragon-sharding-datasource/target/
