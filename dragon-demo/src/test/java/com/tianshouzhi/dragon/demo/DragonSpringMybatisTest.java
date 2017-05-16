@@ -124,7 +124,7 @@ public class DragonSpringMybatisTest {
     public void testUpdateById(){
         User user=sqlSession.selectOne("com.tianshouzhi.mybatis.dao.User.selectById",10001);
         System.out.println(user);
-        user.setName("wangxiaoxiao");
+        user.setName("wangxiao xiao");
         int num=sqlSession.update("com.tianshouzhi.mybatis.dao.User.updateById",user);
         System.out.println(num);
     }

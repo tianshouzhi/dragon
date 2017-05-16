@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
 import com.alibaba.druid.sql.ast.expr.SQLNumberExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
@@ -80,7 +81,11 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
             DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
             originOffset= (Number) paramSetting.values[0];
         }else{
-            originOffset = ((SQLNumberExpr)offset).getNumber();
+            if(offset instanceof SQLIntegerExpr){
+                originOffset = ((SQLIntegerExpr) offset).getNumber();
+            }else{
+                originOffset = ((SQLNumberExpr)offset).getNumber();
+            }
             limit.setOffset(new SQLNumberExpr(0));
         }
         context.setOffset(originOffset.longValue());
@@ -91,7 +96,11 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
             DragonPrepareStatement.ParamSetting paramSetting = getParamSetting(++currentParamterIndex);
             originRowCount= (Number) paramSetting.values[0];
         }else{
-            originRowCount = ((SQLNumberExpr)rowCount).getNumber();
+            if(rowCount instanceof SQLIntegerExpr){
+                originRowCount=((SQLIntegerExpr) rowCount).getNumber();
+            }else{
+                originRowCount = ((SQLNumberExpr)rowCount).getNumber();
+            }
             limit.setRowCount(new SQLNumberExpr(originOffset.longValue()+originRowCount.longValue()));
         }
         context.setRowCount(originRowCount.longValue());
