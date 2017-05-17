@@ -153,12 +153,15 @@ datasource.namePattern:
             int id=1;
             int dbIndex=(id%4)/2;//结果为0
             String dbName=nameFormat.format(new Object[]{dbIndex});//得到的结果为dragon_sharding_0
-        需要注意的是,这里计算出来的dragon_sharding_0只是数据源的名称,而不是库名.不过细心的读者会发现,这个数据源名称,刚好有一个分库的名称与之对应.
+        需要注意的是,这里计算出来的dragon_sharding_0只是数据源的名称,而不是库名.
+        不过细心的读者会发现,这个数据源名称,刚好有一个分库的名称与之对应.
         这是Dragon推荐的方式,将数据源的命名格式与分库的命名格式设为相同,这样只要根据数据源的名称,就能知道操作的是哪一个库
 
 datasource.list:
 
-    这个配置项列出了所有物理数据源的名称.在执行一些sql,例如:select count(*) from user;由于没有指定路由条件,因此需要操作所有库,然后对结果集进行合并.
+    这个配置项列出了所有物理数据源的名称.在执行一些sql,例如:
+    select count(*) from user;
+    由于没有指定路由条件,因此需要操作所有库,然后对结果集进行合并.
     对于dragon来说,这就意味着要找到所有的数据源,获取连接,然后分别执行改写后的sql,合并结果.因此需要这样一个列表
 
 datasource.datasourceClass
