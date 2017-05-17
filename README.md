@@ -144,7 +144,8 @@ dragon-sharding.properties
 
 datasource.namePattern:
 
-        数据源命名格式.dragon中管理了多个物理数据源,为了方便管理,每个物理数据源都有一个名字.这些名字满足一个统一的格式.这个配置项的值会被构造成一个java.text.MessageFormat对象
+        数据源命名格式.dragon中管理了多个物理数据源,为了方便管理,每个物理数据源都有一个名字.这些名字满足一个统一的格式.
+        这个配置项的值会被构造成一个java.text.MessageFormat对象
             MessageFormat nameFormat=new MessageFormat("dragon_sharding_{0}");
         当执行一个sql时,如: select * from user where id=1;
         dragon会根据sql中的逻辑表user,找出对应的路由规则(见倒数第二个配置项):(id%4)/2,然后将sql中的路由条件id=1代入计算,结果为0.
@@ -162,7 +163,8 @@ datasource.list:
 
 datasource.datasourceClass
 
-    由dragon管理的物理数据源的类型,这里使用的是druid.因为我们在datasource.list中列出了2个数据源名称,因此dragon会自动帮我们初始化2个druid数据库连接池对象
+    由dragon管理的物理数据源的类型,这里使用的是druid.因为我们在datasource.list中列出了2个数据源名称,
+    因此dragon会自动帮我们初始化2个druid数据库连接池对象
 
 datasource.default.[propertyName]
 
@@ -200,14 +202,16 @@ logicTable.[logicTableName].dbRouteRules
     库的路由规则,标准的groovy表达式.这里配置的值是(id%4)/2
     其中id是路由字段,在执行sql时,dragon会自动提取出id字段对应的值,如
     select * from user where id=1;
-    提取出的id值为1 ,然后将其作为变量传入库路由规则表达式(id%4)/2中进行计算,得到库的编号,最后通过datasource.namePattern变量,来计算出真实要操作的数据源的名称
+    提取出的id值为1 ,然后将其作为变量传入库路由规则表达式(id%4)/2中进行计算,得到库的编号,
+    最后通过datasource.namePattern变量,来计算出真实要操作的数据源的名称
 
 logicTable.[logicTableName].tbRouteRules
 
     表的路由规则,标准的groovy表达式. id%4
     其中id是一个变量,在执行sql时,dragon会自动提取出id字段对应的值,如
      select * from user where id=1;
-     提取出的id值为1 ,然后将其作为变量传入表路由规则表达式id%4中进行计算,得到表的编号,最后通过logicTable.[logicTableName].namePattern变量,计算出真实表名.替换sql中的逻辑表名.
+     提取出的id值为1 ,然后将其作为变量传入表路由规则表达式id%4中进行计算,得到表的编号,
+     最后通过logicTable.[logicTableName].namePattern变量,计算出真实表名.替换sql中的逻辑表名.
      例如以上sql会被改写为:
      select * from user_1 where id=1;
 
