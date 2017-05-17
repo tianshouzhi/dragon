@@ -194,8 +194,8 @@ logicTable.list
 logicTable.[logicTableName].namePattern
 
      表示一个逻辑表的命名格式, 中间部分的logicTableName是个变量,取值为范围为logicTable.list配置项列出的逻辑表名.
-     改配置项值,也会被构建成一个MessageFormat对象,dragon在执行某个sql时,会根据这个namePattern以及下面将要提到的tbRouteRules,计算出真实表名,
-     替换掉sql中逻辑表名.
+     该配置项值,也会被构建成一个MessageFormat对象。
+     dragon在执行某个sql时,会根据这个namePattern以及下面将要提到的tbRouteRules,计算出真实表名,替换掉sql中逻辑表名.
 
 logicTable.[logicTableName].dbRouteRules
 
