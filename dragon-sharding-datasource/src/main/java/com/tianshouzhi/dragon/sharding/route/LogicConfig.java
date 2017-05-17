@@ -33,7 +33,14 @@ public abstract class LogicConfig {
 
     public Long parseIndex(String realName){
         try {
-            return (Long) messageFormat.parse(realName)[0];
+
+            Object o = messageFormat.parse(realName)[0];
+            if(o instanceof Long){
+                return (Long) o;
+            }else{
+                return Long.parseLong((String) o);
+            }
+
         } catch (ParseException e) {
             throw new RuntimeException(realName);
         }

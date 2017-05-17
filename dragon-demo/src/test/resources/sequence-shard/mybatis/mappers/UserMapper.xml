@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tianshouzhi.mybatis.dao.User">
+    <resultMap id="userWithAccountMap" type="User">
+        <!--主键-->
+        <id property="id" column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <!--普通属性-->
+        <result  property="name" column="name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <!--1对1关联-->
+        <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.demo.domain.UserAccount.userAccountMap" ></association>
+    </resultMap>
+    <insert id="insert" parameterType="User">
+        INSERT INTO user (id,name) VALUES (#{id},#{name});
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO user (id,name) VALUES
+        <foreach collection="list"  item="user" index="index" separator="," >
+            (#{user.id},#{user.name})
+        </foreach>  ;
+    </insert>
+
+    <select id="selectById" parameterType="int" resultType="User">
+        SELECT id,name FROM user WHERE id=#{id};
+    </select>
+
+    <select id="selectAll" resultType="User">
+        SELECT * FROM user;
+    </select>
+
+    <select id="selectOrderByLimit" resultType="User" parameterType="java.util.HashMap">
+        SELECT id,name FROM user ORDER BY id limit #{offset},#{rows};
+    </select>
+
+    <select id="selectAggrGroupBy" resultType="java.util.HashMap">
+        SELECT count(*),name FROM user GROUP BY name;
+    </select>
+
+    <select id="selectWhereIdIn" parameterType="integer[]" resultType="User">
+        SELECT id,name FROM user WHERE id IN
+        <foreach collection="array" item = "id" open="(" separator="," close=")">#{id}</foreach>;
+    </select>
+
+    <update id="updateById" parameterType="User">
+        UPDATE user SET name=#{name} where id=#{id};
+    </update>
+    <update id="updateCaseWhen" parameterType="list">
+        UPDATE user
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="name =CASE id" suffix="END,">
+                <foreach collection="list" item="user" index="index">
+                    WHEN #{user.id} THEN #{user.name}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE id IN
+        <foreach collection="list" item = "user" open="(" separator="," close=")">#{user.id}</foreach>;
+    </update>
+
+    <delete id="deleteById" parameterType="int" >
+        DELETE FROM user WHERE id=#{id};
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM user;
+    </delete>
+
+    <delete id="batchDelete" parameterType="integer[]">
+        DELETE FROM user WHERE id in
+        <foreach collection="array" item = "id" open="(" separator="," close=")">#{id}</foreach>;
+    </delete>
+
+</mapper>

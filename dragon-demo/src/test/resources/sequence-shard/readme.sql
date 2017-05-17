@@ -18,13 +18,13 @@ CREATE TABLE `user_1` (
 CREATE DATABASE IF NOT EXISTS dragon_sharding_1;
 USE dragon_sharding_1;
 
-CREATE TABLE `user_3` (
+CREATE TABLE `user_2` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `user_4` (
+CREATE TABLE `user_3` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)

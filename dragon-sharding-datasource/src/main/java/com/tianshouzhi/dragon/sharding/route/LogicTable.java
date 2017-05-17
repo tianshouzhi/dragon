@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.sharding.route;
 
+import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,6 +27,9 @@ public class LogicTable extends LogicConfig{
      */
     public LogicTable(String logicTableName, String tableNameFormat, Set<String> tbRouteRuleStrs, Set<String> dbRouteRuleStrs, LogicDatasouce logicDatasouce, Map<String,List<String>> realDBTBMap) {
         super(tableNameFormat);
+        this.logicTableName =logicTableName;
+        this.logicDatasouce = logicDatasouce;
+        this.realDBTBMap = realDBTBMap;
         if(CollectionUtils.isEmpty(tbRouteRuleStrs)){
             throw new RuntimeException("tbRouteRuleStrList can't be empty!!!");
         }
@@ -43,9 +47,7 @@ public class LogicTable extends LogicConfig{
             RouteRule routeRule = new RouteRule(dbRouteRule);
             this.dbRouteRules.add(routeRule);
         }
-        this.logicTableName =logicTableName;
-        this.logicDatasouce = logicDatasouce;
-        this.realDBTBMap = realDBTBMap;
+
     }
 
     /**
@@ -122,10 +124,11 @@ public class LogicTable extends LogicConfig{
             throw new RuntimeException("no matched route rule found !!!");
         }
 
-        return (Long) DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
+        Object eval = DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
+        return (Long) eval;
     }
 
-    protected static class RouteRule{
+    protected  class RouteRule{
         private String originRouteRuleStr;//eg:${user_id}.toLong().intdiv(100)%100
         private String replacedRouteRuleStr;//eg:user_id.toLong().intdiv(100)%100
         private List<String> shardColumns;
@@ -146,7 +149,7 @@ public class LogicTable extends LogicConfig{
                 matcher.appendReplacement(sb,column);
             }
             if(CollectionUtils.isEmpty(shardColumns)){
-                throw new IllegalArgumentException("'originRouteRuleStr' must contains shard column!!!");
+                throw new DragonConfigException("logic table '"+logicTableName+"' route rule '"+originRouteRuleStr+"' must contains shard column!!!");
             }
             matcher.appendTail(sb);
             this. replacedRouteRuleStr=sb.toString();

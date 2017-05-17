@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.initailzer.DataSourceInitailzerUtil;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
 import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
@@ -20,17 +21,17 @@ import java.util.concurrent.TimeUnit;
  * Created by TIANSHOUZHI336 on 2017/3/15.
  */
 public abstract class DragonShardingConfigParser {
-
+    //入股需要进行监控的话，必须传入appName
     public static String parseAppName(Properties properties){
         String appName = properties.getProperty("dragon.appName");
-        if(StringUtils.isBlank(appName)){
-            throw new RuntimeException("dragon.appName can't be null");
-        }
+        /*if(StringUtils.isBlank(appName)){
+            throw new DragonException("dragon.appName can't be null");
+        }*/
         return appName;
     }
     public static LogicDatasouce parseLogicDatasouce(Properties properties) throws Exception {
         String dsNamePattern = properties.getProperty("datasource.namePattern");
-        String realDatasourceClass = properties.getProperty("datasource.datasocueClass");
+        String realDatasourceClass = properties.getProperty("datasource.datasourceClass");
         Map<String,String> defaultDatasourceConfigMap= parseDeafultDatasourceConfig(properties);
         HashMap<String, Map<String,String>> datasouceConfigMap = parseEachDatasouceConfigMap(properties);
         Map<String,DataSource> dsNameDatasourceMap=new HashMap<String, DataSource>();
@@ -99,7 +100,6 @@ public abstract class DragonShardingConfigParser {
             LogicTableConfig logicTableConfig=parseLogicTableConfig(logicTableName,logicDatasouce,properties);
             result.put(logicTableName,makeLogicTable(logicTableName,defaultLogicTableConfig,logicTableConfig,logicDatasouce));
         }
-
         return result;
     }
 
@@ -172,9 +172,10 @@ public abstract class DragonShardingConfigParser {
         }else if (MapUtils.isNotEmpty(defaultRealDbTbMapping)) {
             realDbTbMapping = caculateRealDBTBMapping(defaultRealDbTbMapping, messageFomart);
         }
-        if (realDbTbMapping == null) {
-            throw new RuntimeException("no default realDbTbMapping config ,'"+logicTbName+"'must config realDbTbMapping");
-        }
+        //如果要支持sql中不指定路由字段，则必须指定realDbTbMapping
+        /*if (realDbTbMapping == null) {
+            throw new DragonException("no default realDbTbMapping config ,logic table '"+logicTbName+"' must config realDbTbMapping");
+        }*/
 
         return new LogicTable(logicTbName, tbNameFormat, tbRouteRules, dbRouteRules, logicDatasouce, realDbTbMapping);
     }

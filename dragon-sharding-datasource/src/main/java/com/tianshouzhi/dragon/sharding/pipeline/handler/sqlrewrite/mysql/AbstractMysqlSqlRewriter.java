@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
@@ -443,7 +444,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         for (LogicTable logicTable : parsedLogicTableList) { //check每个逻辑表都应该配置了真实库与表的映射关系
             Map<String, List<String>> realDBTBMap = logicTable.getRealDBTBMap();
             if(MapUtils.isEmpty(realDBTBMap)){//全局路由必须要配置 realDBTBMap
-                throw new RuntimeException("logic table '"+logicTable.getLogicTableName()+"' don't config real db and tb Map");
+                throw new DragonException("logic table '"+logicTable.getLogicTableName()+"' don't config realDBTBMap ,so sql '"+originSql+"' must contains route condition!!!");
             }
         }
         LogicTable primaryLogicTable = parsedLogicTableList.get(0);//因为没有分区条件，随机选择一个表作为主维度表，这里选择第一个
