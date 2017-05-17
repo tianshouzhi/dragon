@@ -44,6 +44,8 @@ dragon是一个支持分库分表,读写分离数据源,实现了jdbc规范.
     </tr>
 </table>
 
+[点此查看建表语句](dragon-demo/src/test/resources/readme.sql)
+
 拆分后,我们把原来的库dragon_sharding称之为逻辑库(<code>logic database</code>),下面包含两个物理库(physical database):dragon_sharding_0,dragon_sharding_1
 
 类似的,我们把原来的表user称之为逻辑表(<code>logic table</code>),下面包含4个物理表(physical table):user_0,user_1,user_2,user_3
