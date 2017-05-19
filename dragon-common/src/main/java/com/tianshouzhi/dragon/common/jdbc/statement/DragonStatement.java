@@ -14,7 +14,7 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.Execu
 /**
  * Created by TIANSHOUZHI336 on 2016/12/12.
  */
-public abstract class DragonStatement extends WrapperAdapter implements Statement{
+public abstract   class DragonStatement extends WrapperAdapter implements Statement{
 
     //Statement构造创建参数
     protected int resultSetType=ResultSet.TYPE_FORWARD_ONLY;//mysql默认
@@ -191,6 +191,7 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         batchExecuteInfoList.add(sql);
     }
 
+
     protected abstract boolean doExecute() throws SQLException;
 
     @Override
@@ -275,6 +276,7 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         checkClosed();
         return this.poolable;
     }
+
     @Override
     public void setFetchDirection(int direction) throws SQLException {
         checkClosed();
@@ -322,5 +324,14 @@ public abstract class DragonStatement extends WrapperAdapter implements Statemen
         if (isClosed) {
             throw new SQLException("No operations allowed after connection closed.");
         }
+    }
+
+    // JDK1.7 引入的方法不支持，但是为了使用jdk1.7编译能通过，在此实现
+    public void closeOnCompletion() throws SQLException {
+        throw new UnsupportedOperationException("closeOnCompletion");
+    }
+
+    public boolean isCloseOnCompletion() throws SQLException {
+        throw new UnsupportedOperationException("isCloseOnCompletion");
     }
 }

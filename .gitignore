@@ -10,3 +10,8 @@ dragon-sharding-datasource/dragon-sharding-datasource.iml
 dragon-common/target/
 dragon-demo/target/
 dragon-sharding-datasource/target/
+dragon-console/target/
+dragon-dynamic-datasource/target/
+dragon-ha-datasource/target/
+dragon-idgen/target/
+

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
@@ -23,6 +24,7 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
     protected String password;
     protected boolean isClosed = false;
     protected boolean autoCommit = true;//是否自动提交
+
     protected boolean isReadOnly = false;
     protected int level=Connection.TRANSACTION_READ_COMMITTED; //mysql默认事务隔离级别
     protected String catalog;
@@ -159,4 +161,29 @@ public abstract class DragonConnection extends WrapperAdapter implements  Connec
         }
     }
 
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return super.unwrap(iface);
+    }
+
+    // JDK1.7 引入的方法不支持，但是为了使用jdk1.7编译能通过，在此实现
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+         throw new UnsupportedOperationException("setNetworkTimeout");
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        throw new UnsupportedOperationException("getNetworkTimeout");
+    }
+
+    public void abort(Executor executor) throws SQLException {
+        throw new UnsupportedOperationException("abort");
+    }
+
+    public void setSchema(String schema) throws SQLException {
+        throw new UnsupportedOperationException("setSchema");
+    }
+
+    public String getSchema() throws SQLException {
+        throw new UnsupportedOperationException("getSchema");
+    }
 }
