@@ -3,11 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <name>dragon</name>
     <groupId>com.tianshouzhi</groupId>
     <artifactId>dragon</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.1</version>
     <url>https://github.com/tianshouzhi/dragon</url>
     <description>A dataSource support r/w split and sharding.</description>
     <developers>
@@ -120,6 +120,9 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
                     </plugin>
                     <!-- GPG -->
                     <plugin>

@@ -5,17 +5,17 @@
     <parent>
         <artifactId>dragon</artifactId>
         <groupId>com.tianshouzhi</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <name>dragon-demo</name>
     <artifactId>dragon-demo</artifactId>
 
      <dependencies>
          <dependency>
              <groupId>com.tianshouzhi</groupId>
              <artifactId>dragon-sharding-datasource</artifactId>
-             <version>1.0.0-SNAPSHOT</version>
+             <version>0.0.1</version>
          </dependency>
          <dependency>
              <groupId>org.springframework</groupId>
