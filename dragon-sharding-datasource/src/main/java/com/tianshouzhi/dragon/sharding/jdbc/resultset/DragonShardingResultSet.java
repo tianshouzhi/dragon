@@ -1030,12 +1030,12 @@ public class DragonShardingResultSet implements ResultSet{
 
     }
 
-    @Override
+
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
         throw new UnsupportedOperationException("getObject");
     }
 
-    @Override
+
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
         throw new UnsupportedOperationException("getObject");
     }

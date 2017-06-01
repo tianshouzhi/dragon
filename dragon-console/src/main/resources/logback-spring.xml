@@ -10,7 +10,7 @@
     <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--当天日志文件的目录-->
-        <file>${user.dir}/logs/weixin.log</file>
+        <file>${user.dir}/logs/dragon-console.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--之前日志文件的目录-->
