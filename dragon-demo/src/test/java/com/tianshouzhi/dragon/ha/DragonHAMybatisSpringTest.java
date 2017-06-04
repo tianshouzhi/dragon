@@ -5,10 +5,7 @@ import com.tianshouzhi.dragon.mappers.UserMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/**
- * Created by tianshouzhi on 2017/6/4.
- */
-public class DragonHADatasourceTest {
+public class DragonHAMybatisSpringTest {
     public static void main(String[] args) {
         ApplicationContext context=new ClassPathXmlApplicationContext("classpath:ha/dragon-ha-mybatis-spring.xml");
         UserMapper userMapper = context.getBean(UserMapper.class);
