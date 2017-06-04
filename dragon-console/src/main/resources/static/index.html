@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <title></title>
     <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="app/css/app.css" rel="stylesheet" type="text/css">
 </head>
 <body data-ng-app="DragonConsole">
+<nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
-        <div class="row">
-            <div data-ng-include="'app/tpl/header.html'"></div>
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Dragon Console</a>
         </div>
-        <div class="row content-wrapper">
-            <div class="col-md-2" data-ng-include="'app/tpl/sidebar.html'"></div>
-            <div class="col-md-10" ui-view></div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a ui-sref="create-config">配置管理</a></li>
+                <li><a href="#">SVN</a></li>
+            </ul>
         </div>
     </div>
+</nav>
+<div class="container">
+    <div ui-view></div>
+</div>
 
 
 <!--begin plugins-->
@@ -23,12 +29,12 @@
 <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-<script src="node_modules/angular-resource/angular-resource.min.js"></script>
+<script src="bower_components/angular-resource/angular-resource.min.js"></script>
 
 <!--end plugins-->
 <!--begin app level js-->
-<script src="app/js/app.js"></script>
-<script src="app/dragon-config/DragonConfigService.js"></script>
+<script src="app/app.js"></script>
+<script src="app/modules/config/dragon-config.js"></script>
 <!--end app level js-->
 </body>
 </html>

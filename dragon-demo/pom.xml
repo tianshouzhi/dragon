@@ -18,6 +18,11 @@
              <version>0.0.1</version>
          </dependency>
          <dependency>
+             <groupId>com.tianshouzhi</groupId>
+             <artifactId>dragon-ha-datasource</artifactId>
+             <version>0.0.1</version>
+         </dependency>
+         <dependency>
              <groupId>org.springframework</groupId>
              <artifactId>spring-context</artifactId>
              <version>4.2.7.RELEASE</version>

@@ -3,16 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.tianshouzhi.mybatis.dao.User">
+<mapper namespace="com.tianshouzhi.dragon.mappers.UserMapper">
     <resultMap id="userWithAccountMap" type="User">
         <!--主键-->
         <id property="id" column="id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
         <!--普通属性-->
         <result  property="name" column="name" javaType="java.lang.String" jdbcType="VARCHAR"/>
         <!--1对1关联-->
-        <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.demo.domain.UserAccount.userAccountMap" ></association>
+        <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.domain.UserAccount.userAccountMap" ></association>
     </resultMap>
-    <insert id="insert" parameterType="User">
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO user (id,name) VALUES (#{id},#{name});
     </insert>
 
