@@ -1,0 +1,121 @@
+<div class="row">
+    <div class="col-md-6">
+        <form role="form">
+            <div class="form-group col-md-6" >
+                <div class="input-group">
+                    <span class="input-group-addon">逻辑库名</span>
+                    <input type="text" ng-model="logicDBName" class="form-control" placeholder="用于唯一区分">
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            拆分类型
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="shardType in shardTypes"><a ng-click="setShardType(shardType)">{{shardType.cnName}}</a></li>
+                        </ul>
+                    </div><!-- /btn-group -->
+                    <input type="text" ng-model="currentShardType.cnName" class="form-control" disabled>
+                </div><!-- /input-group -->
+            </div>
+            <div class="form-group col-md-6">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            库表命名风格
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="namingStyle in namingStyles"><a ng-click="setNamingStyle(namingStyle)">{{namingStyle.cnName}}</a></li>
+                        </ul>
+                    </div><!-- /btn-group -->
+                    <input type="text" ng-model="currentNamingStyle.cnName" class="form-control" disabled>
+                </div><!-- /input-group -->
+            </div>
+            <div class="form-group col-md-6"  ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardDB'">
+                <div class="input-group">
+                    <span class="input-group-addon">最大可使用分库数量</span>
+                    <input type="text" ng-model="maxDBNum" class="form-control" placeholder="Twitterhandle">
+                </div>
+            </div>
+            <div class="form-group col-md-6"  ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardDB'">
+                <div class="input-group">
+                    <span class="input-group-addon">实际使用分库数量</span>
+                    <input type="text" class="form-control" placeholder="Twitterhandle">
+                </div>
+            </div>
+            <div class="form-group col-md-6" ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardTB'">
+                <div class="input-group">
+                    <span class="input-group-addon">最大可使用分表数量</span>
+                    <input type="text" class="form-control" placeholder="Twitterhandle">
+                </div>
+            </div>
+            <div class="form-group col-md-6"  ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardTB'">
+                <div class="input-group">
+                    <span class="input-group-addon">实际使用分表数量</span>
+                    <input type="text" class="form-control" placeholder="Twitterhandle">
+                </div>
+            </div>
+            <div class="form-group col-md-6"  ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardDB'">
+                <div class="input-group">
+                    <span class="input-group-addon" >逻辑库命名格式</span>
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-6"  ng-show="currentShardType.enName=='ShardDBAndTB'||currentShardType.enName=='OnlyShardTB'">
+                <div class="input-group">
+                    <span class="input-group-addon">逻辑表列表</span>
+                    <input type="text" class="form-control" placeholder="Twitterhandle">
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            数据源
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="datasource in datasources"><a ng-click="setDatasource(datasource)">{{datasource}}</a></li>
+                        </ul>
+                    </div><!-- /btn-group -->
+                    <input type="text" ng-model="currentDatasource" class="form-control" disabled>
+                </div><!-- /input-group -->
+            </div>
+
+            <div class="form-group col-md-6" >
+                <div class="input-group">
+                    <span class="input-group-addon">用户名</span>
+                    <input type="text" ng-model="username" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-6" >
+                <div class="input-group">
+                    <span class="input-group-addon">密码</span>
+                    <input type="text" ng-model="password" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-6" >
+                <div class="input-group">
+                    <span class="input-group-addon">只读用户名</span>
+                    <input type="text" ng-model="username" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-6" >
+                <div class="input-group">
+                    <span class="input-group-addon">只读密码</span>
+                    <input type="text" ng-model="password" class="form-control">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>配置预览</label>
+            <textarea class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+</div>

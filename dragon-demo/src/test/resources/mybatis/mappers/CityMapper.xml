@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.tianshouzhi.dragon.demo.domain.City">
+<mapper namespace="com.tianshouzhi.dragon.domain.City">
 
     <insert id="insert" parameterType="City">
         INSERT INTO city (id,name) VALUES (#{id},#{name});
