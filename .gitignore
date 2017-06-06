@@ -15,3 +15,5 @@ dragon-dynamic-datasource/target/
 dragon-ha-datasource/target/
 dragon-idgen/target/
 
+/logs/
+/dragon.iml
