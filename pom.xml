@@ -35,7 +35,6 @@
     <modules>
         <module>dragon-sharding-datasource</module>
         <module>dragon-ha-datasource</module>
-        <module>dragon-dynamic-datasource</module>
         <module>dragon-common</module>
         <module>dragon-idgen</module>
         <module>dragon-console</module>
