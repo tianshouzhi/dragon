@@ -1,7 +1,9 @@
 package com.tianshouzhi.dragon.ha.config;
 
 import javax.xml.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -85,5 +87,13 @@ public class DatasourceConfig {
         public void setValue(String value) {
             this.value = value;
         }
+    }
+
+    public static Map<String, String> propertiesToMap(List<DatasourceConfig.Property> properties) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        for (DatasourceConfig.Property property : properties) {
+            map.put(property.getName(),property.getValue());
+        }
+        return map;
     }
 }

@@ -37,7 +37,7 @@ public class DragonHAStatementTest extends BaseTest{
     public void testDelete() throws SQLException {
         DragonHAConnection connection = this.connection;
         Statement statement = connection.createStatement();
-        int i = statement.executeUpdate("DELETE from USER where id>10");
+        int i = statement.executeUpdate("DELETE from user where id>10");
         System.out.println(i);
     }
     @Test
@@ -45,7 +45,7 @@ public class DragonHAStatementTest extends BaseTest{
         ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
         DragonHAConnection connection = this.connection;
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM USER ");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM user ");
         while (resultSet.next()){
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");

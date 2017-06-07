@@ -2,82 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-<!--==========================================DragonHADataSource配置=================================================-->
-    <!--定义主库和从库数据源共同的属性，这里使用的是durid数据源，注意这个bean的abstract=true
-    对于主库和从库不同的配置，例如url、username、password等，单独进行配置
-    -->
-    <bean id="druidParent" class="com.alibaba.druid.pool.DruidDataSource" abstract="true">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-        <property name="initialSize" value="10"></property>
-        <property name="maxActive" value="50"></property>
-        <property name="maxWait" value="60000"></property>
-        <property name="minIdle" value="1" />
-        <property name="testWhileIdle" value="true" />
-        <property name="testOnBorrow" value="false" />
-        <property name="testOnReturn" value="false" />
-        <property name="validationQuery" value="select 'x'"></property>
-    </bean>
 
-    <!--主库数据源配置，这里设置parent="druidParent"，因此druidParent这个bean中配置的属性都会被继承-->
-    <bean id="master" parent="druidParent">
-        <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
-        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_master?characterEncoding=UTF-8&amp;useSSL=false"></property>
-    </bean>
-
-    <!--从库数据源配置，一般从来从库配置的用户名/密码，只具有只读权限-->
-    <bean id="slave1" parent="druidParent">
-        <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
-        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_slave1?characterEncoding=UTF-8&amp;useSSL=false"></property>
-    </bean>
-
-    <bean id="slave2" parent="druidParent">
-        <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
-        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_slave2?characterEncoding=UTF-8&amp;useSSL=false"></property>
-    </bean>
-
-    <!--定义DragonHADatasource，前面定义的几个主库和从库数据源都要交给DragonHADatasource进行管理-->
-    <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource">
-        <!--
-            将之前定义的主、从数据源都保存到一个Map中。
-            Map的key：是为这个数据源起的一个名字，没有特殊含义，主要是为了方便调试。一般与bean的id保持一致。
-            Map的Value：类型是DatasourceWrapper，其实是对前面配置的主从数据源进行的一层封装，封装的目的是为了配置读写权重
-        -->
-        <property name="indexDsMap">
-            <map>
-                <!--将主库数据源交给DragonHADatasource管理，注意这里的属性key=master只是一个名字在而已，并不是真正代表主库。
-                DatasourceWrapper的physicalDataSource属性引用的bean，如果是主库，才表示这个entry真正的是主库数据源-->
-                <entry key="master">
-                    <bean class="com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper">
-                        <!--注意这里的ref="master"才真正表示的是引用前面定义的主库数据源-->
-                        <property name="physicalDataSource" ref="master"></property>
-                        <!--写权重：主库应该是可写的，因此写权重>0-->
-                        <property name="writeWeight" value="10"></property>
-                        <!--读权重: 如果希望读操作不走主库，将读权重设置为0。需要注意的是，即使读权重为0，对于开启事务或者使用了hint的情况，还是走主库-->
-                        <property name="readWeight" value="0"></property>
-
-                    </bean>
-                </entry>
-                <!--从库配置，一般来说，从库都是只读的，因此writeWeight=0。
-                    这里配置了两个从库，readWeight值都为10，二者比例为1:1。表示当有一个查询请求时，在确定从哪一个从库进行查询时，二者选中的比例都是50%-->
-                <entry key="slave1">
-                    <bean class="com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper">
-                        <property name="physicalDataSource" ref="slave1"></property>
-                        <property name="readWeight" value="10"></property>
-                        <property name="writeWeight" value="0"></property>
-                    </bean>
-                </entry>
-                <entry key="slave2">
-                    <bean class="com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper">
-                        <property name="physicalDataSource" ref="slave2"></property>
-                        <property name="readWeight" value="10"></property>
-                        <property name="writeWeight" value="0"></property>
-                    </bean>
-                </entry>
-            </map>
-        </property>
+    <!--定义DragonHADatasource-->
+    <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.config.spring.DragonHADatasourceFactoryBean">
+        <property name="configFile" value="ha/dragon-ha-config.xml"></property>
     </bean>
 
     <!--=====================================Mybatis Spring整合配置=================================-->

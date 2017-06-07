@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public enum SqlType {
+
 //    SELECT_FOR_UPDATE("\\s*SELECT.+"),
     SELECT("\\s*SELECT.+"),
     SHOW("\\s*SHOW.+"),
@@ -26,10 +27,11 @@ public enum SqlType {
     RENAME("\\s*RENAME.+"),
     CALL("\\s*CALL.+");//存储过程
 
+    public static final String HINT_PREFIX="(\\s*/\\*.+\\*/)?";
     Pattern pattern;
 
     SqlType(String parttern) {
-        pattern=Pattern.compile(parttern,Pattern.CASE_INSENSITIVE/*|Pattern.MULTILINE*/);
+        pattern=Pattern.compile(HINT_PREFIX+parttern,Pattern.CASE_INSENSITIVE/*|Pattern.MULTILINE*/);
     }
 
     public Pattern getPattern() {

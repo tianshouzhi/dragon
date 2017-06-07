@@ -12,7 +12,7 @@
         <!--1对1关联-->
         <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.domain.UserAccount.userAccountMap" ></association>
     </resultMap>
-    <insert id="insert" parameterType="User" >
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO user (id,name) VALUES (#{id},#{name});
     </insert>
 

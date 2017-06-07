@@ -198,6 +198,11 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
     }
 
     @Override
+    protected boolean needGeneratedKeys() {
+        return super.needGeneratedKeys()||columnNames!=null||columnIndexes!=null;
+    }
+
+    @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
         params.put(parameterIndex,new DragonPrepareStatement.ParamSetting(setNull,new Object[]{sqlType}));
     }
