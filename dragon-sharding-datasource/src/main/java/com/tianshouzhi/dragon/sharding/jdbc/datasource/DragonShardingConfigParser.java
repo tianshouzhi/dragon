@@ -1,6 +1,5 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.initailzer.DataSourceInitailzerUtil;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
 import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;

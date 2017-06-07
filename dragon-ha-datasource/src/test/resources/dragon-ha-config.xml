@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dragonHAConfig appName="DragonHA">
+    <dataSourceConfig index="master" readWeight="" writeWeight="" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="root"></property>
+        <property name="password" value="shxx12151022"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_master?characterEncoding=UTF-8&amp;useSSL=false"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="initialSize" value="10"></property>
+        <property name="maxActive" value="50"></property>
+        <property name="maxWait" value="60000"></property>
+        <property name="minIdle" value="1" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="validationQuery" value="select 'x'"></property>
+    </dataSourceConfig>
+
+    <dataSourceConfig index="slave1" readWeight="10" writeWeight="0" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="root"></property>
+        <property name="password" value="shxx12151022"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_master?characterEncoding=UTF-8&amp;useSSL=false"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="initialSize" value="10"></property>
+        <property name="maxActive" value="50"></property>
+        <property name="maxWait" value="60000"></property>
+        <property name="minIdle" value="1" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="validationQuery" value="select 'x'"></property>
+    </dataSourceConfig>
+
+    <dataSourceConfig index="slave2" readWeight="10" writeWeight="0" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="root"></property>
+        <property name="password" value="shxx12151022"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha_master?characterEncoding=UTF-8&amp;useSSL=false"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="initialSize" value="10"></property>
+        <property name="maxActive" value="50"></property>
+        <property name="maxWait" value="60000"></property>
+        <property name="minIdle" value="1" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="validationQuery" value="select 'x'"></property>
+    </dataSourceConfig>
+
+</dragonHAConfig>

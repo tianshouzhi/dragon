@@ -12,7 +12,7 @@
         <!--1对1关联-->
         <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.domain.UserAccount.userAccountMap" ></association>
     </resultMap>
-    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    <insert id="insert" parameterType="User" >
         INSERT INTO user (id,name) VALUES (#{id},#{name});
     </insert>
 
@@ -39,7 +39,7 @@
         SELECT count(*),name FROM user GROUP BY name;
     </select>
 
-    <select id="selectWhereIdIn" parameterType="integer[]" resultType="User">
+    <select id="selectWhereIdIn" parameterType="java.lang.Integer" resultType="User">
         SELECT id,name FROM user WHERE id IN
         <foreach collection="array" item = "id" open="(" separator="," close=")">#{id}</foreach>;
     </select>
@@ -79,7 +79,7 @@
         DELETE FROM user;
     </delete>
 
-    <delete id="batchDelete" parameterType="integer[]">
+    <delete id="batchDelete" parameterType="java.lang.Integer">
         DELETE FROM user WHERE id in
         <foreach collection="array" item = "id" open="(" separator="," close=")">#{id}</foreach>;
     </delete>

@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
+import com.tianshouzhi.dragon.ha.config.DragonHAConfiguration;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,10 @@ public class DragonHADatasource extends DragonDataSource {
 //    private List<DatasourceWrapper> datasourceWrapperList=new CopyOnWriteArrayList<DatasourceWrapper>();
     public DragonHADatasource() {
         haDataSourceManager=new HADataSourceManager();
+    }
+
+    public DragonHADatasource(DragonHAConfiguration configuration) {
+
     }
 
     @Override
