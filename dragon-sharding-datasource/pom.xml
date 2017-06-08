@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dragon</artifactId>
         <groupId>com.tianshouzhi</groupId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>dragon-sharding-datasource</name>
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>com.tianshouzhi</groupId>
             <artifactId>dragon-common</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
