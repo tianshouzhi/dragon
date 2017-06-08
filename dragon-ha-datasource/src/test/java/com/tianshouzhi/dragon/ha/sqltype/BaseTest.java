@@ -11,6 +11,7 @@ import org.junit.Before;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +24,8 @@ public abstract class BaseTest {
     DragonHAConnection connection;
     @Before
     public void init() throws Exception {
-        dragonHADatasource= new DragonHADatasourceBuilder().build("dragon-ha-config.xml");
-        connection= (DragonHAConnection) dragonHADatasource.getConnection();
+         dragonHADatasource= new DragonHADatasourceBuilder().build("dragon-ha-config.xml");
+         connection= (DragonHAConnection) dragonHADatasource.getConnection();
     }
 
     @After

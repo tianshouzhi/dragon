@@ -4,13 +4,12 @@ import javax.xml.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by tianshouzhi on 2017/6/7.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DatasourceConfig {
+public class RealDatasourceConfig {
     @XmlAttribute(name="index",required = true) //只能用在基本数据类型上
     private String index;
     @XmlAttribute(name="readWeight",required = true)
@@ -28,14 +27,6 @@ public class DatasourceConfig {
 
     public void setIndex(String index) {
         this.index = index;
-    }
-
-    public int getReadWeight() {
-        return readWeight;
-    }
-
-    public void setReadWeight(int readWeight) {
-        this.readWeight = readWeight;
     }
 
     public Integer getWriteWeight() {
@@ -56,6 +47,10 @@ public class DatasourceConfig {
 
     public void setReadWeight(Integer readWeight) {
         this.readWeight = readWeight;
+    }
+
+    public Integer getReadWeight() {
+        return readWeight;
     }
 
     public List<Property> getProperties() {
@@ -89,11 +84,13 @@ public class DatasourceConfig {
         }
     }
 
-    public static Map<String, String> propertiesToMap(List<DatasourceConfig.Property> properties) {
+    public static Map<String, String> propertiesToMap(List<RealDatasourceConfig.Property> properties) {
         HashMap<String, String> map = new HashMap<String, String>();
-        for (DatasourceConfig.Property property : properties) {
+        for (RealDatasourceConfig.Property property : properties) {
             map.put(property.getName(),property.getValue());
         }
         return map;
     }
+
+
 }

@@ -1,19 +1,16 @@
 package com.tianshouzhi.dragon.ha.config;
 
 import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@XmlRootElement(name="dragonHAConfig")
+@XmlRootElement(name="dragonHADatasource")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DragonHAConfiguration {
     @XmlAttribute(name="appName",required = true)
     private String appName;
-    @XmlElement(name="dataSourceConfig",required = true)
-    private List<DatasourceConfig> dsConfigList=new ArrayList<DatasourceConfig>();
+    @XmlElement(name="realDatasource",required = true)
+    private List<RealDatasourceConfig> dsConfigList=new ArrayList<RealDatasourceConfig>();
 
     public String getAppName() {
         return appName;
@@ -22,11 +19,11 @@ public class DragonHAConfiguration {
         this.appName = appName;
     }
 
-    public List<DatasourceConfig> getDsConfigList() {
+    public List<RealDatasourceConfig> getDsConfigList() {
         return dsConfigList;
     }
 
-    public void setDsConfigList(List<DatasourceConfig> dsConfigList) {
+    public void setDsConfigList(List<RealDatasourceConfig> dsConfigList) {
         this.dsConfigList = dsConfigList;
     }
 }
