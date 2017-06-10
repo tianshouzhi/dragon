@@ -5,7 +5,7 @@ import java.sql.SQLException;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/6.
  */
-public class DragonException extends RuntimeException{
+public class DragonException extends SQLException{
     public DragonException(String reason) {
         super(reason);
     }
