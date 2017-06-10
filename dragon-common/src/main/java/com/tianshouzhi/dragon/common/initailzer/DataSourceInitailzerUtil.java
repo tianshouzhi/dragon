@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.common.initailzer;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
+
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,10 +23,10 @@ public abstract class DataSourceInitailzerUtil {
             classNameInitailzerMap.put(className,dataSourceInitailzer);
         }
     }
-    public static DataSource init(String datasourceClass,Map<String,String> config) throws Exception {
+    public static DataSource init(String datasourceClass,Map<String,String> config) throws DragonException {
         DataSourceInitailzer dataSourceInitailzer = classNameInitailzerMap.get(datasourceClass);
         if(dataSourceInitailzer==null){
-            throw new RuntimeException("can't init datasource type:"+datasourceClass+",you should custom a DataSourceInitailzer and add in the classpath");
+            throw new DragonException("can't init datasource type:"+datasourceClass+",you should custom a DataSourceInitailzer and add in the classpath");
         }
         return dataSourceInitailzer.init(config);
     }

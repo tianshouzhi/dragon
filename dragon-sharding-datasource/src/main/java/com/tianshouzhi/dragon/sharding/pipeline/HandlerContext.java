@@ -5,7 +5,7 @@ import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingConfig;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import javax.sql.DataSource;
@@ -53,8 +53,8 @@ public class HandlerContext {
         this.isPrepare=shardingStatement instanceof PreparedStatement;
         this.sqlRouteMap=new TreeMap<String, Map<String, SqlRouteInfo>>();
     }
-    public DataSource getRealDataSource(String realDBName){
-        return getDragonShardingConfig().getLogicDatasouce().getDatasource(realDBName);
+    public DataSource getRealDataSource(String realDBName) throws SQLException {
+        return getDragonShardingConfig().getLogicDatasource().getDatasource(realDBName);
     }
     public DragonShardingStatement getShardingStatement() {
         return shardingStatement;
@@ -217,26 +217,26 @@ public class HandlerContext {
         this.parallelExecutionTaskNum = tarallelExecutionTaskNum;
     }
 
-    public LogicDatasouce getLogicDataSource() {
-        return getDragonShardingConfig().getLogicDatasouce();
+    public LogicDatasource getLogicDataSource() throws SQLException {
+        return getDragonShardingConfig().getLogicDatasource();
     }
 
-    public DragonShardingConfig getDragonShardingConfig(){
+    public DragonShardingConfig getDragonShardingConfig() throws SQLException {
         try {
             return shardingStatement.getConnection().getDragonShardingConfig();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
-    public LogicTable getLogicTable(String logicTableName) {
+    public LogicTable getLogicTable(String logicTableName) throws SQLException {
         return getDragonShardingConfig().getLogicTableMap().get(logicTableName);
         /*if(logicTable!=null){
             return logicTable;
         }
 
         //没有找到对应的逻辑表的情况下，这张表可能要走默认库
-        boolean hasDefaultDB= StringUtils.isNotBlank(getDragonShardingConfig().getLogicDatasouce().getDefaultDSName());
+        boolean hasDefaultDB= StringUtils.isNotBlank(getDragonShardingConfig().getLogicDatasource().getDefaultDSName());
         if(!hasDefaultDB){
             //如果没有默认库，抛出异常
             throw new RuntimeException("unkown table name'"+logicTableName+"' in sql:"+shardingStatement.getSql()+",may be you should config datasource.defaultDSName in your properties config file");

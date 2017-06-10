@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.statics;
 
 import com.alibaba.fastjson.JSON;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -22,7 +24,7 @@ public class StaticsHandler implements Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticsHandler.class);
 
     @Override
-    public void invoke(HandlerContext context) throws Exception {
+    public void invoke(HandlerContext context) throws SQLException {
         DragonShardingStatement dragonShardingStatement = context.getShardingStatement();
         //原始sql执行时间
         String originSql = dragonShardingStatement.getSql();

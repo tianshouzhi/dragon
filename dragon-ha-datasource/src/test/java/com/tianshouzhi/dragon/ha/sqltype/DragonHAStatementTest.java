@@ -74,4 +74,12 @@ public class DragonHAStatementTest extends BaseTest{
         int[] ints = statement.executeBatch();
         System.out.println(Arrays.toString(ints));
     }
+
+    @Test
+    public void testCreateTable() throws SQLException {
+        DragonHAConnection connection = this.connection;
+        Statement statement = connection.createStatement();
+        int update = statement.executeUpdate("create table test(id int,name varchar(255))");
+        System.out.println(update);
+    }
 }

@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,12 +30,12 @@ public class DragonShardingDataSource extends DragonDataSource {
         configProperties.load(inputStream);
         String appName = DragonShardingConfigParser.parseAppName(configProperties);
 
-        LogicDatasouce logicDatasouce = DragonShardingConfigParser.parseLogicDatasouce(configProperties);
-        Map<String, LogicTable> logicTableMap = DragonShardingConfigParser.parseLogicTableMap(logicDatasouce, configProperties);
+        LogicDatasource logicDatasource = DragonShardingConfigParser.parseLogicDatasouce(configProperties);
+        Map<String, LogicTable> logicTableMap = DragonShardingConfigParser.parseLogicTableMap(logicDatasource, configProperties);
 
-        ExecutorService executor = DragonShardingConfigParser.makeExecutorService(appName, logicDatasouce, logicTableMap, configProperties);
+        ExecutorService executor = DragonShardingConfigParser.makeExecutorService(appName, logicDatasource, logicTableMap, configProperties);
         int executionTimeout = DragonShardingConfigParser.parseExecutionTimeout(configProperties);
-        this.dragonShardingConfig = new DragonShardingConfig(appName, logicDatasouce, logicTableMap, executor, executionTimeout);
+        this.dragonShardingConfig = new DragonShardingConfig(appName, logicDatasource, logicTableMap, executor, executionTimeout);
     }
 
 

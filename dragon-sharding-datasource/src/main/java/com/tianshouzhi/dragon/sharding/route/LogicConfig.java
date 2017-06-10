@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.sharding.route;
 
+import com.tianshouzhi.dragon.common.exception.DragonConfigException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
@@ -15,9 +17,9 @@ public abstract class LogicConfig {
     private String namePattern;
     protected MessageFormat messageFormat;//eg table_{00}
 
-    public LogicConfig(String namePattern) {
+    public LogicConfig(String namePattern) throws DragonConfigException {
         if(StringUtils.isBlank(namePattern)){
-            throw new RuntimeException("namePattern can't be blank!!!");
+            throw new DragonConfigException("namePattern can't be blank!!!");
         }
         this.namePattern = namePattern;
         this.messageFormat = new MessageFormat(namePattern);
@@ -31,7 +33,7 @@ public abstract class LogicConfig {
         return messageFormat.format(new Object[]{caculatedIndex});
     }
 
-    public Long parseIndex(String realName){
+    public Long parseIndex(String realName) throws DragonException {
         try {
 
             Object o = messageFormat.parse(realName)[0];
@@ -42,7 +44,7 @@ public abstract class LogicConfig {
             }
 
         } catch (ParseException e) {
-            throw new RuntimeException(realName);
+            throw new DragonException(realName,e);
         }
     }
 }

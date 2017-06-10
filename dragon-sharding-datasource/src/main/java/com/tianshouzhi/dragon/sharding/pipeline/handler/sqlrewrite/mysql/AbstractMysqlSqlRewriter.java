@@ -54,22 +54,22 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         doRewrite(context);
     }
 
-    protected DragonPrepareStatement.ParamSetting getParamSetting(int paramterIndex){
+    protected DragonPrepareStatement.ParamSetting getParamSetting(int paramterIndex) throws DragonException{
         if(!isPrepare){
-            throw new RuntimeException("current sql is not PreparedStatement!!!");
+            throw new DragonException("current sql is not PreparedStatement!!!");
         }
         if(originParameters ==null){
-            throw new RuntimeException("no params set for sql");
+            throw new DragonException("no params set for sql");
         }
         if(paramterIndex> originParameters.size()){
-            throw new RuntimeException("ParamterIndex>originParameters.size()");
+            throw new DragonException("ParamterIndex>originParameters.size()");
         }
         return originParameters.get(paramterIndex);
     }
 
     protected abstract void doRewrite(HandlerContext context)  throws SQLException;
 
-    protected void parseLogicTableList(SQLTableSource tableSource) {
+    protected void parseLogicTableList(SQLTableSource tableSource) throws SQLException {
 
         parsedLogicTableList=new LinkedList<LogicTable>();
         if(tableSource instanceof SQLExprTableSource){
@@ -113,12 +113,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 
         if(tableSource instanceof SQLUnionQueryTableSource){
-            throw new RuntimeException("don't support union operate,sql:"+originSql);
+            throw new DragonException("don't support union operate,sql:"+originSql);
         }
         if(tableSource instanceof SQLSubqueryTableSource){
-            throw new RuntimeException("don't support subQuery,sql:"+originSql);
+            throw new DragonException("don't support subQuery,sql:"+originSql);
         }
-        throw new RuntimeException("don't support sql:"+originSql);
+        throw new DragonException("don't support sql:"+originSql);
 
     }
     //判断是否是jdbc ？占位符
@@ -135,7 +135,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
      * @param where
      * @return
      */
-    protected void parseWhereRouteConditionList(SQLExpr where){
+    protected void parseWhereRouteConditionList(SQLExpr where) throws SQLException {
         if(where ==null){
             return ;
         }
@@ -147,7 +147,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 
     //解析结果
-    private  void fillWhereConditionExprList(SQLExpr where){
+    private  void fillWhereConditionExprList(SQLExpr where) throws SQLException {
         if(where instanceof SQLIdentifierExpr//直接列名的情况
                 ||where instanceof SQLPropertyExpr){//表名.列名的情况
             SQLExpr parent = (SQLExpr) where.getParent();
@@ -210,7 +210,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
      * 所有二元操作符参见：SQLBinaryOperator
      * @param conditionItemExpr
      */
-    private void parseBinaryRouteConditionExpr(SQLBinaryOpExpr conditionItemExpr) {
+    private void parseBinaryRouteConditionExpr(SQLBinaryOpExpr conditionItemExpr) throws SQLException {
             SQLExpr valueExpr = conditionItemExpr.getRight();
             if(valueExpr instanceof SQLIdentifierExpr || valueExpr instanceof SQLPropertyExpr){
                 //处理a.id=b.id情况，这种条件不能路由路由条件，且currentParamterIndex也不需要改变
@@ -260,7 +260,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
                  }
             }
     }
-    private void parseSQLInRouteListExpr(SQLInListExpr conditionItemExpr) {
+    private void parseSQLInRouteListExpr(SQLInListExpr conditionItemExpr) throws SQLException {
         // not in 不支持作为路由条件
         if(conditionItemExpr.isNot()){
             return;
@@ -281,7 +281,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             sqlRouteParams.putInListRouteParams(logicTable,columnName,valueList);
         }
     }
-    private LogicTable getLogicTable(SQLExpr shardColumnExpr) {
+    private LogicTable getLogicTable(SQLExpr shardColumnExpr) throws SQLException {
         if(parsedLogicTableList.size()==1){
             return parsedLogicTableList.get(0);
         }
@@ -301,12 +301,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
             return logicTable;
         }
-        throw new RuntimeException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
+        throw new DragonException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
     }
 
 
     //根据主维度表生成路由规则
-    private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) {
+    private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) throws DragonException {
         String realDBName = primaryLogicTable.getRealDBName(binaryShardConditionMap);
         String primaryTBName = primaryLogicTable.getRealTBName(binaryShardConditionMap);
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
@@ -331,7 +331,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     }
 
-    protected void makeRouteMap() {
+    protected void makeRouteMap() throws DragonException{
         //如果sql中只包含一个表，则可以执行
         //主维度表
         LogicTable primaryLogicTable = sqlRouteParams.getPrimaryLogicTable();
@@ -368,7 +368,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
      * 需要过滤出id = ？、in (?，?，?)类似这两种类型作为路由参数
      * 对于其他的条件，例如like ，> ，not in (？？？)等，只需要根据实际情况，确定是否将currentParamterIndex++即可
      */
-    protected void fillSqlRouteParams() {
+    protected void fillSqlRouteParams() throws SQLException {
             if(CollectionUtils.isEmpty(whereConditionList)){
                 return ;
             }
@@ -408,7 +408,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
     }
     /**生成更新(U)、删除(D)，查询语句的真实sql*/
-    protected void makeupSqlRouteInfoSqls() {
+    protected void makeupSqlRouteInfoSqls() throws SQLException {
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
         //根据路由表进行重写sql
         for (Map<String, SqlRouteInfo> dbRouteMap :   sqlRouteMap.values()) {
@@ -439,7 +439,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     }
 
-    private void makeRouteAllParamsMap() {
+    private void makeRouteAllParamsMap() throws DragonException{
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
         for (LogicTable logicTable : parsedLogicTableList) { //check每个逻辑表都应该配置了真实库与表的映射关系
             Map<String, List<String>> realDBTBMap = logicTable.getRealDBTBMap();

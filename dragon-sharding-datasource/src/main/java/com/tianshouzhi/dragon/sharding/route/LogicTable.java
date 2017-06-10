@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.sharding.route;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +12,7 @@ import java.util.regex.Matcher;
  * 每个逻辑表 管理了 物理表 ，每个物理表 对应一个读写分离数据源编号
  */
 public class LogicTable extends LogicConfig{
-    private LogicDatasouce logicDatasouce;
+    private LogicDatasource logicDatasource;
     private final Set<RouteRule> dbRouteRules;
     private String logicTableName;
     private final Set<RouteRule> tbRouteRules;//eg:${user_id}.toLong().intdiv(100)%100
@@ -22,18 +23,18 @@ public class LogicTable extends LogicConfig{
      * @param logicTableName
      * @param tableNameFormat
      * @param tbRouteRuleStrs
-     * @param logicDatasouce
+     * @param logicDatasource
      * @param realDBTBMap
      */
-    public LogicTable(String logicTableName, String tableNameFormat, Set<String> tbRouteRuleStrs, Set<String> dbRouteRuleStrs, LogicDatasouce logicDatasouce, Map<String,List<String>> realDBTBMap) {
+    public LogicTable(String logicTableName, String tableNameFormat, Set<String> tbRouteRuleStrs, Set<String> dbRouteRuleStrs, LogicDatasource logicDatasource, Map<String,List<String>> realDBTBMap) throws DragonException {
         super(tableNameFormat);
         this.logicTableName =logicTableName;
-        this.logicDatasouce = logicDatasouce;
+        this.logicDatasource = logicDatasource;
         this.realDBTBMap = realDBTBMap;
         if(CollectionUtils.isEmpty(tbRouteRuleStrs)){
-            throw new RuntimeException("tbRouteRuleStrList can't be empty!!!");
+            throw new DragonException("tbRouteRuleStrList can't be empty!!!");
         }
-        if(logicDatasouce ==null){
+        if(logicDatasource ==null){
             throw new NullPointerException();
         }
 
@@ -55,12 +56,12 @@ public class LogicTable extends LogicConfig{
      * @param shardColumnValuesMap
      * @return
      */
-    public String getRealDBName(Map<String,Object> shardColumnValuesMap){
+    public String getRealDBName(Map<String,Object> shardColumnValuesMap) throws DragonException {
         Long realDBIndex = getRealIndex(shardColumnValuesMap,dbRouteRules);
-        return logicDatasouce.format(realDBIndex);
+        return logicDatasource.format(realDBIndex);
     }
 
-    public String getRealTBName(Map<String,Object> shardColumnValuesMap){
+    public String getRealTBName(Map<String,Object> shardColumnValuesMap) throws DragonException {
         Long realTBIndex=getRealIndex(shardColumnValuesMap,tbRouteRules);
         return format(realTBIndex);
     }
@@ -71,11 +72,11 @@ public class LogicTable extends LogicConfig{
      * @param realTBName
      * @return
      */
-    public Long parseRealTBIndex(String realTBName) {
+    public Long parseRealTBIndex(String realTBName) throws DragonException {
         return super.parseIndex(realTBName);
     }
-    public Long parseRealDBIndex(String realDBName) {
-        return logicDatasouce.parseIndex(realDBName);
+    public Long parseRealDBIndex(String realDBName) throws DragonException {
+        return logicDatasource.parseIndex(realDBName);
     }
 
     /**
@@ -109,7 +110,7 @@ public class LogicTable extends LogicConfig{
      * @param params
      * @return
      */
-    protected Long getRealIndex(Map<String, Object> params,Set<RouteRule> routeRules) {
+    protected Long getRealIndex(Map<String, Object> params,Set<RouteRule> routeRules) throws DragonException {
         if(params==null){
             throw new NullPointerException();
         }
@@ -121,7 +122,7 @@ public class LogicTable extends LogicConfig{
             }
         }
         if(selectedRouteRule==null){
-            throw new RuntimeException("no matched route rule found !!!");
+            throw new DragonException("no matched route rule found !!!");
         }
 
         Object eval = DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
@@ -133,7 +134,7 @@ public class LogicTable extends LogicConfig{
         private String replacedRouteRuleStr;//eg:user_id.toLong().intdiv(100)%100
         private List<String> shardColumns;
 
-        public RouteRule(String originRouteRuleStr) {
+        public RouteRule(String originRouteRuleStr) throws DragonConfigException {
             if(StringUtils.isBlank(originRouteRuleStr)){
                 throw new IllegalArgumentException("'originRouteRuleStr' can't be blank");
             }

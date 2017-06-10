@@ -1,5 +1,8 @@
 package com.tianshouzhi.dragon.sharding.route;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
+import org.apache.commons.collections.MapUtils;
+
 import javax.script.*;
 import java.util.Map;
 
@@ -13,7 +16,7 @@ public abstract class DragonGroovyEngine {
         engine = manager.getEngineByName("Groovy");
     }
 
-    public static Object eval(String script, Map<String,Object> params){
+    public static Object eval(String script, Map<String,Object> params) throws DragonException {
         try{
 
             if(params!=null){
@@ -26,7 +29,7 @@ public abstract class DragonGroovyEngine {
             }
             return engine.eval(script);
         }catch (ScriptException e){
-            throw new RuntimeException(e);
+            throw new DragonException("script:"+script+" eval error,params"+ params.toString(),e);
         }
     }
 }

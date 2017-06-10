@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.sharding.route;
 
+import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,13 +11,13 @@ import java.util.TreeMap;
 /**
  * Created by TIANSHOUZHI336 on 2017/2/19.
  */
-public class LogicDatasouce extends LogicConfig{
+public class LogicDatasource extends LogicConfig{
     private String defaultDSName; //主要用于处理只分表，不分库的情况，可能只有部分表的数据比较多，需要进行分表
     /**
      * 数据库名称与对应的数据源的映射关系,TreeMap会根据key排序
      */
     private Map<String,DataSource> dsNameDatasourceMap =new TreeMap<String, DataSource>();
-    public LogicDatasouce(String dbNameFormat, Map<String,DataSource> dsNameDatasourceMap,String defaultDSName) {
+    public LogicDatasource(String dbNameFormat, Map<String,DataSource> dsNameDatasourceMap, String defaultDSName) throws DragonConfigException {
         super(dbNameFormat);
         if(MapUtils.isEmpty(dsNameDatasourceMap)){
             throw new IllegalArgumentException("dsNameDatasourceMap can't be null or empty!!!");

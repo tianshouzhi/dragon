@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.ha.config;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,7 +33,7 @@ public class DragonHAConfigParser {
 		}
 	}
 
-	public static DragonHAConfiguration parse(InputStream config) {
+	public static DragonHAConfiguration parse(InputStream config) throws DragonConfigException{
 		DragonHAConfiguration configuration = null;
 		try {
 			Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -43,7 +44,7 @@ public class DragonHAConfigParser {
 		}
 	}
 
-	public static String toXml(DragonHAConfiguration configuration) {
+	public static String toXml(DragonHAConfiguration configuration) throws DragonConfigException{
         StringWriter xml = new StringWriter();
         try {
             marshaller.marshal(configuration, xml);

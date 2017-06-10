@@ -5,8 +5,10 @@ import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateSetItem;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -29,12 +31,12 @@ import java.util.List;
 public class MysqlUpdateStatementRewriter extends AbstractMysqlSqlRewriter {
 
     @Override
-    public void doRewrite(HandlerContext context) {
+    public void doRewrite(HandlerContext context) throws SQLException {
 
         MySqlUpdateStatement update = (MySqlUpdateStatement) context.getParsedSqlStatement();
         SQLTableSource tableSource = update.getTableSource();
         if (tableSource != null && tableSource.toString().contains(",")) {//多表更新语法不支持
-            throw new RuntimeException("don't support Multiple-table update syntax!!!sql:" + originSql);
+            throw new DragonException("don't support Multiple-table update syntax!!!sql:" + originSql);
         }
 
         parseLogicTableList(tableSource);

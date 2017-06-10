@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.cache.DragonCache;
 import com.tianshouzhi.dragon.common.cache.DragonCacheBuilder;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 import java.util.Map;
@@ -21,7 +21,7 @@ public class DragonShardingConfig {
     private  DragonCache<Object,Object> cache = DragonCacheBuilder.build(100,2000,50,10, TimeUnit.MINUTES);
     //原始配置信息
     private String appName;
-    private LogicDatasouce logicDatasouce;
+    private LogicDatasource logicDatasource;
     /**
      * key为逻辑表名，value是对应的逻辑表对象
      */
@@ -29,9 +29,9 @@ public class DragonShardingConfig {
     private ExecutorService executor;
     private int executionTimeout;
 
-    public DragonShardingConfig(String appName, LogicDatasouce logicDatasouce, Map<String, LogicTable> logicTableMap, ExecutorService executor, int executionTimeout) {
+    public DragonShardingConfig(String appName, LogicDatasource logicDatasource, Map<String, LogicTable> logicTableMap, ExecutorService executor, int executionTimeout) {
         this.appName = appName;
-        this.logicDatasouce = logicDatasouce;
+        this.logicDatasource = logicDatasource;
         this.logicTableMap .putAll(logicTableMap);
         this.executor = executor;
         this.executionTimeout = executionTimeout;
@@ -41,8 +41,8 @@ public class DragonShardingConfig {
         return appName;
     }
 
-    public LogicDatasouce getLogicDatasouce() {
-        return logicDatasouce;
+    public LogicDatasource getLogicDatasource() {
+        return logicDatasource;
     }
 
     public Map<String, LogicTable> getLogicTableMap() {

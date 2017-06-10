@@ -4,6 +4,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.alibaba.druid.util.JdbcConstants;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
@@ -12,6 +13,7 @@ import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -20,7 +22,7 @@ import java.util.List;
 public class SqlParseHandler implements Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlParseHandler.class);
     @Override
-    public void invoke(HandlerContext context) {
+    public void invoke(HandlerContext context) throws SQLException {
         if(MapUtils.isEmpty(context.getHintMap())){//说明没有hint
             DragonShardingStatement dragonShardingStatement = context.getShardingStatement();
             String sql = dragonShardingStatement.getSql();
@@ -44,7 +46,7 @@ public class SqlParseHandler implements Handler {
         }
     }
 
-    private SQLStatement parseSqlAST(HandlerContext context, String sql) {
+    private SQLStatement parseSqlAST(HandlerContext context, String sql) throws DragonException {
         SQLStatement sqlStatement;
         long start=System.currentTimeMillis();
         SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);
@@ -52,7 +54,7 @@ public class SqlParseHandler implements Handler {
         if(sqlStatements.size()==1){
             sqlStatement=sqlStatements.get(0);
         }else{
-            throw new RuntimeException("only support one sql!!");
+            throw new DragonException("only support one sql!!");
         }
         context.setSqlParseTimeMillis(System.currentTimeMillis()-start);
         return sqlStatement;

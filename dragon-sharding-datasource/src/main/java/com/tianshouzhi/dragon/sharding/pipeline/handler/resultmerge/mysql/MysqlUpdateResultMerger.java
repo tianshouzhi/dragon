@@ -12,15 +12,11 @@ import java.util.List;
  */
 public class MysqlUpdateResultMerger implements ResultMerger{
     @Override
-    public void merge(HandlerContext context) {
+    public void merge(HandlerContext context) throws SQLException{
         int totalUpdateCount = 0;
         List<Statement> realStatementList = context.getRealStatementList();
         for (Statement realStatement : realStatementList) {
-            try {
-                totalUpdateCount = totalUpdateCount + realStatement.getUpdateCount();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            totalUpdateCount = totalUpdateCount + realStatement.getUpdateCount();
         }
         context.setTotalUpdateCount(totalUpdateCount);
     }

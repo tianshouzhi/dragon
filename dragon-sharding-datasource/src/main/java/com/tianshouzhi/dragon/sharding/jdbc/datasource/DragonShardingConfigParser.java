@@ -1,8 +1,9 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.initailzer.DataSourceInitailzerUtil;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasouce;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -28,7 +29,7 @@ public abstract class DragonShardingConfigParser {
         }*/
         return appName;
     }
-    public static LogicDatasouce parseLogicDatasouce(Properties properties) throws Exception {
+    public static LogicDatasource parseLogicDatasouce(Properties properties) throws Exception {
         String dsNamePattern = properties.getProperty("datasource.namePattern");
         String realDatasourceClass = properties.getProperty("datasource.datasourceClass");
         Map<String,String> defaultDatasourceConfigMap= parseDeafultDatasourceConfig(properties);
@@ -45,10 +46,10 @@ public abstract class DragonShardingConfigParser {
         }
 
         String defaultDSName = properties.getProperty("datasource.defaultDSName");
-        LogicDatasouce logicDatasouce = new LogicDatasouce(dsNamePattern, dsNameDatasourceMap,defaultDSName);
+        LogicDatasource logicDatasource = new LogicDatasource(dsNamePattern, dsNameDatasourceMap,defaultDSName);
 
 
-        return logicDatasouce;
+        return logicDatasource;
     }
     //解析数据源的默认配置
     private static Map<String, String> parseDeafultDatasourceConfig(Properties properties) {
@@ -87,22 +88,22 @@ public abstract class DragonShardingConfigParser {
         return datasouceConfigMap;
     }
 
-    public static Map<String, LogicTable> parseLogicTableMap(LogicDatasouce logicDatasouce, Properties properties) {
+    public static Map<String, LogicTable> parseLogicTableMap(LogicDatasource logicDatasource, Properties properties) throws DragonException {
         Map<String, LogicTable> result=new HashMap<String, LogicTable>();
         String logicTableNames=properties.getProperty("logicTable.list");
         if(StringUtils.isBlank(logicTableNames)){
-            throw new RuntimeException("logicTable.list can't be null");
+            throw new DragonException("logicTable.list can't be null");
         }
 
-        LogicTableConfig defaultLogicTableConfig=parseLogicTableConfig("default",logicDatasouce,properties);
+        LogicTableConfig defaultLogicTableConfig=parseLogicTableConfig("default", logicDatasource,properties);
         for (String logicTableName : logicTableNames.split(",")) {
-            LogicTableConfig logicTableConfig=parseLogicTableConfig(logicTableName,logicDatasouce,properties);
-            result.put(logicTableName,makeLogicTable(logicTableName,defaultLogicTableConfig,logicTableConfig,logicDatasouce));
+            LogicTableConfig logicTableConfig=parseLogicTableConfig(logicTableName, logicDatasource,properties);
+            result.put(logicTableName,makeLogicTable(logicTableName,defaultLogicTableConfig,logicTableConfig, logicDatasource));
         }
         return result;
     }
 
-    private static LogicTableConfig parseLogicTableConfig(String logicTableName,LogicDatasouce logicDatasouce, Properties properties) {
+    private static LogicTableConfig parseLogicTableConfig(String logicTableName, LogicDatasource logicDatasource, Properties properties) {
             LogicTableConfig logicTableConfig = new LogicTableConfig();
             logicTableConfig.tbNamePattern=properties.getProperty("logicTable."+logicTableName+".namePattern");
             String dbRouteRules = properties.getProperty("logicTable."+logicTableName+".dbRouteRules");
@@ -114,7 +115,7 @@ public abstract class DragonShardingConfigParser {
                 logicTableConfig.tbRouteRules=Arrays.asList(tbRouteRules.split(","));
             }
             String everydbMappingStr = properties.getProperty("logicTable."+logicTableName+".everydb.mapping");
-            Set<String> datasourceNames = logicDatasouce.getRealDbIndexDatasourceMap().keySet();
+            Set<String> datasourceNames = logicDatasource.getRealDbIndexDatasourceMap().keySet();
             //所有库级别的默认映射规则
             HashMap<String, String> realDbTbMapping = new HashMap<String, String>();
             if(StringUtils.isNotBlank(everydbMappingStr)){
@@ -132,7 +133,7 @@ public abstract class DragonShardingConfigParser {
         logicTableConfig.realDbTbMapping=realDbTbMapping;
         return logicTableConfig;
     }
-    private static LogicTable makeLogicTable(String logicTbName,LogicTableConfig defaultLogicTableConfig, LogicTableConfig logicTableConfig, LogicDatasouce logicDatasouce) {
+    private static LogicTable makeLogicTable(String logicTbName,LogicTableConfig defaultLogicTableConfig, LogicTableConfig logicTableConfig, LogicDatasource logicDatasource) throws DragonException {
         List<String> defaultDbRouteRules = defaultLogicTableConfig.dbRouteRules;
         Map<String, String> defaultRealDbTbMapping = defaultLogicTableConfig.realDbTbMapping;
         String defaultTbNameFormat = defaultLogicTableConfig.tbNamePattern;
@@ -150,7 +151,7 @@ public abstract class DragonShardingConfigParser {
             dbRouteRules.addAll(defaultDbRouteRules);
         }
         if (dbRouteRules == null) {
-            throw new RuntimeException("no default dbRouteRules config ,'"+logicTbName+"'must config dbRouteRules");
+            throw new DragonException("no default dbRouteRules config ,'"+logicTbName+"'must config dbRouteRules");
         }
 
         Set<String> tbRouteRules = new HashSet<String>();
@@ -160,7 +161,7 @@ public abstract class DragonShardingConfigParser {
             tbRouteRules.addAll(defaultTbRouteRules);
         }
         if (tbRouteRules == null) {
-            throw new RuntimeException("no default tbRouteRules config ,'"+logicTbName+"'must config tbRouteRules");
+            throw new DragonException("no default tbRouteRules config ,'"+logicTbName+"'must config tbRouteRules");
         }
 
         Map<String, List<String>> realDbTbMapping = null;
@@ -176,7 +177,7 @@ public abstract class DragonShardingConfigParser {
             throw new DragonException("no default realDbTbMapping config ,logic table '"+logicTbName+"' must config realDbTbMapping");
         }*/
 
-        return new LogicTable(logicTbName, tbNameFormat, tbRouteRules, dbRouteRules, logicDatasouce, realDbTbMapping);
+        return new LogicTable(logicTbName, tbNameFormat, tbRouteRules, dbRouteRules, logicDatasource, realDbTbMapping);
     }
     private static Map<String, List<String>> caculateRealDBTBMapping(Map<String, String> defaultRealDbTbMapping, MessageFormat messageFomart) {
         Map<String, List<String>> realDbTbMapping = new HashMap<String, List<String>>();
@@ -202,12 +203,12 @@ public abstract class DragonShardingConfigParser {
         }
         return timeout;
     }
-    public static ExecutorService makeExecutorService(String appName,LogicDatasouce logicDatasouce,Map<String,LogicTable> logicTableMap,Properties properties) {
-        int corePoolSize = logicDatasouce.getRealDbIndexDatasourceMap().size();
+    public static ExecutorService makeExecutorService(String appName, LogicDatasource logicDatasource, Map<String,LogicTable> logicTableMap, Properties properties) {
+        int corePoolSize = logicDatasource.getRealDbIndexDatasourceMap().size();
         if (properties.getProperty("dragon.executor.corePoolSize") != null) {
             corePoolSize = Integer.parseInt(properties.getProperty("dragon.executor.corePoolSize"));
         }
-        int maxPoolSize = logicDatasouce.getRealDbIndexDatasourceMap().size();
+        int maxPoolSize = logicDatasource.getRealDbIndexDatasourceMap().size();
         if (properties.getProperty("dragon.executor.maxPoolSize") != null) {
             maxPoolSize = Integer.parseInt(properties.getProperty("dragon.executor.maxPoolSize"));
         }

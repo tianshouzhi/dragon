@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.common.initailzer;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
+
 import javax.sql.DataSource;
 import java.util.Map;
 
@@ -12,5 +14,5 @@ public interface DataSourceInitailzer {
      * @return
      */
     public String initDatasouceClassName();
-    public DataSource init(Map<String,String> config) throws Exception;
+    public DataSource init(Map<String,String> config) throws DragonException;
 }
