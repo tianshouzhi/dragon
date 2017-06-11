@@ -466,10 +466,8 @@ public class DragonHAConnection extends DragonConnection implements Connection{
 
     @Override
     public String getCatalog() throws SQLException {
-        if(realConnection!=null){
-            return realConnection.getCatalog();
-        }
-        return catalog;
+        buildNewReadConnectionIfNeed();
+        return realConnection.getCatalog();
     }
 
     public String getDataSourceIndex() {
