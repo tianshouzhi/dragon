@@ -53,6 +53,4 @@ public class DragonHAConfigParser {
         }
         return xml.toString();
 	}
-
-
 }
