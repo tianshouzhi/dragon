@@ -39,6 +39,7 @@
         <module>dragon-idgen</module>
         <module>dragon-console</module>
         <module>dragon-demo</module>
+        <module>dragon_performace_test</module>
     </modules>
     <dependencyManagement>
         <dependencies>

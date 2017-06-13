@@ -15,6 +15,10 @@ public class DragonGroovyEngineTest {
         Object eval = DragonGroovyEngine.eval("id.substring(id.length()-4).toLong().intdiv(100)%100",params);
         System.out.println(eval);
 
+         params = new HashMap<String, Object>();
+         params.put("id","1234");
+         eval = DragonGroovyEngine.eval("id[2..3]",params);
+        System.out.println(eval);
     }
 
 }
