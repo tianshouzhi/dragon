@@ -26,9 +26,19 @@
             <version>0.0.2</version>
         </dependency>
         <dependency>
+            <groupId>com.tianshouzhi</groupId>
+            <artifactId>dragon-ha-datasource</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
