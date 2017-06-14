@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.console.benchmark.result;
 
-import com.tianshouzhi.dragon.console.benchmark.result.SingleBenchmarkResult;
+import com.tianshouzhi.dragon.console.benchmark.jmx.JMXUtils;
+import com.tianshouzhi.dragon.console.benchmark.jmx.RuntimeInfo;
 
 import java.util.List;
 
@@ -8,45 +9,27 @@ import java.util.List;
  * Created by tianshouzhi on 2017/6/14.
  */
 public class BenchmarkResult {
-    private SystemConfig systemConfig;
-
+    private RuntimeInfo runtimeInfo = JMXUtils.getRuntimeInfo();
+    private BenchmarkConfig benchmarkConfig;
     private List<SingleBenchmarkResult> results;
     private long startTime;
     private long endTime;
-    private int warmupRounds;
-    private int benchmarkRounds;
-    private int concurrency;
+    private long roundAvg;
     private String className;
     private String methodName;
-    private int ygcCalls;//ygc次数
-    private int fgcCalls;//fgc次数
+    private int errorCount;//错误数
 
-    public BenchmarkResult(String className,String methodName,
-                           int warmupRounds, int benchmarkRounds,
-                           int concurrency,
-                           long startTime,
-                           long endTime,
-                           List<SingleBenchmarkResult> results) {
-        this.className = className;
-        this.methodName = methodName;
-        this.warmupRounds = warmupRounds;
-        this.benchmarkRounds = benchmarkRounds;
-        this.concurrency = concurrency;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.results = results;
+
+    public RuntimeInfo getRuntimeInfo() {
+        return runtimeInfo;
     }
 
-    public int getWarmupRounds() {
-        return warmupRounds;
+    public BenchmarkConfig getBenchmarkConfig() {
+        return benchmarkConfig;
     }
 
-    public int getBenchmarkRounds() {
-        return benchmarkRounds;
-    }
-
-    public int getConcurrency() {
-        return concurrency;
+    public void setBenchmarkConfig(BenchmarkConfig benchmarkConfig) {
+        this.benchmarkConfig = benchmarkConfig;
     }
 
     public String getClassName() {
@@ -62,5 +45,49 @@ public class BenchmarkResult {
 
     public long getEndTime() {
         return endTime;
+    }
+
+    public long getRoundAvg() {
+        return roundAvg;
+    }
+
+    public int getErrorCount() {
+        return errorCount;
+    }
+
+    public void setRuntimeInfo(RuntimeInfo runtimeInfo) {
+        this.runtimeInfo = runtimeInfo;
+    }
+
+    public List<SingleBenchmarkResult> getResults() {
+        return results;
+    }
+
+    public void setResults(List<SingleBenchmarkResult> results) {
+        this.results = results;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setRoundAvg(long roundAvg) {
+        this.roundAvg = roundAvg;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public void setErrorCount(int errorCount) {
+        this.errorCount = errorCount;
     }
 }

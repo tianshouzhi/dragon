@@ -1,9 +1,9 @@
-package com.tianshouzhi.dragon.console.benchmark.result;
+package com.tianshouzhi.dragon.console.benchmark.jmx;
 
 /**
  * Created by tianshouzhi on 2017/6/14.
  */
-public class SystemConfig {
+public class RuntimeInfo {
     private final String osname;
     private final String osarch;
     private final String osversion;
@@ -11,7 +11,7 @@ public class SystemConfig {
     private final String vmName;
     private final String vmVersion;
 
-    public SystemConfig(String osname, String osarch, String osversion, int availableProcessors, String vmName, String vmVersion) {
+    public RuntimeInfo(String osname, String osarch, String osversion, int availableProcessors, String vmName, String vmVersion) {
 
         this.osname = osname;
         this.osarch = osarch;

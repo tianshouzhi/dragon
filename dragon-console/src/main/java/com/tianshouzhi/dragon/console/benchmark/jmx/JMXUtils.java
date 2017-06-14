@@ -1,11 +1,11 @@
-package com.tianshouzhi.dragon.console.benchmark;
-
-import com.tianshouzhi.dragon.console.benchmark.result.SystemConfig;
+package com.tianshouzhi.dragon.console.benchmark.jmx;
 
 import javax.management.ObjectName;
 import java.lang.management.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tianshouzhi on 2017/6/14.
@@ -17,6 +17,7 @@ public class JMXUtils {
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         int availableProcessors = operatingSystemMXBean.getAvailableProcessors();
     }
+
 
     public static void main(String[] args) {
         List<GarbageCollectorMXBean> gcMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -34,7 +35,21 @@ public class JMXUtils {
             System.out.println();
         }
     }
-    public SystemConfig getRuntimeInfo(){
+
+    public static Map<String, GCInfo> getGcInfo(){
+        List<GarbageCollectorMXBean> gcMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        Map<String,GCInfo> result=new HashMap<String,GCInfo>();
+        for (GarbageCollectorMXBean gcMXBean : gcMXBeans) {
+            String name = gcMXBean.getName();
+            long collectionTime = gcMXBean.getCollectionTime();
+            long collectionCount = gcMXBean.getCollectionCount();
+            String[] memoryPoolNames = gcMXBean.getMemoryPoolNames();
+            result.put(name,new GCInfo(name,collectionTime,collectionCount,memoryPoolNames));
+        }
+        return result;
+    }
+
+    public static RuntimeInfo getRuntimeInfo(){
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         String osname = operatingSystemMXBean.getName();
         int availableProcessors = operatingSystemMXBean.getAvailableProcessors();
@@ -43,6 +58,6 @@ public class JMXUtils {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         String vmName = runtimeMXBean.getVmName();
         String vmVersion = runtimeMXBean.getSpecVersion();
-        return new SystemConfig(osname,osarch,osversion,availableProcessors,vmName,vmVersion);
+        return new RuntimeInfo(osname,osarch,osversion,availableProcessors,vmName,vmVersion);
     }
 }
