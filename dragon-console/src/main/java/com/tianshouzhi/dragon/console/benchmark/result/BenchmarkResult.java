@@ -1,24 +1,28 @@
 package com.tianshouzhi.dragon.console.benchmark.result;
 
-import com.tianshouzhi.dragon.console.benchmark.jmx.JMXUtils;
+import com.tianshouzhi.dragon.console.benchmark.jmx.GCInfo;
 import com.tianshouzhi.dragon.console.benchmark.jmx.RuntimeInfo;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tianshouzhi on 2017/6/14.
  */
 public class BenchmarkResult {
-    private RuntimeInfo runtimeInfo = JMXUtils.getRuntimeInfo();
+    private RuntimeInfo runtimeInfo ;
+    private Map<String, GCInfo> startGcInfoMap;
+    private Map<String, GCInfo> endGCInfoMap;
     private BenchmarkConfig benchmarkConfig;
     private List<SingleBenchmarkResult> results;
+    private long startCpuTime;
+    private long endCpuTime;
     private long startTime;
     private long endTime;
-    private long roundAvg;
     private String className;
     private String methodName;
     private int errorCount;//错误数
-
 
     public RuntimeInfo getRuntimeInfo() {
         return runtimeInfo;
@@ -47,8 +51,8 @@ public class BenchmarkResult {
         return endTime;
     }
 
-    public long getRoundAvg() {
-        return roundAvg;
+    public double getRoundAvg() {
+        return (endTime-startTime)/benchmarkConfig.getBenchmarkRounds();
     }
 
     public int getErrorCount() {
@@ -75,10 +79,6 @@ public class BenchmarkResult {
         this.endTime = endTime;
     }
 
-    public void setRoundAvg(long roundAvg) {
-        this.roundAvg = roundAvg;
-    }
-
     public void setClassName(String className) {
         this.className = className;
     }
@@ -89,5 +89,64 @@ public class BenchmarkResult {
 
     public void setErrorCount(int errorCount) {
         this.errorCount = errorCount;
+    }
+
+    public void setStartGcInfoMap(Map<String, GCInfo> startGcInfoMap) {
+        this.startGcInfoMap = startGcInfoMap;
+    }
+    
+
+    public void setEndGCInfoMap(Map<String, GCInfo> endGCInfoMap) {
+        this.endGCInfoMap = endGCInfoMap;
+    }
+    
+    public List<GCInfo> getGCInfoList(){
+        List<GCInfo> gcInfoList=new ArrayList<GCInfo>();
+        for (String gcName : endGCInfoMap.keySet()) {
+            GCInfo startGcInfo = this.startGcInfoMap.get(gcName);
+            GCInfo endGcInfo = this.endGCInfoMap.get(gcName);
+            gcInfoList.add(new GCInfo(gcName,
+                    endGcInfo.getGcCount() - startGcInfo.getGcCount(),
+                    endGcInfo.getGcTime()-startGcInfo.getGcTime(),
+                    endGcInfo.getMemoryPoolNames()));
+        }
+        return gcInfoList;
+    }
+
+    public long getStartCpuTime() {
+        return startCpuTime;
+    }
+
+    public void setStartCpuTime(long startCpuTime) {
+        this.startCpuTime = startCpuTime;
+    }
+
+    public long getEndCpuTime() {
+        return endCpuTime;
+    }
+
+    public void setEndCpuTime(long endCpuTime) {
+        this.endCpuTime = endCpuTime;
+    }
+
+    public double getAverageCpuRatio(){
+        double ratio = (endCpuTime-startCpuTime)/1000000.0/(endTime-startTime);
+        return ratio;
+    }
+
+    @Override
+    public String toString() {
+        return "BenchmarkResult{" +
+                "runtimeInfo=" + runtimeInfo +
+                ", startGcInfoMap=" + startGcInfoMap +
+                ", endGCInfoMap=" + endGCInfoMap +
+                ", benchmarkConfig=" + benchmarkConfig +
+                ", results=" + results +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", errorCount=" + errorCount +
+                '}';
     }
 }

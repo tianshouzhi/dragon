@@ -44,4 +44,16 @@ public class RuntimeInfo {
     public String getVmVersion() {
         return vmVersion;
     }
+
+    @Override
+    public String toString() {
+        return "RuntimeInfo{" +
+                "osname='" + osname + '\'' +
+                ", osarch='" + osarch + '\'' +
+                ", osversion='" + osversion + '\'' +
+                ", availableProcessors=" + availableProcessors +
+                ", vmName='" + vmName + '\'' +
+                ", vmVersion='" + vmVersion + '\'' +
+                '}';
+    }
 }

@@ -37,4 +37,13 @@ public class BenchmarkConfig {
     public void setConcurrency(int concurrency) {
         this.concurrency = concurrency;
     }
+
+    @Override
+    public String toString() {
+        return "BenchmarkConfig{" +
+                "warmupRounds=" + warmupRounds +
+                ", benchmarkRounds=" + benchmarkRounds +
+                ", concurrency=" + concurrency +
+                '}';
+    }
 }

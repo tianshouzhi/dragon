@@ -1,7 +1,11 @@
 package com.tianshouzhi.dragon.console.benchmark.jmx;
 
+import com.sun.management.*;
+
 import javax.management.ObjectName;
 import java.lang.management.*;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,24 +22,6 @@ public class JMXUtils {
         int availableProcessors = operatingSystemMXBean.getAvailableProcessors();
     }
 
-
-    public static void main(String[] args) {
-        List<GarbageCollectorMXBean> gcMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
-        for (GarbageCollectorMXBean gcMXBean : gcMXBeans) {
-            String name = gcMXBean.getName();
-            long collectionTime = gcMXBean.getCollectionTime();
-            long collectionCount = gcMXBean.getCollectionCount();
-            String[] memoryPoolNames = gcMXBean.getMemoryPoolNames();
-            ObjectName objectName = gcMXBean.getObjectName();
-            System.out.println("name:"+name);
-            System.out.println("collectionTime:"+collectionTime);
-            System.out.println("collectionCount:"+collectionCount);
-            System.out.println("memoryPoolNames:"+ Arrays.toString(memoryPoolNames));
-            System.out.println("objectName:"+objectName);
-            System.out.println();
-        }
-    }
-
     public static Map<String, GCInfo> getGcInfo(){
         List<GarbageCollectorMXBean> gcMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
         Map<String,GCInfo> result=new HashMap<String,GCInfo>();
@@ -50,14 +36,23 @@ public class JMXUtils {
     }
 
     public static RuntimeInfo getRuntimeInfo(){
-        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-        String osname = operatingSystemMXBean.getName();
-        int availableProcessors = operatingSystemMXBean.getAvailableProcessors();
-        String osarch = operatingSystemMXBean.getArch();
-        String osversion = operatingSystemMXBean.getVersion();
+        OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+        String osname = osMXBean.getName();
+        int availableProcessors = osMXBean.getAvailableProcessors();
+        String osarch = osMXBean.getArch();
+        String osversion = osMXBean.getVersion();
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         String vmName = runtimeMXBean.getVmName();
         String vmVersion = runtimeMXBean.getSpecVersion();
         return new RuntimeInfo(osname,osarch,osversion,availableProcessors,vmName,vmVersion);
+    }
+
+    public static MemeryInfo getMemeryInfo(){
+        return null;
+    }
+
+    public static long getCpuTimeNs(){
+        OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+        return ((com.sun.management.OperatingSystemMXBean) osMXBean).getProcessCpuTime();
     }
 }

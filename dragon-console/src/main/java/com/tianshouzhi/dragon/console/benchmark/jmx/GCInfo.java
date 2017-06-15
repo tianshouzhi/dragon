@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.console.benchmark.jmx;
 
+import java.util.Arrays;
+
 /**
  * Created by tianshouzhi on 2017/6/14.
  */
@@ -46,5 +48,15 @@ public class GCInfo {
 
     public void setMemoryPoolNames(String[] memoryPoolNames) {
         this.memoryPoolNames = memoryPoolNames;
+    }
+
+    @Override
+    public String toString() {
+        return "GCInfo{" +
+                "gcName='" + gcName + '\'' +
+                ", gcCount=" + gcCount +
+                ", gcTime=" + gcTime +
+                ", memoryPoolNames=" + Arrays.toString(memoryPoolNames) +
+                '}';
     }
 }
