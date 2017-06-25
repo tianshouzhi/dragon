@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.common.util;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,8 @@ import java.util.regex.Pattern;
 public class SqlTypeUtil {
     private static final Logger LOGGER= LoggerFactory.getLogger(SqlTypeUtil.class);
     private static Map<String,Boolean> sqlTypeCache=new ConcurrentHashMap<String, Boolean>();
-
+//INSERT INTO article(title,abstracts,content,visible,qr_code_url,create_time,last_update_time)
+//VALUES (?,?,?,?,?,?,?);
     /**
      * 传入的应该是一条sql，不应该将多条sql放在一起传入，且SQL前面不能包含任何形式的注释，包括hint
      * @param sql
@@ -74,6 +76,6 @@ public class SqlTypeUtil {
                 return current;
             }
         }
-        throw new UnsupportedOperationException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
+        throw new DragonException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
     }
 }

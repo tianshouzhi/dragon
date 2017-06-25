@@ -31,7 +31,7 @@ public enum SqlType {
     Pattern pattern;
 
     SqlType(String parttern) {
-        pattern=Pattern.compile(HINT_PREFIX+parttern,Pattern.CASE_INSENSITIVE/*|Pattern.MULTILINE*/);
+        pattern=Pattern.compile(HINT_PREFIX+parttern,Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
     }
 
     public Pattern getPattern() {

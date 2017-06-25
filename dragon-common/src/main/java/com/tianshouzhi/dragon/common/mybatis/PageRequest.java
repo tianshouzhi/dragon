@@ -1,4 +1,4 @@
-package com.tianshouzhi.site.domain.dto;
+package com.tianshouzhi.dragon.common.mybatis;
 
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -75,7 +75,7 @@ public class PageRequest {
     public static class Condition{
         private String columnName;
         private String columnValue;
-        private ConditionType conditionType=ConditionType.EQUALS;
+        private ConditionType conditionType= ConditionType.EQUALS;
 
         public Condition(String columnName, String columnValue) {
             this.columnName = columnName;

@@ -1,21 +1,21 @@
-package com.tianshouzhi.site.domain.dto;
+package com.tianshouzhi.dragon.common.mybatis;
 
 import java.util.List;
 
 /**
  * Created by tianshouzhi on 2017/6/11.
  */
-public class Page<T> {
+public class Page {
     private Long recordsTotal;
     private Long recordsFiltered;
     private PageRequest pageRequest;
-    List<T> data;
+    List<?> records;
 
-    public Page(Long recordsTotal, Long recordsFiltered, PageRequest pageRequest, List<T> data) {
+    public Page(Long recordsTotal, Long recordsFiltered, PageRequest pageRequest, List<?> records) {
         this.recordsTotal = recordsTotal;
         this.recordsFiltered = recordsFiltered;
         this.pageRequest = pageRequest;
-        this.data = data;
+        this.records = records;
     }
 
     public Long getRecordsTotal() {
@@ -34,12 +34,12 @@ public class Page<T> {
         this.recordsFiltered = recordsFiltered;
     }
 
-    public List<T> getData() {
-        return data;
+    public List<?> getRecords() {
+        return records;
     }
 
-    public void setData(List<T> data) {
-        this.data = data;
+    public void setRecords(List<?> records) {
+        this.records = records;
     }
 
     public PageRequest getPageRequest() {

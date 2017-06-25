@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dragon</artifactId>
         <groupId>com.tianshouzhi</groupId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>dragon-ha-datasource</name>
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>com.tianshouzhi</groupId>
             <artifactId>dragon-common</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

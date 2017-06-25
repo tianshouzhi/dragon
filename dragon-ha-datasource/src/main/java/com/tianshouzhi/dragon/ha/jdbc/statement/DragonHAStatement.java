@@ -44,11 +44,8 @@ public class DragonHAStatement extends DragonStatement implements Statement {
         if(resultSet!=null){//jdbc规范规定，每次执行的时候，如果当前ResultSet不为空，需要显式关闭，因此最好一个Statement执行一个sql
             resultSet.close();
         }
-        int errorCount = 0;
         boolean isResultSet = false;
-        int maxRetryTimes = 3;
         Set<String> excludes = null;
-        for (int i = 0; i < maxRetryTimes; i++) {
             Connection realConnection=null;
             try {
                 if(executeType !=EXECUTE_BATCH){
@@ -69,30 +66,9 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                     dragonHAConnection.getHAConnectionManager().invalid(dataSourceIndex);
                     throw e;
                 } else {
-                    //不是致命异常,没有开启事务，其sql是查询，重试 //TODO 不包含Hint 或者就不需要失败重试...
-                    if (failRetry()) {
-                        LOGGER.error("query failed for the " + (errorCount++) + "st try,sql state:{},error code:{},sql is:'{}'", e.getSQLState(), e.getErrorCode(), sql,e);
-                        if (errorCount == maxRetryTimes) {
-                            throw new SQLException("query failed after try 3 times,sql is:" + sql, e);
-                        }
-                        if(excludes==null){
-                            excludes=new HashSet<String>();
-                        }
-                        excludes.add(dataSourceIndex);
-                        //选择一个新的数据源，创建connection，并且重新创建statement
-                        Connection newConnection=dragonHAConnection.buildNewReadConnectionExclue(excludes);
-                        if(newConnection==null){
-                            LOGGER.error("no more datasource can be used to retry,have tried:{}", excludes);
-                            throw e;
-                        }
-                        createRealStatement(newConnection);
-                    } else {//如果开启了事务，或者是写操作，或者是致命异常，不重试
-                        throw new DragonException("sql '" + sql + "' execute fail, no retry", e);
-                    }
+                    throw e;
                 }
             }
-        }
-        return isResultSet;
     }
     protected void createRealStatement(Connection realConnection) throws SQLException {
         switch (createType) {

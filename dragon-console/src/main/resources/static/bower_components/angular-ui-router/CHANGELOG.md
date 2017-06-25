@@ -50,7 +50,7 @@
 
 * **noImplicitAny:** move noimplicitany compliance test file to correct location ([ec6e5e4](https://github.com/angular-ui/ui-router/commit/ec6e5e4))
 * **onEnter:** Fix typescript typing for onEnter/onRetain/onExit ([df6ee24](https://github.com/angular-ui/ui-router/commit/df6ee24))
-* **routeToComponent:** Bind resolves that start with data- or x- ([4559c32](https://github.com/angular-ui/ui-router/commit/4559c32))
+* **routeToComponent:** Bind resolves that start with records- or x- ([4559c32](https://github.com/angular-ui/ui-router/commit/4559c32))
 * **StateRegistry:** Allow stateRegistry.register() to take a Ng1StateDeclaration ([cc88525](https://github.com/angular-ui/ui-router/commit/cc88525)), closes [#3345](https://github.com/angular-ui/ui-router/issues/3345)
 * **uiCanExit:** Only process uiCanExit hook once during redirects ([7a086ee](https://github.com/angular-ui/ui-router/commit/7a086ee))
 * **uiSref:** replace angular.copy with extend (PR [#3330](https://github.com/angular-ui/ui-router/issues/3330)) ([20d1fcd](https://github.com/angular-ui/ui-router/commit/20d1fcd)), closes [#3189](https://github.com/angular-ui/ui-router/issues/3189)
@@ -97,10 +97,10 @@ Please keep reading to see if the breaking changes from core between 3.1.0 and 5
 * **common:** Perf improvements in hot functions: ([4193244](https://github.com/ui-router/core/commit/4193244))
 * **core:** Export all vanilla.* code from `ui-router-core` ([f3392d1](https://github.com/ui-router/core/commit/f3392d1))
 * **core:** Switch to [@uirouter](https://github.com/uirouter)/core npm module ([e3f389f](https://github.com/ui-router/core/commit/e3f389f))
-* **decorators:** Add state, resolve and resolve data decorators ([642df0b](https://github.com/ui-router/core/commit/642df0b))
+* **decorators:** Add state, resolve and resolve records decorators ([642df0b](https://github.com/ui-router/core/commit/642df0b))
 * **defaultErrorHandler:** Do not invoke default error handler for ABORTED transitions ([b07a24b](https://github.com/ui-router/core/commit/b07a24b))
 * **globals:** Removed `UIRouterGlobals` interface. Renamed `Globals` class to `UIRouterGlobals` ([8719334](https://github.com/ui-router/core/commit/8719334))
-* **Globals:** implement Disposable and delete global transition data ([a794018](https://github.com/ui-router/core/commit/a794018))
+* **Globals:** implement Disposable and delete global transition records ([a794018](https://github.com/ui-router/core/commit/a794018))
 * **onBefore:** Run onBefore hooks asynchronously. ([30b82aa](https://github.com/ui-router/core/commit/30b82aa))
 * **onEnter/Exit/Retain:** Use onExit/onEnter/onRetain from 56955state(), not state.self ([bc1f554](https://github.com/ui-router/core/commit/bc1f554))
 * **Rejection:** Add $id to ease debugging of transition rejections ([d456d54](https://github.com/ui-router/core/commit/d456d54))
@@ -127,7 +127,7 @@ Please keep reading to see if the breaking changes from core between 3.1.0 and 5
 
 ```js
 import { State } from "ui-router-core";
-const match = { to: (state: State) => state.data.auth };
+const match = { to: (state: State) => state.records.auth };
 transitionsvc.onEnter(match, (trans: Transition, state: State) => {
   // state is the internal State object
   if (state.includes["foo"]) { // internal ui-router API
@@ -140,7 +140,7 @@ transitionsvc.onEnter(match, (trans: Transition, state: State) => {
 
 ```js
 import { StateDeclaration } from "ui-router-core";
-const match = { to: (state: StateDeclaration) => state.data.auth };
+const match = { to: (state: StateDeclaration) => state.records.auth };
 transitionsvc.onEnter(match, (trans: Transition, state: StateDeclaration) => {
   // state === the state object you registered
   // Access internal ui-router API using $$state()
@@ -763,7 +763,7 @@ This release fixes bugs for both ng1 and ng2
 * **ng2:** Angular 2.0.0 final compatibility ([7c54b75](https://github.com/angular-ui/ui-router/commit/7c54b75)), closes [#2991](https://github.com/angular-ui/ui-router/issues/2991)
 * **ng2.NgModule:** Allow apps with no forChild modules ([d3bd332](https://github.com/angular-ui/ui-router/commit/d3bd332)), closes [#3009](https://github.com/angular-ui/ui-router/issues/3009)
 * **ng2.uiView:** Use ReflectorReader to get component inputs
-* **resolve:** Don't re-resolve data when redirected to same state, but only dynamic params changed. ([98cd2d2](https://github.com/angular-ui/ui-router/commit/98cd2d2)), closes [#3033](https://github.com/angular-ui/ui-router/issues/3033)
+* **resolve:** Don't re-resolve records when redirected to same state, but only dynamic params changed. ([98cd2d2](https://github.com/angular-ui/ui-router/commit/98cd2d2)), closes [#3033](https://github.com/angular-ui/ui-router/issues/3033)
 * **trace:** Show function definition during logging of trace.enable('HOOK') ([190d122](https://github.com/angular-ui/ui-router/commit/190d122))
 * **transition:** Fail a transition if a new one has started while resolves are loading ([bc87d9e](https://github.com/angular-ui/ui-router/commit/bc87d9e)), closes [#2972](https://github.com/angular-ui/ui-router/issues/2972)
 * **urlMatcherFactory:** fix tilde edge case with "string" encoding ([#3018](https://github.com/angular-ui/ui-router/issues/3018)) ([a201906](https://github.com/angular-ui/ui-router/commit/a201906))
@@ -878,7 +878,7 @@ class RootAppModule {}
 * **ng1.uiSref:** Allow nested UISrefs by stopping event propagation on-click ([b4a2499](https://github.com/angular-ui/ui-router/commit/b4a2499)), closes [#2962](https://github.com/angular-ui/ui-router/issues/2962)
 * **ng1.uiSrefActive:** update sref-active after existing transition-in-progress completes ([0994c71](https://github.com/angular-ui/ui-router/commit/0994c71)), closes [#2908](https://github.com/angular-ui/ui-router/issues/2908)
 * **uiSref, uiState:** added click unbind to prevent memory leaks ([79d501e](https://github.com/angular-ui/ui-router/commit/79d501e))
-* **uiView:** separate $uiView and $uiViewAnim element.data() ([a94117d](https://github.com/angular-ui/ui-router/commit/a94117d)), closes [#2763](https://github.com/angular-ui/ui-router/issues/2763)
+* **uiView:** separate $uiView and $uiViewAnim element.records() ([a94117d](https://github.com/angular-ui/ui-router/commit/a94117d)), closes [#2763](https://github.com/angular-ui/ui-router/issues/2763)
 
 #### ng2
 
@@ -959,12 +959,12 @@ The most common breaks will be #1 and #2
 
 8) BC-BREAK: remove support for `JIT` resolves.  This also eliminated the need for the `loadAllControllerLocals` hook which was also removed
 
-9) BC-BREAK: Replaced `ViewConfig.node` with `ViewConfig.path`. Angular 1's `$(element).data('$uiView')` is affected. 
+9) BC-BREAK: Replaced `ViewConfig.node` with `ViewConfig.path`. Angular 1's `$(element).records('$uiView')` is affected. 
    Previously the .node was the node for the view. Now the last element in the path is the node for the view.
 
 10) BC-BREAK: Nodes no longer have (stateful) `.resolveContext` properties. Instead, a new ResolveContext is wrapped over a Path of Nodes.  Removed `PathFactory.bindResolveContexts()`.
 
-11) BC-BREAK: ResolveContext.resolvePath returns a promise for resolved data as an array of tuples, instead of a promise for an object of resolved data.  Removed `ResolveContext.resolvePathElement()`.
+11) BC-BREAK: ResolveContext.resolvePath returns a promise for resolved records as an array of tuples, instead of a promise for an object of resolved records.  Removed `ResolveContext.resolvePathElement()`.
 
 12) BC-BREAK: Removed ResolvePolicy enum in favor of the ResolvePolicy interface `{ when: "", async: "" }`
 
@@ -1032,7 +1032,7 @@ The most common breaks will be #1 and #2
 ### Features
 
 ## ng2
-* **ng2.uiView:** bind resolve data to input[] and [@Input](https://github.com/Input)(), process bindings:([f6dae28](https://github.com/angular-ui/ui-router/commit/f6dae28))
+* **ng2.uiView:** bind resolve records to input[] and [@Input](https://github.com/Input)(), process bindings:([f6dae28](https://github.com/angular-ui/ui-router/commit/f6dae28))
 * **ng2.urlRouter:** HTML5 PushState support([9842fb7](https://github.com/angular-ui/ui-router/commit/9842fb7)), closes [#2688](https://github.com/angular-ui/ui-router/issues/2688)
 * **ng2.UIRouter:** update to ng2 beta.17([45c0758](https://github.com/angular-ui/ui-router/commit/45c0758))
 * **ng2.UIRouter:** Update ui-router for ng2 rc.1([3219406](https://github.com/angular-ui/ui-router/commit/3219406)), closes [#2722](https://github.com/angular-ui/ui-router/issues/2722)
@@ -1050,7 +1050,7 @@ The most common breaks will be #1 and #2
 ### Features
 
 * **uiView:** add support for hybrid ng1/ng2 ui-router apps via ng-upgrade and http://github.com/ui-router/ng1-to-ng2
-* **ng2.uiView:** bind resolve data to input[] and @Input(), process bindings: ([f6dae28](https://github.com/angular-ui/ui-router/commit/f6dae28))
+* **ng2.uiView:** bind resolve records to input[] and @Input(), process bindings: ([f6dae28](https://github.com/angular-ui/ui-router/commit/f6dae28))
 
 
 
@@ -1108,13 +1108,13 @@ This is the first release with angular 2 support.  See http://github.com/ui-rout
 ### Features
 
 * **params:** Add uiOnParamsChanged controller callback ([961c96d](https://github.com/angular-ui/ui-router/commit/961c96d)), closes [#2608](https://github.com/angular-ui/ui-router/issues/2608) [#2470](https://github.com/angular-ui/ui-router/issues/2470) [#2391](https://github.com/angular-ui/ui-router/issues/2391) [#1967](https://github.com/angular-ui/ui-router/issues/1967)
-* **resolve:** Allow all resolved data for a node to be injected as `$resolve$` ([e432c27](https://github.com/angular-ui/ui-router/commit/e432c27))
+* **resolve:** Allow all resolved records for a node to be injected as `$resolve$` ([e432c27](https://github.com/angular-ui/ui-router/commit/e432c27))
 * **state:** Expose the internal state API via `$$state()` ([92053f1](https://github.com/angular-ui/ui-router/commit/92053f1)), closes [#13](https://github.com/angular-ui/ui-router/issues/13)
 * **ui-router-ng2:** Initial angular2 support ([217de70](https://github.com/angular-ui/ui-router/commit/217de70))
 * **uiCanExit:** Add controller lifecycle hook "uiCanExit" ([afcfe95](https://github.com/angular-ui/ui-router/commit/afcfe95))
-* **uiView:** Expose the resolved data for a state as $scope.$resolve ([0f6aea6](https://github.com/angular-ui/ui-router/commit/0f6aea6)), closes [#2175](https://github.com/angular-ui/ui-router/issues/2175) [#2547](https://github.com/angular-ui/ui-router/issues/2547)
+* **uiView:** Expose the resolved records for a state as $scope.$resolve ([0f6aea6](https://github.com/angular-ui/ui-router/commit/0f6aea6)), closes [#2175](https://github.com/angular-ui/ui-router/issues/2175) [#2547](https://github.com/angular-ui/ui-router/issues/2547)
 * **uiView:** Fire the $onInit hook ([c8afc38](https://github.com/angular-ui/ui-router/commit/c8afc38)), closes [#2559](https://github.com/angular-ui/ui-router/issues/2559)
-* **uiView:** Put $animate promises on element.data('$uiView') ([a5578de](https://github.com/angular-ui/ui-router/commit/a5578de)), closes [#2562](https://github.com/angular-ui/ui-router/issues/2562) [#2579](https://github.com/angular-ui/ui-router/issues/2579)
+* **uiView:** Put $animate promises on element.records('$uiView') ([a5578de](https://github.com/angular-ui/ui-router/commit/a5578de)), closes [#2562](https://github.com/angular-ui/ui-router/issues/2562) [#2579](https://github.com/angular-ui/ui-router/issues/2579)
 * **view:** Route a view to a directive using `component:` ([1552032](https://github.com/angular-ui/ui-router/commit/1552032)), closes [#2627](https://github.com/angular-ui/ui-router/issues/2627)
 
 
@@ -1133,7 +1133,7 @@ Many of these commits are merged from 0.2.x `legacy` branch
 * **urlMatcher:** add support for optional spaces ([4b7f304](https://github.com/angular-ui/ui-router/commit/4b7f304))
 * **urlMatcher:** Add param only type names ([6a371f9](https://github.com/angular-ui/ui-router/commit/6a371f9))
 * **$IncludedByStateFilter:** add parameters to $IncludedByStateFilter ([963f6e7](https://github.com/angular-ui/ui-router/commit/963f6e7)), closes [#1735](https://github.com/angular-ui/ui-router/issues/1735)
-* **$state:** make state data inheritance prototypical ([c4fec8c](https://github.com/angular-ui/ui-router/commit/c4fec8c))
+* **$state:** make state records inheritance prototypical ([c4fec8c](https://github.com/angular-ui/ui-router/commit/c4fec8c))
 * **$state:** Inject templateProvider with resolved values ([afa20f2](https://github.com/angular-ui/ui-router/commit/afa20f2))
 * **$state:** added 'state' to state reload method (feat no.1612) ([b8f0457](https://github.com/angular-ui/ui-router/commit/b8f0457))
 * **$state:** broadcast $stateChangeCancel event when event.preventDefault() is called in $sta ([ecefb75](https://github.com/angular-ui/ui-router/commit/ecefb75))
@@ -1205,7 +1205,7 @@ This is a maintenance release which fixes a few known bugs introduced in 0.2.16.
 
 * **$IncludedByStateFilter:** add parameters to $IncludedByStateFilter ([963f6e71](https://github.com/angular-ui/ui-router/commit/963f6e71633b9c3a266f3991d79089b7d14786b4), closes [#1735](https://github.com/angular-ui/ui-router/issues/1735))
 * **isStateFilter:** Include optional state params. ([71d74699](https://github.com/angular-ui/ui-router/commit/71d7469987ee9ca86a41c8c6393ccd5d8913c3d6))
-* **$state:** make state data inheritance prototypical ([c4fec8c7](https://github.com/angular-ui/ui-router/commit/c4fec8c7998113902af4152d716c42dada6eb465))
+* **$state:** make state records inheritance prototypical ([c4fec8c7](https://github.com/angular-ui/ui-router/commit/c4fec8c7998113902af4152d716c42dada6eb465))
 * **$stateChangeStart:** Add options to event ([a1f07559](https://github.com/angular-ui/ui-router/commit/a1f07559ec74e10ff80bc4be81f287e3772b8fcb))
 * **UrlMatcher:** Add param only type names ([6a371f9b](https://github.com/angular-ui/ui-router/commit/6a371f9b70e37a82eb324122879e4473c3f6d526))
 * **uiSrefActive:**
@@ -1417,7 +1417,7 @@ This release includes a lot of bug fixes around default/optional and typed param
 * **bower.json:** JS files should not be ignored ([ccdab193](https://github.com/angular-ui/ui-router/commit/ccdab193315f304eb3be5f5b97c47a926c79263e))
 * **dev:** karma:background task is missing, can't run grunt:dev. ([d9f7b898](https://github.com/angular-ui/ui-router/commit/d9f7b898e8e3abb8c846b0faa16a382913d7b22b))
 * **sample:** Contacts menu button not staying active when navigating to detail states. Need t ([2fcb8443](https://github.com/angular-ui/ui-router/commit/2fcb84437cb43ade12682a92b764f13cac77dfe7))
-* **uiSref:** support mock-clicks/events with no data ([717d3ff7](https://github.com/angular-ui/ui-router/commit/717d3ff7d0ba72d239892dee562b401cdf90e418))
+* **uiSref:** support mock-clicks/events with no records ([717d3ff7](https://github.com/angular-ui/ui-router/commit/717d3ff7d0ba72d239892dee562b401cdf90e418))
 * **uiView:**
   * Do NOT autoscroll when autoscroll attr is missing ([affe5bd7](https://github.com/angular-ui/ui-router/commit/affe5bd785cdc3f02b7a9f64a52e3900386ec3a0), closes [#807](https://github.com/angular-ui/ui-router/issues/807))
   * Refactoring uiView directive to copy ngView logic ([548fab6a](https://github.com/angular-ui/ui-router/commit/548fab6ab9debc9904c5865c8bc68b4fc3271dd0), closes [#857](https://github.com/angular-ui/ui-router/issues/857), [#552](https://github.com/angular-ui/ui-router/issues/552))
