@@ -4,6 +4,7 @@ package com.tianshouzhi.dragon.idgen.snowflake;
 import com.tianshouzhi.dragon.idgen.AbstractIdGen;
 
 /**
+ * //TODO 与dragon console整合，本来就可以拉取配置，此时多增加一个功能，通过dragon_console，根据appName获取id
  * Created by TIANSHOUZHI336 on 2017/3/9.
  */
 public class IdGenSnowFlakeImpl extends AbstractIdGen {
@@ -12,6 +13,7 @@ public class IdGenSnowFlakeImpl extends AbstractIdGen {
     public static final long DEFAULT_TWEPOCH =1420041600000L;
     public static final int WORKER_ID_BITS =10;//默认最多可以扩容到1024台机器
     public static final int SEQUENCE_BITS =12;   /**最大sequenceId 4095*/
+
     private long twepoch;
     private int workerIdBits;
     private int maxWorkerId;
@@ -35,14 +37,18 @@ public class IdGenSnowFlakeImpl extends AbstractIdGen {
         }
         this.twepoch = twepoch;
         this.workerIdBits = workerIdBits;
-        this.maxWorkerId=-1 ^ (-1 << workerIdBits);
+        //todo: check twepoch and workerIdBits
+
+//      this.maxWorkerId=-1 ^ (-1 << workerIdBits); 这种方式计算效率高，但是可阅读性差，而且因为只会在程序启动时计算一次，因此性能可以忽略不计
+        this.maxWorkerId=((Double)Math.pow(2,workerIdBits)).intValue()-1;//相对来说，这种方式具有更好的可阅读性
         this.workerId = workerId;
         if(workerId>maxWorkerId){
-            throw new IllegalArgumentException("workerId("+workerId+")must <= maxWorkerId"+maxWorkerId);
+            throw new IllegalArgumentException("workerId("+workerId+")must <= maxWorkerId("+maxWorkerId+")");
         }
-        this.sequenceBits = sequenceBits;
-        this.maxSequenceId=-1 ^ (-1 << sequenceBits);/** 生成序列的掩码，默认为4095 (0b111111111111=0xfff=4095) */
 
+        this.sequenceBits = sequenceBits;
+//        this.maxSequenceId=-1 ^ (-1 << sequenceBits);/** 生成序列的掩码，默认为4095 (0b111111111111=0xfff=4095) */
+        this.maxSequenceId=((Double)Math.pow(2,sequenceBits)).intValue()-1;
     }
 
     @Override

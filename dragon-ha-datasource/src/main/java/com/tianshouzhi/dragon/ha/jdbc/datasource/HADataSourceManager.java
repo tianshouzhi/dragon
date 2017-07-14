@@ -99,7 +99,7 @@ public class HADataSourceManager{
             @Override
             public void run() {
 
-                while (true) {
+                while (true) {//存在问题... cpu使用率必然变高，改成阻塞队列
                     if (!invalidDsMap.isEmpty()) {
                         for (Map.Entry<String, DatasourceWrapper> entry : invalidDsMap.entrySet()) {
                             String dsIndex = entry.getKey();
@@ -108,7 +108,7 @@ public class HADataSourceManager{
                             try {
                                 Connection connection = realDataSource.getConnection();
                                 if (connection.isValid(3000)) {
-                                    LOGGER.info("datasource '{}' is recovered,try to rebuid.....", dsIndex);
+                                    LOGGER.info("datasource '{}' is recovered,try to rebuild.....", dsIndex);
                                     invalidDsMap.remove(dsIndex);
                                     indexDSMap.put(dsIndex, datasourceWrapper);
                                     rebuild();

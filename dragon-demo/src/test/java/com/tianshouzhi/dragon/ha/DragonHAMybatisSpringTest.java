@@ -2,6 +2,7 @@ package com.tianshouzhi.dragon.ha;
 
 import com.tianshouzhi.dragon.domain.User;
 import com.tianshouzhi.dragon.mappers.UserMapper;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,4 +26,5 @@ public class DragonHAMybatisSpringTest {
         int deleteCount = userMapper.deleteById(user.getId());
         assert deleteCount==1;
     }
+
 }

@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Assert;
@@ -104,6 +104,18 @@ public class DragonHAPrepareStatementTest extends BaseTest{
         int[] ints = preparedStatement.executeBatch();
         System.out.println(ints);
         testQuery();
+    }
 
+    @Test
+    public void testReuse() throws SQLException {
+        DragonHAConnection connection = this.connection;
+        PreparedStatement preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =slave2)*/SELECT * from User");
+        preparedStatement.executeQuery();
+        ResultSet resultSet = preparedStatement.getResultSet();
+        while (resultSet.next()){
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("id:"+id+",name:"+name);
+        }
     }
 }

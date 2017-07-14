@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;

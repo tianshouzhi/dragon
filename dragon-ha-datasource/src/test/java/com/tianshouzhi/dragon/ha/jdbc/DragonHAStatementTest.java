@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
@@ -81,5 +81,9 @@ public class DragonHAStatementTest extends BaseTest{
         Statement statement = connection.createStatement();
         int update = statement.executeUpdate("create table test(id int,name varchar(255))");
         System.out.println(update);
+    }
+    @Test
+    public void testReuse(){
+
     }
 }
