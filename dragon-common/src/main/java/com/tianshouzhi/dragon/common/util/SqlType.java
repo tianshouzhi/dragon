@@ -7,34 +7,30 @@ import java.util.regex.Pattern;
  */
 public enum SqlType {
 
-//    SELECT_FOR_UPDATE("\\s*SELECT.+"),
-    SELECT("\\s*SELECT.+"),
-    SHOW("\\s*SHOW.+"),
-    DEBUG("\\s*DEBUG.+"),
-    EXPLAIN("\\S+EXPLAIN.+"),
-    DUMP("\\s*DUMP.+"),
+	SELECT(true), SHOW(true), DEBUG(true), EXPLAIN(true), DUMP,
 
-    INSERT("\\s*INSERT.+"),
-    UPDATE("\\s*UPDATE.+"),
-    DELETE("\\s*DELETE.+"),
-    REPLACE("\\s*REPLACE.+"),
-    TRUNCATE("\\s*TRUNCATE.+"),
-    CREATE("\\s*CREATE.+"),
-    DROP("\\s*DROP.+"),
-    LOAD("\\s*LOAD.+"),
-    MERGE("\\s*MERGE.+"),
-    ALTER("\\s*ALTER.+"),
-    RENAME("\\s*RENAME.+"),
-    CALL("\\s*CALL.+");//存储过程
+	INSERT, UPDATE, DELETE, REPLACE, TRUNCATE, CREATE, DROP, LOAD, MERGE, ALTER, RENAME, CALL;
 
-    public static final String HINT_PREFIX="(\\s*/\\*.+\\*/)?";
-    Pattern pattern;
+	private Pattern pattern;
 
-    SqlType(String parttern) {
-        pattern=Pattern.compile(HINT_PREFIX+parttern,Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
-    }
+	private boolean isQuery;
 
-    public Pattern getPattern() {
-        return pattern;
-    }
+	SqlType() {
+		this(false);
+	}
+
+	SqlType(boolean isQuery) {
+		String regex = "(\\s*/\\*.+\\*/)?" + "\\s*" + this.name() + ".+";
+		int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+		pattern = Pattern.compile(regex, flags);
+		this.isQuery = isQuery;
+	}
+
+	public Pattern getPattern() {
+		return pattern;
+	}
+
+	public boolean isQuery() {
+		return isQuery;
+	}
 }

@@ -27,13 +27,13 @@ public class DragonHAConfigParser {
 			context = JAXBContext.newInstance(DragonHAConfiguration.class);
 			unmarshaller = context.createUnmarshaller();
 			marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);//格式化输出
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);// 格式化输出
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static DragonHAConfiguration parse(InputStream config) throws DragonConfigException{
+	public static DragonHAConfiguration parse(InputStream config) throws DragonConfigException {
 		DragonHAConfiguration configuration = null;
 		try {
 			Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -44,13 +44,13 @@ public class DragonHAConfigParser {
 		}
 	}
 
-	public static String toXml(DragonHAConfiguration configuration) throws DragonConfigException{
-        StringWriter xml = new StringWriter();
-        try {
-            marshaller.marshal(configuration, xml);
-        } catch (JAXBException e) {
-            throw new DragonConfigException("unparse DragonHADataSource config error", e);
-        }
-        return xml.toString();
+	public static String toXml(DragonHAConfiguration configuration) throws DragonConfigException {
+		StringWriter xml = new StringWriter();
+		try {
+			marshaller.marshal(configuration, xml);
+		} catch (JAXBException e) {
+			throw new DragonConfigException("unparse DragonHADataSource config error", e);
+		}
+		return xml.toString();
 	}
 }

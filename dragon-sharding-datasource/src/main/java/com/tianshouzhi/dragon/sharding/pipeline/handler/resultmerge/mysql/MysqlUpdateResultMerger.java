@@ -10,14 +10,14 @@ import java.util.List;
 /**
  * 增删改结果合并
  */
-public class MysqlUpdateResultMerger implements ResultMerger{
-    @Override
-    public void merge(HandlerContext context) throws SQLException{
-        int totalUpdateCount = 0;
-        List<Statement> realStatementList = context.getRealStatementList();
-        for (Statement realStatement : realStatementList) {
-            totalUpdateCount = totalUpdateCount + realStatement.getUpdateCount();
-        }
-        context.setTotalUpdateCount(totalUpdateCount);
-    }
+public class MysqlUpdateResultMerger implements ResultMerger {
+	@Override
+	public void merge(HandlerContext context) throws SQLException {
+		int totalUpdateCount = 0;
+		List<Statement> realStatementList = context.getRealStatementList();
+		for (Statement realStatement : realStatementList) {
+			totalUpdateCount = totalUpdateCount + realStatement.getUpdateCount();
+		}
+		context.setTotalUpdateCount(totalUpdateCount);
+	}
 }

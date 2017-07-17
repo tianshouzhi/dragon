@@ -12,22 +12,25 @@ import java.util.ServiceLoader;
  * Created by TIANSHOUZHI336 on 2017/3/20.
  */
 public abstract class DataSourceInitailzerUtil {
-    private static ServiceLoader<DataSourceInitailzer> serviceLoader=ServiceLoader.load(DataSourceInitailzer.class);;
-    private static Map<String,DataSourceInitailzer> classNameInitailzerMap=new HashMap<String, DataSourceInitailzer>();
-    static {
-        Iterator<DataSourceInitailzer> iterator = serviceLoader.iterator();
-        classNameInitailzerMap=new HashMap<String, DataSourceInitailzer>();
-        while (iterator.hasNext()){
-            DataSourceInitailzer dataSourceInitailzer = iterator.next();
-            String className = dataSourceInitailzer.initDatasouceClassName();
-            classNameInitailzerMap.put(className,dataSourceInitailzer);
-        }
-    }
-    public static DataSource init(String datasourceClass,Map<String,String> config) throws DragonException {
-        DataSourceInitailzer dataSourceInitailzer = classNameInitailzerMap.get(datasourceClass);
-        if(dataSourceInitailzer==null){
-            throw new DragonException("can't init datasource type:"+datasourceClass+",you should custom a DataSourceInitailzer and add in the classpath");
-        }
-        return dataSourceInitailzer.init(config);
-    }
+	private static ServiceLoader<DataSourceInitailzer> serviceLoader = ServiceLoader.load(DataSourceInitailzer.class);;
+
+	private static Map<String, DataSourceInitailzer> classNameInitailzerMap = new HashMap<String, DataSourceInitailzer>();
+	static {
+		Iterator<DataSourceInitailzer> iterator = serviceLoader.iterator();
+		classNameInitailzerMap = new HashMap<String, DataSourceInitailzer>();
+		while (iterator.hasNext()) {
+			DataSourceInitailzer dataSourceInitailzer = iterator.next();
+			String className = dataSourceInitailzer.initDatasouceClassName();
+			classNameInitailzerMap.put(className, dataSourceInitailzer);
+		}
+	}
+
+	public static DataSource init(String datasourceClass, Map<String, String> config) throws DragonException {
+		DataSourceInitailzer dataSourceInitailzer = classNameInitailzerMap.get(datasourceClass);
+		if (dataSourceInitailzer == null) {
+			throw new DragonException("can't init datasource type:" + datasourceClass
+			      + ",you should custom a DataSourceInitailzer and add in the classpath");
+		}
+		return dataSourceInitailzer.init(config);
+	}
 }

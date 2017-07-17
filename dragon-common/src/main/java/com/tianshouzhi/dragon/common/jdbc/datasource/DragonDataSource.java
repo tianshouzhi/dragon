@@ -13,46 +13,49 @@ import java.util.logging.Logger;
 /**
  * Created by TIANSHOUZHI336 on 2016/11/30.
  */
-public abstract class DragonDataSource extends WrapperAdapter implements DataSource{
-    protected AtomicBoolean inited=new AtomicBoolean(false);
-    protected int loginTimeout=0;
-    private PrintWriter logWriter;
-    public void init(){
-        if(inited.compareAndSet(false,true)){
-            doInit();
-        }
-    }
+public abstract class DragonDataSource extends WrapperAdapter implements DataSource {
+	protected AtomicBoolean inited = new AtomicBoolean(false);
 
-    protected  void doInit(){};
+	protected int loginTimeout = 0;
 
-    @Override
-    public PrintWriter getLogWriter() throws SQLException {
-        return logWriter;
-    }
+	private PrintWriter logWriter;
 
-    @Override
-    public void setLogWriter(PrintWriter out) throws SQLException {
-        logWriter=out;
-    }
+	public void init() {
+		if (inited.compareAndSet(false, true)) {
+			doInit();
+		}
+	}
 
-    @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
-        loginTimeout=seconds;
-    }
+	protected void doInit() {
+	};
 
-    @Override
-    public int getLoginTimeout() throws SQLException {
-        return loginTimeout;
-    }
+	@Override
+	public PrintWriter getLogWriter() throws SQLException {
+		return logWriter;
+	}
 
-    @Override
-    public Connection getConnection() throws SQLException {
-        init();
-        return getConnection(null,null);
-    }
+	@Override
+	public void setLogWriter(PrintWriter out) throws SQLException {
+		logWriter = out;
+	}
 
+	@Override
+	public void setLoginTimeout(int seconds) throws SQLException {
+		loginTimeout = seconds;
+	}
 
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException("getParentLogger");
-    }
+	@Override
+	public int getLoginTimeout() throws SQLException {
+		return loginTimeout;
+	}
+
+	@Override
+	public Connection getConnection() throws SQLException {
+		init();
+		return getConnection(null, null);
+	}
+
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		throw new SQLFeatureNotSupportedException("getParentLogger");
+	}
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<shard-config appName="DragonHA">
+    <datasource-list>
+
+    </datasource-list>
+    <logic-table-list>
+        <logic-table name="user" suffixPattern="_{0,number,#00}" mapping=""></logic-table>
+    </logic-table-list>
+</shard-config>

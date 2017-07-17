@@ -4,26 +4,28 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name="dragonHADatasource")
+@XmlRootElement(name = "dragonHADatasource")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DragonHAConfiguration {
-    @XmlAttribute(name="appName",required = true)
-    private String appName;
-    @XmlElement(name="realDatasource",required = true)
-    private List<RealDatasourceConfig> dsConfigList=new ArrayList<RealDatasourceConfig>();
+	@XmlAttribute(name = "appName", required = true)
+	private String appName;
 
-    public String getAppName() {
-        return appName;
-    }
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
+	@XmlElement(name = "realDatasource", required = true)
+	private List<RealDatasourceConfig> dsConfigList = new ArrayList<RealDatasourceConfig>();
 
-    public List<RealDatasourceConfig> getDsConfigList() {
-        return dsConfigList;
-    }
+	public String getAppName() {
+		return appName;
+	}
 
-    public void setDsConfigList(List<RealDatasourceConfig> dsConfigList) {
-        this.dsConfigList = dsConfigList;
-    }
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
+
+	public List<RealDatasourceConfig> getDsConfigList() {
+		return dsConfigList;
+	}
+
+	public void setDsConfigList(List<RealDatasourceConfig> dsConfigList) {
+		this.dsConfigList = dsConfigList;
+	}
 }

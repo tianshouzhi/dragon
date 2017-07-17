@@ -10,87 +10,92 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RealDatasourceConfig {
-    @XmlAttribute(name="index",required = true) //只能用在基本数据类型上
-    private String index;
-    @XmlAttribute(name="readWeight",required = true)
-    private Integer readWeight;
-    @XmlAttribute(name="writeWeight",required = true)
-    private Integer writeWeight;
-    @XmlAttribute(name="realClass",required = true)
-    private String realClass;
-    @XmlElement(name="property") //用在复杂数据类型上
-    private List<Property> properties;
+	@XmlAttribute(name = "index", required = true) // 只能用在基本数据类型上
+	private String index;
 
-    public String getIndex() {
-        return index;
-    }
+	@XmlAttribute(name = "readWeight", required = true)
+	private Integer readWeight;
 
-    public void setIndex(String index) {
-        this.index = index;
-    }
+	@XmlAttribute(name = "writeWeight", required = true)
+	private Integer writeWeight;
 
-    public Integer getWriteWeight() {
-        return writeWeight;
-    }
+	@XmlAttribute(name = "realClass", required = true)
+	private String realClass;
 
-    public void setWriteWeight(Integer writeWeight) {
-        this.writeWeight = writeWeight;
-    }
+	@XmlElement(name = "property") // 用在复杂数据类型上
+	private List<Property> properties;
 
-    public String getRealClass() {
-        return realClass;
-    }
+	public String getIndex() {
+		return index;
+	}
 
-    public void setRealClass(String realClass) {
-        this.realClass = realClass;
-    }
+	public void setIndex(String index) {
+		this.index = index;
+	}
 
-    public void setReadWeight(Integer readWeight) {
-        this.readWeight = readWeight;
-    }
+	public Integer getWriteWeight() {
+		return writeWeight;
+	}
 
-    public Integer getReadWeight() {
-        return readWeight;
-    }
+	public void setWriteWeight(Integer writeWeight) {
+		this.writeWeight = writeWeight;
+	}
 
-    public List<Property> getProperties() {
-        return properties;
-    }
+	public String getRealClass() {
+		return realClass;
+	}
 
-    public void setProperties(List<Property> properties) {
-        this.properties = properties;
-    }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class Property{
-        @XmlAttribute
-        private String name;
-        @XmlAttribute
-        private String value;
+	public void setRealClass(String realClass) {
+		this.realClass = realClass;
+	}
 
-        public String getName() {
-            return name;
-        }
+	public void setReadWeight(Integer readWeight) {
+		this.readWeight = readWeight;
+	}
 
-        public void setName(String name) {
-            this.name = name;
-        }
+	public Integer getReadWeight() {
+		return readWeight;
+	}
 
-        public String getValue() {
-            return value;
-        }
+	public List<Property> getProperties() {
+		return properties;
+	}
 
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
+	public void setProperties(List<Property> properties) {
+		this.properties = properties;
+	}
 
-    public static Map<String, String> propertiesToMap(List<RealDatasourceConfig.Property> properties) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        for (RealDatasourceConfig.Property property : properties) {
-            map.put(property.getName(),property.getValue());
-        }
-        return map;
-    }
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class Property {
+		@XmlAttribute
+		private String name;
 
+		@XmlAttribute
+		private String value;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
+
+	public static Map<String, String> propertiesToMap(List<RealDatasourceConfig.Property> properties) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		for (RealDatasourceConfig.Property property : properties) {
+			map.put(property.getName(), property.getValue());
+		}
+		return map;
+	}
 
 }

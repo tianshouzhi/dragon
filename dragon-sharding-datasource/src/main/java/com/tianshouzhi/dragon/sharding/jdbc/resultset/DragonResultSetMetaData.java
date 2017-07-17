@@ -9,130 +9,132 @@ import java.util.*;
 /**
  * Created by TIANSHOUZHI336 on 2017/3/10.
  */
-public class DragonResultSetMetaData extends WrapperAdapter implements ResultSetMetaData{
-    //column 从1开始计算
-    private Map<Integer,ColumnMetaData> columnMetaDataMap =null;
-    private Map<String,Integer> columnLabelIndexMap=new HashMap<String, Integer>();
-    public DragonResultSetMetaData(Map<Integer,ColumnMetaData>  columnMetaDataMap) {
-        if(columnMetaDataMap ==null){
-            throw new NullPointerException();
-        }
-        this.columnMetaDataMap = columnMetaDataMap;
-    }
+public class DragonResultSetMetaData extends WrapperAdapter implements ResultSetMetaData {
+	// column 从1开始计算
+	private Map<Integer, ColumnMetaData> columnMetaDataMap = null;
 
-    @Override
-    public int getColumnCount() throws SQLException {
-        return columnMetaDataMap.size();
-    }
+	private Map<String, Integer> columnLabelIndexMap = new HashMap<String, Integer>();
 
-    @Override
-    public boolean isAutoIncrement(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isAutoIncrement();
-    }
+	public DragonResultSetMetaData(Map<Integer, ColumnMetaData> columnMetaDataMap) {
+		if (columnMetaDataMap == null) {
+			throw new NullPointerException();
+		}
+		this.columnMetaDataMap = columnMetaDataMap;
+	}
 
-    @Override
-    public boolean isCaseSensitive(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isCaseSensitive();
-    }
+	@Override
+	public int getColumnCount() throws SQLException {
+		return columnMetaDataMap.size();
+	}
 
-    @Override
-    public boolean isSearchable(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isSearchable();
-    }
+	@Override
+	public boolean isAutoIncrement(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isAutoIncrement();
+	}
 
-    @Override
-    public boolean isCurrency(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isCurrency();
-    }
+	@Override
+	public boolean isCaseSensitive(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isCaseSensitive();
+	}
 
-    @Override
-    public int isNullable(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isNullable();
-    }
+	@Override
+	public boolean isSearchable(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isSearchable();
+	}
 
-    @Override
-    public boolean isSigned(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isSigned();
-    }
+	@Override
+	public boolean isCurrency(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isCurrency();
+	}
 
-    @Override
-    public int getColumnDisplaySize(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnDisplaySize();
-    }
+	@Override
+	public int isNullable(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isNullable();
+	}
 
-    @Override
-    public String getColumnLabel(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnLabel();
-    }
+	@Override
+	public boolean isSigned(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isSigned();
+	}
 
-    @Override
-    public String getColumnName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnName();
-    }
+	@Override
+	public int getColumnDisplaySize(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnDisplaySize();
+	}
 
-    @Override
-    public String getSchemaName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getSchemaName();
-    }
+	@Override
+	public String getColumnLabel(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnLabel();
+	}
 
-    @Override
-    public int getPrecision(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getPrecision();
-    }
+	@Override
+	public String getColumnName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnName();
+	}
 
-    @Override
-    public int getScale(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getScale();
-    }
+	@Override
+	public String getSchemaName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getSchemaName();
+	}
 
-    @Override
-    public String getTableName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getTableName();
-    }
+	@Override
+	public int getPrecision(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getPrecision();
+	}
 
-    @Override
-    public String getCatalogName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getCatalogName();
-    }
+	@Override
+	public int getScale(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getScale();
+	}
 
-    @Override
-    public int getColumnType(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnType();
-    }
+	@Override
+	public String getTableName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getTableName();
+	}
 
-    @Override
-    public String getColumnTypeName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnTypeName();
-    }
+	@Override
+	public String getCatalogName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getCatalogName();
+	}
 
-    @Override
-    public boolean isReadOnly(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isReadOnly();
-    }
+	@Override
+	public int getColumnType(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnType();
+	}
 
-    @Override
-    public boolean isWritable(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isWritable();
-    }
+	@Override
+	public String getColumnTypeName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnTypeName();
+	}
 
-    @Override
-    public boolean isDefinitelyWritable(int column) throws SQLException {
-        return columnMetaDataMap.get(column).isDefinitelyWritable();
-    }
+	@Override
+	public boolean isReadOnly(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isReadOnly();
+	}
 
-    @Override
-    public String getColumnClassName(int column) throws SQLException {
-        return columnMetaDataMap.get(column).getColumnClassName();
-    }
+	@Override
+	public boolean isWritable(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isWritable();
+	}
 
-    public void putColumnLabelIndexMaping(String columnLabel, int i) {
-        columnLabelIndexMap.put(columnLabel,i);
-    }
+	@Override
+	public boolean isDefinitelyWritable(int column) throws SQLException {
+		return columnMetaDataMap.get(column).isDefinitelyWritable();
+	}
 
-    public int getColumnIndex(String columnLabel) {
-        if(columnLabelIndexMap.containsKey(columnLabel)){
-            return columnLabelIndexMap.get(columnLabel);
-        }
-        return 0;
-    }
+	@Override
+	public String getColumnClassName(int column) throws SQLException {
+		return columnMetaDataMap.get(column).getColumnClassName();
+	}
+
+	public void putColumnLabelIndexMaping(String columnLabel, int i) {
+		columnLabelIndexMap.put(columnLabel, i);
+	}
+
+	public int getColumnIndex(String columnLabel) {
+		if (columnLabelIndexMap.containsKey(columnLabel)) {
+			return columnLabelIndexMap.get(columnLabel);
+		}
+		return 0;
+	}
 }
