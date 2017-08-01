@@ -6,17 +6,17 @@ import java.util.Map;
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public class WriteDBSelector extends AbstractDBSelector {
-	public WriteDBSelector(Map<String, DatasourceWrapper> indexDsMap) {
+	public WriteDBSelector(Map<String, RealDatasourceWrapper> indexDsMap) {
 		super(indexDsMap);
 	}
 
 	@Override
-	protected boolean isCadidate(DatasourceWrapper datasourceWrapper) {
-		return datasourceWrapper.getWriteWeight() > 0;
+	protected boolean isCadidate(RealDatasourceWrapper realDatasourceWrapper) {
+		return realDatasourceWrapper.getWriteWeight() > 0;
 	}
 
 	@Override
-	protected int getWeight(DatasourceWrapper datasourceWrapper) {
-		return datasourceWrapper.getWriteWeight();
+	protected int getWeight(RealDatasourceWrapper realDatasourceWrapper) {
+		return realDatasourceWrapper.getWriteWeight();
 	}
 }

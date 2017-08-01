@@ -46,6 +46,11 @@ public class DragonShardingDataSource extends DragonDataSource {
 	public Connection getConnection(String username, String password) throws SQLException {
 		return new DragonShardingConnection(username, password, dragonShardingConfig);
 	}
+
+	@Override
+	public void close() throws SQLException {
+		//TODO
+	}
 	/*
 	 * public DragonShardingConfig getDragonShardingConfig() { return dragonShardingConfig; }
 	 */

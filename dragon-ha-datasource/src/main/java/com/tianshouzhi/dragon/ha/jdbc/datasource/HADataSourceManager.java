@@ -1,9 +1,10 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DBSelector;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.ReadDBSelector;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.WriteDBSelector;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class HADataSourceManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(HADataSourceManager.class);
 
-	private Map<String, DatasourceWrapper> indexDSMap = new ConcurrentHashMap<String, DatasourceWrapper>();
+	private Map<String, RealDatasourceWrapper> indexDSMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
-	private Map<String, DatasourceWrapper> invalidDsMap = new ConcurrentHashMap<String, DatasourceWrapper>();
+	private Map<String, RealDatasourceWrapper> invalidDsMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
 	private DBSelector readDBSelector;
 
@@ -70,7 +71,7 @@ public class HADataSourceManager {
 		return readDBSelector.select();
 	}
 
-	public DatasourceWrapper getDatasourceWrapperByDbIndex(String dataSourceIndex) throws SQLException {
+	public RealDatasourceWrapper getDatasourceWrapperByDbIndex(String dataSourceIndex) throws SQLException {
 		while (!isRebuiding)
 			break;
 		return indexDSMap.get(dataSourceIndex);
@@ -80,18 +81,18 @@ public class HADataSourceManager {
 	      throws SQLException {
 		while (!isRebuiding)
 			break;
-		DatasourceWrapper datasourceWrapper = indexDSMap.get(dataSourceIndex);
-		if (datasourceWrapper == null) {
+		RealDatasourceWrapper realDatasourceWrapper = indexDSMap.get(dataSourceIndex);
+		if (realDatasourceWrapper == null) {
 			throw new IllegalArgumentException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
 		}
-		DataSource realDataSource = datasourceWrapper.getPhysicalDataSource();
+		DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
 		Connection connection = null;
 
 		if (StringUtils.isAnyBlank(username, password))
 			connection = realDataSource.getConnection();
 		else
 			connection = realDataSource.getConnection(username, password);// druid不支持这个方法
-		if (!connection.isReadOnly() && datasourceWrapper.isReadOnly() && indexDSMap.get(dataSourceIndex).isReadOnly()) {
+		if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly() && indexDSMap.get(dataSourceIndex).isReadOnly()) {
 			connection.setReadOnly(true);
 		}
 		return connection;
@@ -118,16 +119,16 @@ public class HADataSourceManager {
 
 				while (true) {// 存在问题... cpu使用率必然变高，改成阻塞队列
 					if (!invalidDsMap.isEmpty()) {
-						for (Map.Entry<String, DatasourceWrapper> entry : invalidDsMap.entrySet()) {
+						for (Map.Entry<String, RealDatasourceWrapper> entry : invalidDsMap.entrySet()) {
 							String dsIndex = entry.getKey();
-							DatasourceWrapper datasourceWrapper = entry.getValue();
-							DataSource realDataSource = (DataSource) datasourceWrapper.getPhysicalDataSource();
+							RealDatasourceWrapper realDatasourceWrapper = entry.getValue();
+							DataSource realDataSource = (DataSource) realDatasourceWrapper.getRealDataSource();
 							try {
 								Connection connection = realDataSource.getConnection();
 								if (connection.isValid(3000)) {
 									LOGGER.info("datasource '{}' is recovered,try to rebuild.....", dsIndex);
 									invalidDsMap.remove(dsIndex);
-									indexDSMap.put(dsIndex, datasourceWrapper);
+									indexDSMap.put(dsIndex, realDatasourceWrapper);
 									rebuild();
 								}
 							} catch (SQLException e) {
@@ -147,9 +148,9 @@ public class HADataSourceManager {
 		while (!isRebuiding)
 			break;
 		if (indexDSMap.get(dataSourceIndex) != null) {
-			DatasourceWrapper datasourceWrapper = indexDSMap.get(dataSourceIndex);
+			RealDatasourceWrapper realDatasourceWrapper = indexDSMap.get(dataSourceIndex);
 			LOGGER.warn("invalid datasource {}", dataSourceIndex);
-			invalidDsMap.put(dataSourceIndex, datasourceWrapper);
+			invalidDsMap.put(dataSourceIndex, realDatasourceWrapper);
 			indexDSMap.remove(dataSourceIndex);
 			rebuild();
 		}
@@ -164,11 +165,23 @@ public class HADataSourceManager {
 		return managedDataSourceIndices.iterator().next();
 	}
 
-	public Map<String, DatasourceWrapper> getIndexDSMap() {
+	public Map<String, RealDatasourceWrapper> getIndexDSMap() {
 		return indexDSMap;
 	}
 
-	void setIndexDSMap(Map<String, DatasourceWrapper> indexDSMap) {
+	void setIndexDSMap(Map<String, RealDatasourceWrapper> indexDSMap) {
 		this.indexDSMap = indexDSMap;
+	}
+
+	public void close() {
+		if(MapUtils.isNotEmpty(indexDSMap)){
+
+		}
+		if(MapUtils.isNotEmpty(invalidDsMap)){
+			for (RealDatasourceWrapper wrapper : invalidDsMap.values()) {
+				DataSource physicalDataSource = wrapper.getRealDataSource();
+
+			}
+		}
 	}
 }

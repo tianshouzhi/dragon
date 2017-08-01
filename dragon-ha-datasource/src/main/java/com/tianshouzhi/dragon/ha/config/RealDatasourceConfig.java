@@ -98,4 +98,27 @@ public class RealDatasourceConfig {
 		return map;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		RealDatasourceConfig that = (RealDatasourceConfig) o;
+
+		if (!index.equals(that.index)) return false;
+		if (!readWeight.equals(that.readWeight)) return false;
+		if (!writeWeight.equals(that.writeWeight)) return false;
+		if (!realClass.equals(that.realClass)) return false;
+		return properties.equals(that.properties);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = index.hashCode();
+		result = 31 * result + readWeight.hashCode();
+		result = 31 * result + writeWeight.hashCode();
+		result = 31 * result + realClass.hashCode();
+		result = 31 * result + properties.hashCode();
+		return result;
+	}
 }

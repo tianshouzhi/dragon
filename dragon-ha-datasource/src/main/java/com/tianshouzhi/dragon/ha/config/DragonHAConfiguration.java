@@ -11,7 +11,7 @@ public class DragonHAConfiguration {
 	private String appName;
 
 	@XmlElement(name = "realDatasource", required = true)
-	private List<RealDatasourceConfig> dsConfigList = new ArrayList<RealDatasourceConfig>();
+	private List<RealDatasourceConfig> realDatasourceConfigList = new ArrayList<RealDatasourceConfig>();
 
 	public String getAppName() {
 		return appName;
@@ -21,11 +21,29 @@ public class DragonHAConfiguration {
 		this.appName = appName;
 	}
 
-	public List<RealDatasourceConfig> getDsConfigList() {
-		return dsConfigList;
+	public List<RealDatasourceConfig> getRealDataSourceConfigList() {
+		return realDatasourceConfigList;
 	}
 
-	public void setDsConfigList(List<RealDatasourceConfig> dsConfigList) {
-		this.dsConfigList = dsConfigList;
+	public void setRealDatasourceConfigList(List<RealDatasourceConfig> realDatasourceConfigList) {
+		this.realDatasourceConfigList = realDatasourceConfigList;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		DragonHAConfiguration that = (DragonHAConfiguration) o;
+
+		if (!appName.equals(that.appName)) return false;
+		return realDatasourceConfigList.equals(that.realDatasourceConfigList);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = appName.hashCode();
+		result = 31 * result + realDatasourceConfigList.hashCode();
+		return result;
 	}
 }

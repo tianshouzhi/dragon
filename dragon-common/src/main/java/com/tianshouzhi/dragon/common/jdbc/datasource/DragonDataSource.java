@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.common.jdbc.datasource;
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import javax.sql.DataSource;
+import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,4 +59,6 @@ public abstract class DragonDataSource extends WrapperAdapter implements DataSou
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		throw new SQLFeatureNotSupportedException("getParentLogger");
 	}
+
+	public abstract void close() throws SQLException;
 }

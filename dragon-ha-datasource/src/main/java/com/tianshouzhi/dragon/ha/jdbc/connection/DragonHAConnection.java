@@ -7,7 +7,7 @@ import com.tianshouzhi.dragon.common.util.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import org.slf4j.Logger;
@@ -465,8 +465,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	}
 
 	public ExceptionSorter getExceptionSorter() throws SQLException {
-		DatasourceWrapper datasourceWrapper = hADataSourceManager.getDatasourceWrapperByDbIndex(dataSourceIndex);
-		ExceptionSorter exceptionSorter = datasourceWrapper.getExceptionSorter();
+		RealDatasourceWrapper realDatasourceWrapper = hADataSourceManager.getDatasourceWrapperByDbIndex(dataSourceIndex);
+		ExceptionSorter exceptionSorter = realDatasourceWrapper.getExceptionSorter();
 		return exceptionSorter;
 	}
 

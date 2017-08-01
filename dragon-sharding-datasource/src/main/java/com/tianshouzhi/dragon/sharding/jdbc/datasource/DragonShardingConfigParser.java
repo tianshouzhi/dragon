@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.initailzer.DataSourceInitailzerUtil;
+import com.tianshouzhi.dragon.common.initailzer.DataSourceUtil;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
 import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * Created by TIANSHOUZHI336 on 2017/3/15.
  */
 public abstract class DragonShardingConfigParser {
-	// 入股需要进行监控的话，必须传入appName
+	// 如果需要进行监控的话，必须传入appName
 	public static String parseAppName(Properties properties) {
 		String appName = properties.getProperty("dragon.appName");
 		/*
@@ -42,7 +42,7 @@ public abstract class DragonShardingConfigParser {
 			Map<String, String> mergedConfig = new HashMap<String, String>();
 			mergedConfig.putAll(defaultDatasourceConfigMap);
 			mergedConfig.putAll(datasourceConfig);// 覆盖默认配置
-			DataSource dataSource = DataSourceInitailzerUtil.init(realDatasourceClass, mergedConfig);
+			DataSource dataSource = DataSourceUtil.create(realDatasourceClass, mergedConfig);
 			dsNameDatasourceMap.put(datasourceName, dataSource);
 		}
 

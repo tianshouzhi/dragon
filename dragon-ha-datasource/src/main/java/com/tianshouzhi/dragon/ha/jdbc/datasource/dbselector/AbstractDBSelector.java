@@ -18,8 +18,8 @@ public abstract class AbstractDBSelector implements DBSelector {
 
 	protected int totalWeight = 0;
 
-	public AbstractDBSelector(Map<String, DatasourceWrapper> indexDsMap) {
-		Map<String, DatasourceWrapper> filterResult = filter(indexDsMap);
+	public AbstractDBSelector(Map<String, RealDatasourceWrapper> indexDsMap) {
+		Map<String, RealDatasourceWrapper> filterResult = filter(indexDsMap);
 
 		if (filterResult == null || filterResult.size() == 0) {
 			LOGGER.warn("no datasource configed for {}", this.getClass().getSimpleName());
@@ -33,17 +33,17 @@ public abstract class AbstractDBSelector implements DBSelector {
 		}
 	}
 
-	private String buildLog(Map<WeightRange, String> rangeDBIndexMap, Map<String, DatasourceWrapper> filterResult) {
+	private String buildLog(Map<WeightRange, String> rangeDBIndexMap, Map<String, RealDatasourceWrapper> filterResult) {
 		StringBuilder sb = new StringBuilder("\n");
 		sb.append("managed datasource num:" + filterResult.size());
 		sb.append(",total weight:" + totalWeight);
 		sb.append("\n[\n");
-		for (Map.Entry<String, DatasourceWrapper> entry : filterResult.entrySet()) {
-			DatasourceWrapper datasourceWrapper = entry.getValue();
+		for (Map.Entry<String, RealDatasourceWrapper> entry : filterResult.entrySet()) {
+			RealDatasourceWrapper realDatasourceWrapper = entry.getValue();
 			String dataSourceIndex = entry.getKey();
-			Integer readWeight = datasourceWrapper.getReadWeight();
-			Integer writeWeight = datasourceWrapper.getWriteWeight();
-			CommonDataSource realDataSource = datasourceWrapper.getPhysicalDataSource();
+			Integer readWeight = realDatasourceWrapper.getReadWeight();
+			Integer writeWeight = realDatasourceWrapper.getWriteWeight();
+			CommonDataSource realDataSource = realDatasourceWrapper.getRealDataSource();
 			WeightRange caculateRange = null;
 			for (Map.Entry<WeightRange, String> weightRangeDBIndexEntry : rangeDBIndexMap.entrySet()) {
 				String value = weightRangeDBIndexEntry.getValue();
@@ -55,7 +55,7 @@ public abstract class AbstractDBSelector implements DBSelector {
 			sb.append("{");
 			sb.append("dataSourceIndex:" + dataSourceIndex + ",readWeight:" + readWeight + ",writeWeight:" + writeWeight
 			      + ",type:" + realDataSource.getClass().getSimpleName() + ","
-			      + (datasourceWrapper.isReadOnly() ? "read" : "write") + ",select probability:"
+			      + (realDatasourceWrapper.isReadOnly() ? "read" : "write") + ",select probability:"
 			      + (caculateRange.end - caculateRange.start) / ((float) totalWeight));
 			sb.append("}\n");
 		}
@@ -63,9 +63,9 @@ public abstract class AbstractDBSelector implements DBSelector {
 		return sb.toString();
 	}
 
-	private void fillRangeIndexMap(Map<String, DatasourceWrapper> filterResult) {
+	private void fillRangeIndexMap(Map<String, RealDatasourceWrapper> filterResult) {
 		int current = 0;
-		for (Map.Entry<String, DatasourceWrapper> entry : filterResult.entrySet()) {
+		for (Map.Entry<String, RealDatasourceWrapper> entry : filterResult.entrySet()) {
 			int start = current;
 			int end = current + getWeight(entry.getValue());
 			WeightRange weightRange = new WeightRange(start, end);
@@ -74,12 +74,12 @@ public abstract class AbstractDBSelector implements DBSelector {
 		}
 	}
 
-	protected Map<String, DatasourceWrapper> filter(Map<String, DatasourceWrapper> indexDsMap) {
+	protected Map<String, RealDatasourceWrapper> filter(Map<String, RealDatasourceWrapper> indexDsMap) {
 		if (indexDsMap == null) {
 			return null;
 		}
-		Map<String, DatasourceWrapper> result = new HashMap<String, DatasourceWrapper>();
-		for (Map.Entry<String, DatasourceWrapper> entry : indexDsMap.entrySet()) {
+		Map<String, RealDatasourceWrapper> result = new HashMap<String, RealDatasourceWrapper>();
+		for (Map.Entry<String, RealDatasourceWrapper> entry : indexDsMap.entrySet()) {
 			if (isCadidate(entry.getValue())) {
 				result.put(entry.getKey(), entry.getValue());
 			}
@@ -87,17 +87,17 @@ public abstract class AbstractDBSelector implements DBSelector {
 		return result;
 	}
 
-	protected abstract boolean isCadidate(DatasourceWrapper datasourceWrapper);
+	protected abstract boolean isCadidate(RealDatasourceWrapper realDatasourceWrapper);
 
-	private int caculateTotalWeight(Collection<DatasourceWrapper> datasourceWrapperList) {
+	private int caculateTotalWeight(Collection<RealDatasourceWrapper> realDatasourceWrapperList) {
 		int tempTotalWeight = 0;
-		for (DatasourceWrapper datasourceWrapper : datasourceWrapperList) {
-			tempTotalWeight += getWeight(datasourceWrapper);
+		for (RealDatasourceWrapper realDatasourceWrapper : realDatasourceWrapperList) {
+			tempTotalWeight += getWeight(realDatasourceWrapper);
 		}
 		return tempTotalWeight;
 	}
 
-	protected abstract int getWeight(DatasourceWrapper datasourceWrapper);
+	protected abstract int getWeight(RealDatasourceWrapper realDatasourceWrapper);
 
 	@Override
 	public String select() {
