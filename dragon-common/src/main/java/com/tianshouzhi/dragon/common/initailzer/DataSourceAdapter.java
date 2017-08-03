@@ -4,6 +4,7 @@ import com.tianshouzhi.dragon.common.exception.DragonException;
 
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -20,5 +21,7 @@ public interface DataSourceAdapter {
 
 	public void init(DataSource dataSource) throws Exception;
 
-	public void close(DataSource dataSource) throws Exception;
+	public void close(DataSource dataSource);//ignore the exception when close a datasource
+
+	void checkConfig(Map<String, String> config) throws SQLException;
 }

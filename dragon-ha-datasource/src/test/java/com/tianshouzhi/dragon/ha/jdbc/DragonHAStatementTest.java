@@ -2,6 +2,7 @@ package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
+import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import org.junit.Test;
 
 import java.sql.ResultSet;
@@ -17,21 +18,19 @@ public class DragonHAStatementTest extends BaseTest {
 	public void testAutoGenerateKeys() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
-
-		boolean result = statement.execute("INSERT INTO user(name) VALUES ('luyang')", Statement.RETURN_GENERATED_KEYS);
-		if (result) {
-			ResultSet resultSet = statement.getResultSet();
-			System.out.println(result);
-		} else {
-			ResultSet generatedKeys = statement.getGeneratedKeys();
-			while (generatedKeys.next()) {
-				int anInt = generatedKeys.getInt(1);
-				System.out.println(anInt);
-			}
-			int updateCount = statement.getUpdateCount();
-			System.out.println(generatedKeys);
-			System.out.println(updateCount);
+		statement.execute("INSERT INTO user(name) VALUES ('luyang')", Statement.RETURN_GENERATED_KEYS);
+		ResultSet generatedKeys = statement.getGeneratedKeys();
+		int generatedKey = 0;
+		while (generatedKeys.next()) {
+			generatedKey = generatedKeys.getInt(1);
 		}
+
+		DragonHAStatement statement1 = connection.createStatement();
+		ResultSet resultSet = statement1.executeQuery("select @@identity as id");
+		resultSet.next();
+		int id = resultSet.getInt("id");
+		assert generatedKey == id;
+		System.out.println("generatedKey==id==" + id);
 	}
 
 	@Test

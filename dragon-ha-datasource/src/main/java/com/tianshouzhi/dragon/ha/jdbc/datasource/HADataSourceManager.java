@@ -42,15 +42,16 @@ public class HADataSourceManager {
 		runInvalidRecoveryThread();
 	}
 
-	public void rebuild() {
+	public void refresh(Map<String, RealDatasourceWrapper> indexDSMap) {
 		try {
 			rebuildLock.lockInterruptibly();
 			isRebuiding = true;
-			LOGGER.info("start building HADataSourceManager...");
+			LOGGER.info("start refresh HADataSourceManager...");
 			long start = System.currentTimeMillis();
 			readDBSelector = new ReadDBSelector(indexDSMap);
 			writeDBSelector = new WriteDBSelector(indexDSMap);
-			LOGGER.info("end building HADataSourceManager ...elapse:{}ms", System.currentTimeMillis() - start);
+			this.indexDSMap = indexDSMap;
+			LOGGER.info("end refresh HADataSourceManager ...elapse:{}ms", System.currentTimeMillis() - start);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -92,7 +93,8 @@ public class HADataSourceManager {
 			connection = realDataSource.getConnection();
 		else
 			connection = realDataSource.getConnection(username, password);// druid不支持这个方法
-		if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly() && indexDSMap.get(dataSourceIndex).isReadOnly()) {
+		if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly()
+		      && indexDSMap.get(dataSourceIndex).isReadOnly()) {
 			connection.setReadOnly(true);
 		}
 		return connection;
@@ -126,10 +128,10 @@ public class HADataSourceManager {
 							try {
 								Connection connection = realDataSource.getConnection();
 								if (connection.isValid(3000)) {
-									LOGGER.info("datasource '{}' is recovered,try to rebuild.....", dsIndex);
+									LOGGER.info("datasource '{}' is recovered,try to refresh.....", dsIndex);
 									invalidDsMap.remove(dsIndex);
 									indexDSMap.put(dsIndex, realDatasourceWrapper);
-									rebuild();
+									refresh(indexDSMap);
 								}
 							} catch (SQLException e) {
 								// 依然失败，将当前失败的加入队列最后一个，这样就能重试下一个失败的数据源，而不是总是重试第一个失败的数据源
@@ -152,7 +154,7 @@ public class HADataSourceManager {
 			LOGGER.warn("invalid datasource {}", dataSourceIndex);
 			invalidDsMap.put(dataSourceIndex, realDatasourceWrapper);
 			indexDSMap.remove(dataSourceIndex);
-			rebuild();
+			refresh(indexDSMap);
 		}
 	}
 
@@ -169,15 +171,11 @@ public class HADataSourceManager {
 		return indexDSMap;
 	}
 
-	void setIndexDSMap(Map<String, RealDatasourceWrapper> indexDSMap) {
-		this.indexDSMap = indexDSMap;
-	}
-
 	public void close() {
-		if(MapUtils.isNotEmpty(indexDSMap)){
+		if (MapUtils.isNotEmpty(indexDSMap)) {
 
 		}
-		if(MapUtils.isNotEmpty(invalidDsMap)){
+		if (MapUtils.isNotEmpty(invalidDsMap)) {
 			for (RealDatasourceWrapper wrapper : invalidDsMap.values()) {
 				DataSource physicalDataSource = wrapper.getRealDataSource();
 

@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc;
 
-import com.tianshouzhi.dragon.ha.config.DragonHADatasourceBuilder;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasourceFactory;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import org.junit.After;
@@ -18,7 +18,7 @@ public abstract class BaseTest {
 
 	@Before
 	public void init() throws Exception {
-		dragonHADatasource = new DragonHADatasourceBuilder().build("dragon-ha-config.xml");
+		dragonHADatasource = new DragonHADatasourceFactory().build("dragon-ha-config.xml");
 		connection = (DragonHAConnection) dragonHADatasource.getConnection();
 	}
 

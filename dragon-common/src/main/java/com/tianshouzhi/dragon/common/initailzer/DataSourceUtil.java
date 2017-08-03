@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.common.initailzer;
 import com.tianshouzhi.dragon.common.exception.DragonException;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,20 +27,27 @@ public abstract class DataSourceUtil {
 	}
 
 	public static DataSource create(String datasourceClass, Map<String, String> config) throws Exception {
-		DataSourceAdapter dataSourceAdapter = classNameInitailzerMap.get(datasourceClass);
-		if (dataSourceAdapter == null) {
-			throw new DragonException("can't init datasource type:" + datasourceClass
-			      + ",you should custom a DataSourceAdapter and add in the classpath");
-		}
-		return dataSourceAdapter.create(config);
+		return getDatasourceAdapter(datasourceClass).create(config);
 	}
 
 	public static void init(DataSource dataSource) throws Exception {
-		DataSourceAdapter dataSourceAdapter = classNameInitailzerMap.get(dataSource.getClass().getName());
-		dataSourceAdapter.init(dataSource);
+		getDatasourceAdapter(dataSource.getClass().getName()).init(dataSource);
 	}
 
-	public static void close(DataSource dataSource) throws DragonException {
+	public static void close(DataSource dataSource) {
+		getDatasourceAdapter(dataSource.getClass().getName()).close(dataSource);
+	}
 
+	public static void checkConfig(String datasourceClass, Map<String, String> config) throws SQLException{
+		getDatasourceAdapter(datasourceClass).checkConfig(config);
+	}
+
+	private static DataSourceAdapter getDatasourceAdapter(String datasourceClass) {
+		DataSourceAdapter dataSourceAdapter = classNameInitailzerMap.get(datasourceClass);
+		if (dataSourceAdapter == null) {
+			throw new NullPointerException("can't init datasource type:" + datasourceClass
+					+ ",you should custom a DataSourceAdapter and add in the classpath");
+		}
+		return dataSourceAdapter;
 	}
 }

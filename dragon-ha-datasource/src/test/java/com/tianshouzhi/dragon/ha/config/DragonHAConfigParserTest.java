@@ -16,5 +16,4 @@ public class DragonHAConfigParserTest {
 		DragonHAConfiguration configuration = DragonHAConfigParser.parse(stream);
 		System.out.println(DragonHAConfigParser.toXml(configuration));
 	}
-
 }

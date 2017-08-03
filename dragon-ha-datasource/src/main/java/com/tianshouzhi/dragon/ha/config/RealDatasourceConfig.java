@@ -14,10 +14,10 @@ public class RealDatasourceConfig {
 	private String index;
 
 	@XmlAttribute(name = "readWeight", required = true)
-	private Integer readWeight;
+	private int readWeight=10;
 
 	@XmlAttribute(name = "writeWeight", required = true)
-	private Integer writeWeight;
+	private int writeWeight=10;
 
 	@XmlAttribute(name = "realClass", required = true)
 	private String realClass;
@@ -33,7 +33,7 @@ public class RealDatasourceConfig {
 		this.index = index;
 	}
 
-	public Integer getWriteWeight() {
+	public int getWriteWeight() {
 		return writeWeight;
 	}
 
@@ -53,7 +53,7 @@ public class RealDatasourceConfig {
 		this.readWeight = readWeight;
 	}
 
-	public Integer getReadWeight() {
+	public int getReadWeight() {
 		return readWeight;
 	}
 
@@ -90,9 +90,9 @@ public class RealDatasourceConfig {
 		}
 	}
 
-	public static Map<String, String> propertiesToMap(List<RealDatasourceConfig.Property> properties) {
+	public Map<String, String> getPropertiesMap() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		for (RealDatasourceConfig.Property property : properties) {
+		for (RealDatasourceConfig.Property property : this.properties) {
 			map.put(property.getName(), property.getValue());
 		}
 		return map;
@@ -105,9 +105,9 @@ public class RealDatasourceConfig {
 
 		RealDatasourceConfig that = (RealDatasourceConfig) o;
 
+		if (readWeight != that.readWeight) return false;
+		if (writeWeight != that.writeWeight) return false;
 		if (!index.equals(that.index)) return false;
-		if (!readWeight.equals(that.readWeight)) return false;
-		if (!writeWeight.equals(that.writeWeight)) return false;
 		if (!realClass.equals(that.realClass)) return false;
 		return properties.equals(that.properties);
 	}
@@ -115,10 +115,22 @@ public class RealDatasourceConfig {
 	@Override
 	public int hashCode() {
 		int result = index.hashCode();
-		result = 31 * result + readWeight.hashCode();
-		result = 31 * result + writeWeight.hashCode();
+		result = 31 * result + readWeight;
+		result = 31 * result + writeWeight;
 		result = 31 * result + realClass.hashCode();
 		result = 31 * result + properties.hashCode();
 		return result;
+	}
+
+
+	@Override
+	public String toString() {
+		return "RealDatasourceConfig{" +
+				"index='" + index + '\'' +
+				", readWeight=" + readWeight +
+				", writeWeight=" + writeWeight +
+				", realClass='" + realClass + '\'' +
+				", properties=" + properties +
+				'}';
 	}
 }

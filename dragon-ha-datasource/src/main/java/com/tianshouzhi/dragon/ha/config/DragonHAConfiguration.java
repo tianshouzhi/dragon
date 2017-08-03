@@ -10,8 +10,11 @@ public class DragonHAConfiguration {
 	@XmlAttribute(name = "appName", required = true)
 	private String appName;
 
-	@XmlElement(name = "realDatasource", required = true)
-	private List<RealDatasourceConfig> realDatasourceConfigList = new ArrayList<RealDatasourceConfig>();
+	@XmlAttribute(name = "lazyInit", required = true)
+	private Boolean lazyInit =true;
+
+	@XmlElement(name = "realDataSource", required = true)
+	private List<RealDatasourceConfig> realDataSourceConfigList = new ArrayList<RealDatasourceConfig>();
 
 	public String getAppName() {
 		return appName;
@@ -22,12 +25,23 @@ public class DragonHAConfiguration {
 	}
 
 	public List<RealDatasourceConfig> getRealDataSourceConfigList() {
-		return realDatasourceConfigList;
+		return realDataSourceConfigList;
 	}
 
-	public void setRealDatasourceConfigList(List<RealDatasourceConfig> realDatasourceConfigList) {
-		this.realDatasourceConfigList = realDatasourceConfigList;
+	public boolean isLazyInit() {
+		return lazyInit;
 	}
+
+	public void setLazyInit(boolean lazyInit) {
+		this.lazyInit = lazyInit;
+	}
+
+
+
+	public void setRealDataSourceConfigList(List<RealDatasourceConfig> realDataSourceConfigList) {
+		this.realDataSourceConfigList = realDataSourceConfigList;
+	}
+
 
 	@Override
 	public boolean equals(Object o) {
@@ -37,13 +51,15 @@ public class DragonHAConfiguration {
 		DragonHAConfiguration that = (DragonHAConfiguration) o;
 
 		if (!appName.equals(that.appName)) return false;
-		return realDatasourceConfigList.equals(that.realDatasourceConfigList);
+		if (!lazyInit.equals(that.lazyInit)) return false;
+		return realDataSourceConfigList.equals(that.realDataSourceConfigList);
 	}
 
 	@Override
 	public int hashCode() {
 		int result = appName.hashCode();
-		result = 31 * result + realDatasourceConfigList.hashCode();
+		result = 31 * result + lazyInit.hashCode();
+		result = 31 * result + realDataSourceConfigList.hashCode();
 		return result;
 	}
 }

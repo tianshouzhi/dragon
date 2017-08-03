@@ -14,11 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DBSelectorTest extends BaseTest {
 
-	@Test
-	public void selectProbilityTest() {
-		Map<String, AtomicInteger> map = new HashMap<String, AtomicInteger>();
-		int i = 0;
-		while (i < 3000) {
+//	@Test
+//	public void selectProbilityTest() {
+//		Map<String, AtomicInteger> map = new HashMap<String, AtomicInteger>();
+//		int i = 0;
+//		while (i < 3000) {
 //			try {
 //				DragonHAConnection connection = (DragonHAConnection) dragonHADatasource.getConnection();
 //				PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
@@ -43,7 +43,7 @@ public class DBSelectorTest extends BaseTest {
 //			} catch (Exception e) {
 //				e.printStackTrace();
 //			}
-		}
-		System.out.println(map);
-	}
+//		}
+//		System.out.println(map);
+//	}
 }

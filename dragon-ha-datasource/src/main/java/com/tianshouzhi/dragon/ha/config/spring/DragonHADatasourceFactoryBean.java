@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.config.spring;
 
-import com.tianshouzhi.dragon.ha.config.DragonHADatasourceBuilder;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasourceFactory;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -12,7 +12,7 @@ public class DragonHADatasourceFactoryBean implements FactoryBean<DragonHADataso
 
 	@Override
 	public DragonHADatasource getObject() throws Exception {
-		return new DragonHADatasourceBuilder().build(configFile);
+		return new DragonHADatasourceFactory().build(configFile);
 	}
 
 	@Override
