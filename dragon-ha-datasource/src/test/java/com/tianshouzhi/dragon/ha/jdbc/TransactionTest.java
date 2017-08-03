@@ -25,4 +25,21 @@ public class TransactionTest extends BaseTest {
 			connection.rollback();
 		}
 	}
+
+	@Test
+	public void testRollback() throws SQLException {
+		Connection connection = dragonHADatasource.getConnection();
+		connection.setAutoCommit(false);
+		try {
+			PreparedStatement insert1 = connection.prepareStatement("INSERT into user(name) VALUES ('huhuamin')");
+			PreparedStatement insert2 = connection.prepareStatement("INSERT into user(name) VALUES ('wangxiaoxiao')");
+			insert1.execute();
+			int i=1/0;
+			insert2.execute();
+			connection.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			connection.rollback();
+		}
+	}
 }

@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DBSelector;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.ReadDBSelector;
@@ -84,7 +85,7 @@ public class HADataSourceManager {
 			break;
 		RealDatasourceWrapper realDatasourceWrapper = indexDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper == null) {
-			throw new IllegalArgumentException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
+			throw new DragonException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
 		}
 		DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
 		Connection connection = null;

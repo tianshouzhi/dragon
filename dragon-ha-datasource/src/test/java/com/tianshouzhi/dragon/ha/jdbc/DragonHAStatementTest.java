@@ -43,7 +43,7 @@ public class DragonHAStatementTest extends BaseTest {
 
 	@Test
 	public void testQuery() throws SQLException {
-		ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
+		ThreadLocalHintUtil.setDBIndexes("master");
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM user ");
@@ -58,13 +58,11 @@ public class DragonHAStatementTest extends BaseTest {
 	@Test
 	public void testUpdate() throws SQLException {
 		testQuery();
-		ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
 		int i = statement.executeUpdate("UPDATE user SET name='tianshouzhi' where id<=10");
 		System.out.println(i);
 		testQuery();
-		ThreadLocalHintUtil.remove();
 	}
 
 	@Test
