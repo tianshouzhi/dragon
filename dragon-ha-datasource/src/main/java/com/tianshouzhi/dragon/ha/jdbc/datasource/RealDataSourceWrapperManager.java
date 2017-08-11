@@ -2,7 +2,6 @@ package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DBSelector;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.ReadDBSelector;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.WriteDBSelector;
 import org.apache.commons.collections.MapUtils;
@@ -24,8 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
-public class HADataSourceManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger(HADataSourceManager.class);
+public class RealDataSourceWrapperManager {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RealDataSourceWrapperManager.class);
 
 	private Map<String, RealDatasourceWrapper> indexDSMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
@@ -39,7 +38,7 @@ public class HADataSourceManager {
 
 	private Lock rebuildLock = new ReentrantLock();
 
-	public HADataSourceManager() {
+	public RealDataSourceWrapperManager() {
 		runInvalidRecoveryThread();
 	}
 
@@ -47,12 +46,12 @@ public class HADataSourceManager {
 		try {
 			rebuildLock.lockInterruptibly();
 			isRebuiding = true;
-			LOGGER.info("start refresh HADataSourceManager...");
+			LOGGER.info("start refresh RealDataSourceWrapperManager...");
 			long start = System.currentTimeMillis();
 			readDBSelector = new ReadDBSelector(indexDSMap);
 			writeDBSelector = new WriteDBSelector(indexDSMap);
 			this.indexDSMap = indexDSMap;
-			LOGGER.info("end refresh HADataSourceManager ...elapse:{}ms", System.currentTimeMillis() - start);
+			LOGGER.info("end refresh RealDataSourceWrapperManager ...elapse:{}ms", System.currentTimeMillis() - start);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {

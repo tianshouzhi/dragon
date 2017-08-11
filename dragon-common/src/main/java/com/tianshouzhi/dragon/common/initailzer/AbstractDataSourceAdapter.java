@@ -1,10 +1,9 @@
 package com.tianshouzhi.dragon.common.initailzer;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.sql.DataSource;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,9 +35,7 @@ public abstract class AbstractDataSourceAdapter implements DataSourceAdapter {
 		try {
 			Method initMethod = dataSource.getClass().getMethod("close");
 			initMethod.invoke(dataSource);
-		} catch (Exception ignore) {
-
-		}
+		} catch (Exception ignore) {}
 	}
 
 	@Override
@@ -46,12 +43,19 @@ public abstract class AbstractDataSourceAdapter implements DataSourceAdapter {
 		String url = config.get("url");
 		String username = config.get("username");
 		String password = config.get("password");
+		Connection connection = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
+			connection = DriverManager.getConnection(url, username, password);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new DragonRuntimeException(e);
+		} finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException ignore) {
+				}
+			}
 		}
-		Connection connection = DriverManager.getConnection(url, username, password);
-
 	}
 }

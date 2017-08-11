@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.common.initailzer;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
-
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -38,7 +36,7 @@ public abstract class DataSourceUtil {
 		getDatasourceAdapter(dataSource.getClass().getName()).close(dataSource);
 	}
 
-	public static void checkConfig(String datasourceClass, Map<String, String> config) throws SQLException{
+	public static void checkConnection(String datasourceClass, Map<String, String> config) throws SQLException{
 		getDatasourceAdapter(datasourceClass).checkConfig(config);
 	}
 

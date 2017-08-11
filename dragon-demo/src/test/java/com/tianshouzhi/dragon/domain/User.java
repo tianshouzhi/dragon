@@ -5,7 +5,7 @@ package com.tianshouzhi.dragon.domain;
  */
 public class User {
     private Integer id;
-    private String name;
+    private String name="tianshouzhi";
     private UserAccount userAccount;
     public User() {
     }

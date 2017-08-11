@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
 
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDatasourceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

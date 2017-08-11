@@ -3,14 +3,14 @@
 <dragonHADatasource appName="DragonHA">
     <!--
         连接主库的数据源配置：
-            realDatasource节点：表示这是一个真实数据源
+            realDataSource节点：表示这是一个真实数据源
             index属性：为数据源起的名字，主要是为了调试方便
             readWeight、writeWeight属性：表示数据源的读写权重，因为是主库，因此读权重设置为0，写权重设置为10。
             realClass：真实数据源类型的全路径，目前支持druid、dbcp、c3p0,proxool，这里使用的是durid。
             property子节点：表示真实数据源的属性，即realClass指定的数据源支持的属性。因为这里配置的是druid，所以配置的都是druid数据源支持的属性。
                             如果你使用了其他的数据源，则将name/value改为这个数据源支持的相应属性名和值即可。
     -->
-    <realDatasource index="master" readWeight="0" writeWeight="10" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource index="master" readWeight="0" writeWeight="10" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8"></property>
@@ -23,9 +23,9 @@
         <property name="testOnBorrow" value="false" />
         <property name="testOnReturn" value="false" />
         <property name="validationQuery" value="select 'x'"></property>
-    </realDatasource>
+    </realDataSource>
     <!--从库数据源配置，一般从库的readWeight>0,writeWeight=0-->
-    <realDatasource index="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource index="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8"></property>
@@ -38,9 +38,9 @@
         <property name="testOnBorrow" value="false" />
         <property name="testOnReturn" value="false" />
         <property name="validationQuery" value="select 'x'"></property>
-    </realDatasource>
+    </realDataSource>
     <!--从库数据源配置-->
-    <realDatasource index="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource index="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8"></property>
@@ -53,5 +53,5 @@
         <property name="testOnBorrow" value="false" />
         <property name="testOnReturn" value="false" />
         <property name="validationQuery" value="select 'x'"></property>
-    </realDatasource>
+    </realDataSource>
 </dragonHADatasource>

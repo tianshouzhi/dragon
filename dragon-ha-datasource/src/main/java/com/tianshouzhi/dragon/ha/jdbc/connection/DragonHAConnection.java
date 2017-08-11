@@ -6,8 +6,8 @@ import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.util.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.HADataSourceManager;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.RealDatasourceWrapper;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapperManager;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import org.slf4j.Logger;
@@ -33,11 +33,11 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	 */
 	protected Connection realConnection;
 
-	protected HADataSourceManager hADataSourceManager;
+	protected RealDataSourceWrapperManager hADataSourceManager;
 
 	private String dataSourceIndex;// 当前连接是从哪一个数据源中获取的
 
-	public DragonHAConnection(String username, String password, HADataSourceManager hADataSourceManager)
+	public DragonHAConnection(String username, String password, RealDataSourceWrapperManager hADataSourceManager)
 	      throws SQLException {
 		super(username, password);
 		if (hADataSourceManager == null) {
@@ -262,7 +262,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		return realConnection;
 	}
 
-	public HADataSourceManager getHAConnectionManager() {
+	public RealDataSourceWrapperManager getHAConnectionManager() {
 		return hADataSourceManager;
 	}
 
