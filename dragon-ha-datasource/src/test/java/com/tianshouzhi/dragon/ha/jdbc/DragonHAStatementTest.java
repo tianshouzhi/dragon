@@ -1,6 +1,7 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import java.util.Arrays;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/7.
  */
-public class DragonHAStatementTest extends BaseTest{
+public class DragonHAStatementTest extends BaseTest {
     @Test
     public void testAutoGenerateKeys() throws SQLException {
         DragonHAConnection connection = this.connection;

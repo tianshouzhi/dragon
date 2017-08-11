@@ -28,7 +28,7 @@ public abstract class AbstractDBSelector implements DBSelector {
         }
         if(LOGGER.isInfoEnabled()){
             String log=buildLog(rangeDBIndexMap,filterResult);
-            LOGGER.info("{} build success:{}",this.getClass().getSimpleName(), log);
+            LOGGER.info("{} buildFromLocal success:{}",this.getClass().getSimpleName(), log);
         }
     }
 

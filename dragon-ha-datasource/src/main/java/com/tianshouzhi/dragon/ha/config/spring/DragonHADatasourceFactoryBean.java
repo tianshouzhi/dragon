@@ -11,7 +11,7 @@ public class DragonHADatasourceFactoryBean implements FactoryBean<DragonHADataso
     protected String configFile;
     @Override
     public DragonHADatasource getObject() throws Exception {
-        return new DragonHADatasourceBuilder().build(configFile);
+        return new DragonHADatasourceBuilder().buildFromLocal(configFile);
     }
 
     @Override

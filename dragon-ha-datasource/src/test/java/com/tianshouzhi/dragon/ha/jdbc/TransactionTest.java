@@ -1,5 +1,6 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -9,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/4.
  */
-public class TransactionTest extends BaseTest{
+public class TransactionTest extends BaseTest {
     @Test
     public void testRwSplit() throws SQLException {
         Connection connection = dragonHADatasource.getConnection();

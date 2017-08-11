@@ -1,5 +1,6 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/7.
  */
-public class DragonHAPrepareStatementTest extends BaseTest{
+public class DragonHAPrepareStatementTest extends BaseTest {
     @Test
     public void testInsert() throws SQLException {
         DragonHAConnection connection = this.connection;

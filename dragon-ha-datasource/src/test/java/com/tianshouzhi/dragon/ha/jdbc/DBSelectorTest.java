@@ -1,5 +1,6 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 查询3000次，查看每个从库选择的比重
  */
-public class DBSelectorTest extends BaseTest{
+public class DBSelectorTest extends BaseTest {
 
     @Test
     public void selectProbilityTest() {

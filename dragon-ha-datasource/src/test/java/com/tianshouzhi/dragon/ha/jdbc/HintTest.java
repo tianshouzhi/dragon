@@ -1,6 +1,7 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/4.
  */
-public class HintTest extends BaseTest{
+public class HintTest extends BaseTest {
     @Test
     public void sqlHintTest() throws SQLException {
 

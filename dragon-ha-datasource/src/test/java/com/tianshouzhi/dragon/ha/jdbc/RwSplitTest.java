@@ -1,5 +1,6 @@
-package com.tianshouzhi.dragon.ha.sqltype;
+package com.tianshouzhi.dragon.ha.jdbc;
 
+import com.tianshouzhi.dragon.ha.jdbc.BaseTest;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 /**
  * 读写分离测试，主要观察log中的连接切换
  */
-public class RwSplitTest extends BaseTest{
+public class RwSplitTest extends BaseTest {
     @Test
     public void testRwSplit() throws SQLException {
         Connection connection = dragonHADatasource.getConnection();

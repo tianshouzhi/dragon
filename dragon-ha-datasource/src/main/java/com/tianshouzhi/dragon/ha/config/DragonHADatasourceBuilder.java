@@ -10,8 +10,8 @@ import java.io.Reader;
  * Created by tianshouzhi on 2017/6/7.
  */
 public class DragonHADatasourceBuilder{
-    public DragonHADatasource build(String configFile) throws Exception {
-        return build(ClassLoader.getSystemResourceAsStream(configFile));
+    public DragonHADatasource buildFromLocal(String configFile) throws Exception {
+        return build(DragonHADatasourceBuilder.class.getClassLoader().getResourceAsStream(configFile));
     }
     public DragonHADatasource build(InputStream in) throws Exception {
         return build(DragonHAConfigParser.parse(in));
