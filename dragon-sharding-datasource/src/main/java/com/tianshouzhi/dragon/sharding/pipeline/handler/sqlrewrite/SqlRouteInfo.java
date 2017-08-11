@@ -12,81 +12,84 @@ import java.util.Map;
  * 代表一条sql信息
  */
 public class SqlRouteInfo {
-    private Statement targetStatement;
-    /**参数位置与参数的映射关系*/
-    private Map<Integer, DragonPrepareStatement.ParamSetting> parameters=new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
+	private Statement targetStatement;
 
-    /**真正要执行的sql*/
-    private String sql;
+	/** 参数位置与参数的映射关系 */
+	private Map<Integer, DragonPrepareStatement.ParamSetting> parameters = new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
 
-    private String realDBName;
-    //主维度真实表名
-    private String primaryRealTBName;
-    /**
-     * 主维度逻辑表
-     */
-    private LogicTable primaryLogicTable;
+	/** 真正要执行的sql */
+	private String sql;
 
-    //记录这个sql的执行时间
-    private long executionTimeMillis;
+	private String realDBName;
 
-    public SqlRouteInfo(LogicTable primaryLogicTable,String primaryDBName,String primaryRealTBName) {
-        if(StringUtils.isAnyBlank(primaryDBName, primaryRealTBName)){
-            throw new IllegalArgumentException("primaryDBName and primaryRealTBName both can't be blank!!!");
-        }
-        this.realDBName=primaryDBName;
-        this.primaryRealTBName = primaryRealTBName;
-        this.primaryLogicTable=primaryLogicTable;
-    }
+	// 主维度真实表名
+	private String primaryRealTBName;
 
-    public void addParam(DragonPrepareStatement.ParamSetting paramSetting) {
-        if(parameters==null){
-            parameters=new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
-        }
-        parameters.put(parameters.size()+1,paramSetting);
-    }
+	/**
+	 * 主维度逻辑表
+	 */
+	private LogicTable primaryLogicTable;
 
-    public String getSql() {
-        return sql;
-    }
+	// 记录这个sql的执行时间
+	private long executionTimeMillis;
 
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
+	public SqlRouteInfo(LogicTable primaryLogicTable, String primaryDBName, String primaryRealTBName) {
+		if (StringUtils.isAnyBlank(primaryDBName, primaryRealTBName)) {
+			throw new IllegalArgumentException("primaryDBName and primaryRealTBName both can't be blank!!!");
+		}
+		this.realDBName = primaryDBName;
+		this.primaryRealTBName = primaryRealTBName;
+		this.primaryLogicTable = primaryLogicTable;
+	}
 
-    public Map<Integer, DragonPrepareStatement.ParamSetting> getParameters() {
-        return parameters;
-    }
+	public void addParam(DragonPrepareStatement.ParamSetting paramSetting) {
+		if (parameters == null) {
+			parameters = new HashMap<Integer, DragonPrepareStatement.ParamSetting>();
+		}
+		parameters.put(parameters.size() + 1, paramSetting);
+	}
 
-    public void setParameters(Map<Integer, DragonPrepareStatement.ParamSetting> parameters) {
-        this.parameters = parameters;
-    }
+	public String getSql() {
+		return sql;
+	}
 
-    public void setTargetStatement(Statement targetStatement) {
-        this.targetStatement = targetStatement;
-    }
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
 
-    public Statement getTargetStatement() {
-        return targetStatement;
-    }
+	public Map<Integer, DragonPrepareStatement.ParamSetting> getParameters() {
+		return parameters;
+	}
 
-    public String getRealDBName() {
-        return realDBName;
-    }
+	public void setParameters(Map<Integer, DragonPrepareStatement.ParamSetting> parameters) {
+		this.parameters = parameters;
+	}
 
-    public String getPrimaryRealTBName() {
-        return primaryRealTBName;
-    }
+	public void setTargetStatement(Statement targetStatement) {
+		this.targetStatement = targetStatement;
+	}
 
-    public LogicTable getPrimaryLogicTable() {
-        return primaryLogicTable;
-    }
+	public Statement getTargetStatement() {
+		return targetStatement;
+	}
 
-    public long getExecutionTimeMillis() {
-        return executionTimeMillis;
-    }
+	public String getRealDBName() {
+		return realDBName;
+	}
 
-    public void setExecutionTimeMillis(long executionTimeMillis) {
-        this.executionTimeMillis = executionTimeMillis;
-    }
+	public String getPrimaryRealTBName() {
+		return primaryRealTBName;
+	}
+
+	public LogicTable getPrimaryLogicTable() {
+		return primaryLogicTable;
+	}
+
+	public long getExecutionTimeMillis() {
+		return executionTimeMillis;
+	}
+
+	public void setExecutionTimeMillis(long executionTimeMillis) {
+		this.executionTimeMillis = executionTimeMillis;
+	}
 }

@@ -12,39 +12,41 @@ import java.util.regex.Pattern;
  * Created by TIANSHOUZHI336 on 2017/2/23.
  */
 public abstract class LogicConfig {
-    //route rule中变量的命名规则
-    public static final Pattern routeRuleVariablePattern =Pattern.compile("(\\$\\{.+?\\})",Pattern.CASE_INSENSITIVE);
-    private String namePattern;
-    protected MessageFormat messageFormat;//eg table_{00}
+	// route rule中变量的命名规则
+	public static final Pattern routeRuleVariablePattern = Pattern.compile("(\\$\\{.+?\\})", Pattern.CASE_INSENSITIVE);
 
-    public LogicConfig(String namePattern) throws DragonConfigException {
-        if(StringUtils.isBlank(namePattern)){
-            throw new DragonConfigException("namePattern can't be blank!!!");
-        }
-        this.namePattern = namePattern;
-        this.messageFormat = new MessageFormat(namePattern);
-    }
+	private String namePattern;
 
-    public String getNamePattern(){
-        return namePattern;
-    }
+	protected MessageFormat messageFormat;// eg table_{00}
 
-    public String format(Long caculatedIndex){
-        return messageFormat.format(new Object[]{caculatedIndex});
-    }
+	public LogicConfig(String namePattern) throws DragonConfigException {
+		if (StringUtils.isBlank(namePattern)) {
+			throw new DragonConfigException("namePattern can't be blank!!!");
+		}
+		this.namePattern = namePattern;
+		this.messageFormat = new MessageFormat(namePattern);
+	}
 
-    public Long parseIndex(String realName) throws DragonException {
-        try {
+	public String getNamePattern() {
+		return namePattern;
+	}
 
-            Object o = messageFormat.parse(realName)[0];
-            if(o instanceof Long){
-                return (Long) o;
-            }else{
-                return Long.parseLong((String) o);
-            }
+	public String format(Long caculatedIndex) {
+		return messageFormat.format(new Object[] { caculatedIndex });
+	}
 
-        } catch (ParseException e) {
-            throw new DragonException(realName,e);
-        }
-    }
+	public Long parseIndex(String realName) throws DragonException {
+		try {
+
+			Object o = messageFormat.parse(realName)[0];
+			if (o instanceof Long) {
+				return (Long) o;
+			} else {
+				return Long.parseLong((String) o);
+			}
+
+		} catch (ParseException e) {
+			throw new DragonException(realName, e);
+		}
+	}
 }

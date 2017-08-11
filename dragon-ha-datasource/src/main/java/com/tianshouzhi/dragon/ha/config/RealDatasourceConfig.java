@@ -10,87 +10,127 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RealDatasourceConfig {
-    @XmlAttribute(name="index",required = true) //只能用在基本数据类型上
-    private String index;
-    @XmlAttribute(name="readWeight",required = true)
-    private Integer readWeight;
-    @XmlAttribute(name="writeWeight",required = true)
-    private Integer writeWeight;
-    @XmlAttribute(name="realClass",required = true)
-    private String realClass;
-    @XmlElement(name="property") //用在复杂数据类型上
-    private List<Property> properties;
+	@XmlAttribute(name = "index", required = true) // 只能用在基本数据类型上
+	private String index;
 
-    public String getIndex() {
-        return index;
-    }
+	@XmlAttribute(name = "readWeight", required = true)
+	private int readWeight=10;
 
-    public void setIndex(String index) {
-        this.index = index;
-    }
+	@XmlAttribute(name = "writeWeight", required = true)
+	private int writeWeight=10;
 
-    public Integer getWriteWeight() {
-        return writeWeight;
-    }
+	@XmlAttribute(name = "realClass", required = true)
+	private String realClass;
 
-    public void setWriteWeight(Integer writeWeight) {
-        this.writeWeight = writeWeight;
-    }
+	@XmlElement(name = "property") // 用在复杂数据类型上
+	private List<Property> properties;
 
-    public String getRealClass() {
-        return realClass;
-    }
+	public String getIndex() {
+		return index;
+	}
 
-    public void setRealClass(String realClass) {
-        this.realClass = realClass;
-    }
+	public void setIndex(String index) {
+		this.index = index;
+	}
 
-    public void setReadWeight(Integer readWeight) {
-        this.readWeight = readWeight;
-    }
+	public int getWriteWeight() {
+		return writeWeight;
+	}
 
-    public Integer getReadWeight() {
-        return readWeight;
-    }
+	public void setWriteWeight(Integer writeWeight) {
+		this.writeWeight = writeWeight;
+	}
 
-    public List<Property> getProperties() {
-        return properties;
-    }
+	public String getRealClass() {
+		return realClass;
+	}
 
-    public void setProperties(List<Property> properties) {
-        this.properties = properties;
-    }
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class Property{
-        @XmlAttribute
-        private String name;
-        @XmlAttribute
-        private String value;
+	public void setRealClass(String realClass) {
+		this.realClass = realClass;
+	}
 
-        public String getName() {
-            return name;
-        }
+	public void setReadWeight(Integer readWeight) {
+		this.readWeight = readWeight;
+	}
 
-        public void setName(String name) {
-            this.name = name;
-        }
+	public int getReadWeight() {
+		return readWeight;
+	}
 
-        public String getValue() {
-            return value;
-        }
+	public List<Property> getProperties() {
+		return properties;
+	}
 
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
+	public void setProperties(List<Property> properties) {
+		this.properties = properties;
+	}
 
-    public static Map<String, String> propertiesToMap(List<RealDatasourceConfig.Property> properties) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        for (RealDatasourceConfig.Property property : properties) {
-            map.put(property.getName(),property.getValue());
-        }
-        return map;
-    }
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class Property {
+		@XmlAttribute
+		private String name;
+
+		@XmlAttribute
+		private String value;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
+
+	public Map<String, String> getPropertiesMap() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		for (RealDatasourceConfig.Property property : this.properties) {
+			map.put(property.getName(), property.getValue());
+		}
+		return map;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		RealDatasourceConfig that = (RealDatasourceConfig) o;
+
+		if (readWeight != that.readWeight) return false;
+		if (writeWeight != that.writeWeight) return false;
+		if (!index.equals(that.index)) return false;
+		if (!realClass.equals(that.realClass)) return false;
+		return properties.equals(that.properties);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = index.hashCode();
+		result = 31 * result + readWeight;
+		result = 31 * result + writeWeight;
+		result = 31 * result + realClass.hashCode();
+		result = 31 * result + properties.hashCode();
+		return result;
+	}
 
 
+	@Override
+	public String toString() {
+		return "RealDatasourceConfig{" +
+				"index='" + index + '\'' +
+				", readWeight=" + readWeight +
+				", writeWeight=" + writeWeight +
+				", realClass='" + realClass + '\'' +
+				", properties=" + properties +
+				'}';
+	}
 }

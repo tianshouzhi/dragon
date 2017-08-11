@@ -8,5 +8,5 @@ import java.sql.SQLException;
  * Created by TIANSHOUZHI336 on 2017/2/28.
  */
 public interface SqlRewriter {
-    public void rewrite(HandlerContext context) throws SQLException;
+	public void rewrite(HandlerContext context) throws SQLException;
 }

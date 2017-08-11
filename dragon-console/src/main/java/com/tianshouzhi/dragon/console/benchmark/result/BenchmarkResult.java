@@ -144,7 +144,7 @@ public class BenchmarkResult {
                 ", results=" + results +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
-                ", className='" + className + '\'' +
+                ", getClassName='" + className + '\'' +
                 ", methodName='" + methodName + '\'' +
                 ", errorCount=" + errorCount +
                 '}';

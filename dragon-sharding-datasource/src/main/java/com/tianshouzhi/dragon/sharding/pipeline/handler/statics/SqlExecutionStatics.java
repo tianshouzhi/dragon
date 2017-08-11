@@ -8,194 +8,213 @@ import java.util.Map;
  */
 public class SqlExecutionStatics {
 
-    private String originSql;
-    private String originParamters;
-    private boolean query;
-    private boolean prepare;
-    private boolean success;
-    private String exception;
-    private int totalUpdateCount;
-    private int returnRowCount;
-    private int queryRowCount;
-    private long routeSqlNums;
-    private long beginTime;
-    private long totalExecuteTime;
-    private boolean hitSqlParserCache;
-    private long sqlParseTimeMillis;
-    private long sqlRewriteTimeMillis;
-    private int parallelExecutionTaskNum;
-    private long parallelExecutionTimeMillis;
-    private long resultMergeTimeMillis;
-    private Map<String, List<SqlRouteDetail>> routeDetailMap;
-    private String ip;
-    private String appName;
+	private String originSql;
 
-    public void setOriginSql(String originSql) {
-        this.originSql = originSql;
-    }
+	private String originParamters;
 
-    public String getOriginSql() {
-        return originSql;
-    }
+	private boolean query;
 
-    public void setOriginParamters(String originParamters) {
-        this.originParamters = originParamters;
-    }
+	private boolean prepare;
 
-    public String getOriginParamters() {
-        return originParamters;
-    }
+	private boolean success;
 
-    public void setQuery(boolean query) {
-        this.query = query;
-    }
+	private String exception;
 
-    public boolean isQuery() {
-        return query;
-    }
+	private int totalUpdateCount;
 
-    public void setPrepare(boolean prepare) {
-        this.prepare = prepare;
-    }
+	private int returnRowCount;
 
-    public boolean isPrepare() {
-        return prepare;
-    }
+	private int queryRowCount;
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+	private long routeSqlNums;
 
-    public boolean isSuccess() {
-        return success;
-    }
+	private long beginTime;
 
-    public void setException(String exception) {
-        this.exception = exception;
-    }
+	private long totalExecuteTime;
 
-    public String getException() {
-        return exception;
-    }
+	private boolean hitSqlParserCache;
 
-    public void setTotalUpdateCount(int totalUpdateCount) {
-        this.totalUpdateCount = totalUpdateCount;
-    }
+	private long sqlParseTimeMillis;
 
-    public int getTotalUpdateCount() {
-        return totalUpdateCount;
-    }
+	private long sqlRewriteTimeMillis;
 
-    public void setReturnRowCount(int returnRowCount) {
-        this.returnRowCount = returnRowCount;
-    }
+	private int parallelExecutionTaskNum;
 
-    public int getReturnRowCount() {
-        return returnRowCount;
-    }
+	private long parallelExecutionTimeMillis;
 
-    public void setQueryRowCount(int queryRowCount) {
-        this.queryRowCount = queryRowCount;
-    }
+	private long resultMergeTimeMillis;
 
-    public int getQueryRowCount() {
-        return queryRowCount;
-    }
+	private Map<String, List<SqlRouteDetail>> routeDetailMap;
 
-    public void setRouteSqlNums(long routeSqlNums) {
-        this.routeSqlNums = routeSqlNums;
-    }
+	private String ip;
 
-    public long getRouteSqlNums() {
-        return routeSqlNums;
-    }
+	private String appName;
 
-    public void setBeginTime(long beginTime) {
-        this.beginTime = beginTime;
-    }
+	public void setOriginSql(String originSql) {
+		this.originSql = originSql;
+	}
 
-    public long getBeginTime() {
-        return beginTime;
-    }
+	public String getOriginSql() {
+		return originSql;
+	}
 
-    public void setTotalExecuteTime(long totalExecuteTime) {
-        this.totalExecuteTime = totalExecuteTime;
-    }
+	public void setOriginParamters(String originParamters) {
+		this.originParamters = originParamters;
+	}
 
-    public long getTotalExecuteTime() {
-        return totalExecuteTime;
-    }
+	public String getOriginParamters() {
+		return originParamters;
+	}
 
-    public void setHitSqlParserCache(boolean hitSqlParserCache) {
-        this.hitSqlParserCache = hitSqlParserCache;
-    }
+	public void setQuery(boolean query) {
+		this.query = query;
+	}
 
-    public boolean isHitSqlParserCache() {
-        return hitSqlParserCache;
-    }
+	public boolean isQuery() {
+		return query;
+	}
 
-    public void setSqlParseTimeMillis(long sqlParseTimeMillis) {
-        this.sqlParseTimeMillis = sqlParseTimeMillis;
-    }
+	public void setPrepare(boolean prepare) {
+		this.prepare = prepare;
+	}
 
-    public long getSqlParseTimeMillis() {
-        return sqlParseTimeMillis;
-    }
+	public boolean isPrepare() {
+		return prepare;
+	}
 
-    public void setSqlRewriteTimeMillis(long sqlRewriteTimeMillis) {
-        this.sqlRewriteTimeMillis = sqlRewriteTimeMillis;
-    }
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
 
-    public long getSqlRewriteTimeMillis() {
-        return sqlRewriteTimeMillis;
-    }
+	public boolean isSuccess() {
+		return success;
+	}
 
-    public void setParallelExecutionTaskNum(int parallelExecutionTaskNum) {
-        this.parallelExecutionTaskNum = parallelExecutionTaskNum;
-    }
+	public void setException(String exception) {
+		this.exception = exception;
+	}
 
-    public int getParallelExecutionTaskNum() {
-        return parallelExecutionTaskNum;
-    }
+	public String getException() {
+		return exception;
+	}
 
-    public void setParallelExecutionTimeMillis(long parallelExecutionTimeMillis) {
-        this.parallelExecutionTimeMillis = parallelExecutionTimeMillis;
-    }
+	public void setTotalUpdateCount(int totalUpdateCount) {
+		this.totalUpdateCount = totalUpdateCount;
+	}
 
-    public long getParallelExecutionTimeMillis() {
-        return parallelExecutionTimeMillis;
-    }
+	public int getTotalUpdateCount() {
+		return totalUpdateCount;
+	}
 
-    public void setResultMergeTimeMillis(long resultMergeTimeMillis) {
-        this.resultMergeTimeMillis = resultMergeTimeMillis;
-    }
+	public void setReturnRowCount(int returnRowCount) {
+		this.returnRowCount = returnRowCount;
+	}
 
-    public long getResultMergeTimeMillis() {
-        return resultMergeTimeMillis;
-    }
+	public int getReturnRowCount() {
+		return returnRowCount;
+	}
 
-    public Map<String, List<SqlRouteDetail>> getRouteDetailMap() {
-        return routeDetailMap;
-    }
+	public void setQueryRowCount(int queryRowCount) {
+		this.queryRowCount = queryRowCount;
+	}
 
-    public void setRouteDetailMap(Map<String, List<SqlRouteDetail>> routeDetailMap) {
-        this.routeDetailMap = routeDetailMap;
-    }
+	public int getQueryRowCount() {
+		return queryRowCount;
+	}
 
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
+	public void setRouteSqlNums(long routeSqlNums) {
+		this.routeSqlNums = routeSqlNums;
+	}
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+	public long getRouteSqlNums() {
+		return routeSqlNums;
+	}
 
-    public String getIp() {
-        return ip;
-    }
+	public void setBeginTime(long beginTime) {
+		this.beginTime = beginTime;
+	}
 
+	public long getBeginTime() {
+		return beginTime;
+	}
 
-    public String getAppName() {
-        return appName;
-    }
+	public void setTotalExecuteTime(long totalExecuteTime) {
+		this.totalExecuteTime = totalExecuteTime;
+	}
+
+	public long getTotalExecuteTime() {
+		return totalExecuteTime;
+	}
+
+	public void setHitSqlParserCache(boolean hitSqlParserCache) {
+		this.hitSqlParserCache = hitSqlParserCache;
+	}
+
+	public boolean isHitSqlParserCache() {
+		return hitSqlParserCache;
+	}
+
+	public void setSqlParseTimeMillis(long sqlParseTimeMillis) {
+		this.sqlParseTimeMillis = sqlParseTimeMillis;
+	}
+
+	public long getSqlParseTimeMillis() {
+		return sqlParseTimeMillis;
+	}
+
+	public void setSqlRewriteTimeMillis(long sqlRewriteTimeMillis) {
+		this.sqlRewriteTimeMillis = sqlRewriteTimeMillis;
+	}
+
+	public long getSqlRewriteTimeMillis() {
+		return sqlRewriteTimeMillis;
+	}
+
+	public void setParallelExecutionTaskNum(int parallelExecutionTaskNum) {
+		this.parallelExecutionTaskNum = parallelExecutionTaskNum;
+	}
+
+	public int getParallelExecutionTaskNum() {
+		return parallelExecutionTaskNum;
+	}
+
+	public void setParallelExecutionTimeMillis(long parallelExecutionTimeMillis) {
+		this.parallelExecutionTimeMillis = parallelExecutionTimeMillis;
+	}
+
+	public long getParallelExecutionTimeMillis() {
+		return parallelExecutionTimeMillis;
+	}
+
+	public void setResultMergeTimeMillis(long resultMergeTimeMillis) {
+		this.resultMergeTimeMillis = resultMergeTimeMillis;
+	}
+
+	public long getResultMergeTimeMillis() {
+		return resultMergeTimeMillis;
+	}
+
+	public Map<String, List<SqlRouteDetail>> getRouteDetailMap() {
+		return routeDetailMap;
+	}
+
+	public void setRouteDetailMap(Map<String, List<SqlRouteDetail>> routeDetailMap) {
+		this.routeDetailMap = routeDetailMap;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
 }

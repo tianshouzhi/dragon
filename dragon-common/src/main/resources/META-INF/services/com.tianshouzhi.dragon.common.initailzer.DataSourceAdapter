@@ -1,0 +1,4 @@
+com.tianshouzhi.dragon.common.initailzer.impl.DruidDataSourceAdapter
+com.tianshouzhi.dragon.common.initailzer.impl.ProxoolDataSourceAdapter
+com.tianshouzhi.dragon.common.initailzer.impl.DbcpDataSourceAdapter
+com.tianshouzhi.dragon.common.initailzer.impl.C3P0DataSourceAdapter

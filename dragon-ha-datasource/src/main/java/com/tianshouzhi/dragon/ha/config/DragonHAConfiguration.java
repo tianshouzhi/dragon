@@ -4,26 +4,62 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name="dragonHADatasource")
+@XmlRootElement(name = "dragonHADatasource")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DragonHAConfiguration {
-    @XmlAttribute(name="appName",required = true)
-    private String appName;
-    @XmlElement(name="realDatasource",required = true)
-    private List<RealDatasourceConfig> dsConfigList=new ArrayList<RealDatasourceConfig>();
+	@XmlAttribute(name = "appName", required = true)
+	private String appName;
 
-    public String getAppName() {
-        return appName;
-    }
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
+	@XmlAttribute(name = "lazyInit", required = true)
+	private Boolean lazyInit =true;
 
-    public List<RealDatasourceConfig> getDsConfigList() {
-        return dsConfigList;
-    }
+	@XmlElement(name = "realDataSource", required = true)
+	private List<RealDatasourceConfig> realDataSourceConfigList = new ArrayList<RealDatasourceConfig>();
 
-    public void setDsConfigList(List<RealDatasourceConfig> dsConfigList) {
-        this.dsConfigList = dsConfigList;
-    }
+	public String getAppName() {
+		return appName;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
+
+	public List<RealDatasourceConfig> getRealDataSourceConfigList() {
+		return realDataSourceConfigList;
+	}
+
+	public boolean isLazyInit() {
+		return lazyInit;
+	}
+
+	public void setLazyInit(boolean lazyInit) {
+		this.lazyInit = lazyInit;
+	}
+
+
+
+	public void setRealDataSourceConfigList(List<RealDatasourceConfig> realDataSourceConfigList) {
+		this.realDataSourceConfigList = realDataSourceConfigList;
+	}
+
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		DragonHAConfiguration that = (DragonHAConfiguration) o;
+
+		if (!appName.equals(that.appName)) return false;
+		if (!lazyInit.equals(that.lazyInit)) return false;
+		return realDataSourceConfigList.equals(that.realDataSourceConfigList);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = appName.hashCode();
+		result = 31 * result + lazyInit.hashCode();
+		result = 31 * result + realDataSourceConfigList.hashCode();
+		return result;
+	}
 }

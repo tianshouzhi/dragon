@@ -18,42 +18,44 @@ import java.util.List;
  * Created by TIANSHOUZHI336 on 2017/2/23.
  */
 public class Pipeline {
-    private List<Handler> handlerChains;
-    private HandlerContext handlerContext;
+	private List<Handler> handlerChains;
 
-    public Pipeline(DragonShardingStatement dragonShardingStatement) {
-        this.handlerContext = new HandlerContext(dragonShardingStatement);
-        this.handlerChains = new ArrayList<Handler>();
-        this.handlerChains.add(new HintParseHandler());
-        this.handlerChains.add(new SqlParseHandler());
-        this.handlerChains.add(new SqlRewriteHandler());
-        this.handlerChains.add(new ExecutionHandler());
-        this.handlerChains.add(new ResultMergeHandler());
-    }
+	private HandlerContext handlerContext;
 
-    //执行调用链
-    public void execute() throws SQLException{
-        Handler currentHandler=null;
-        try {
-            for (Handler handler : handlerChains) {
-                currentHandler=handler;
-                handler.invoke(handlerContext);
-            }
-        } catch (Exception e) {
-            handlerContext.setThrowable(e);
-            throw new DragonException("execute handler chain fail,current handler:"+currentHandler.getClass().getSimpleName(),e);
-        } finally {
-            //不管成功还是失败，最终都走要StaticsHandler
-            try {
-                new StaticsHandler().invoke(handlerContext);
-            } catch (SQLException e) {
-                throw e;
-            }
+	public Pipeline(DragonShardingStatement dragonShardingStatement) {
+		this.handlerContext = new HandlerContext(dragonShardingStatement);
+		this.handlerChains = new ArrayList<Handler>();
+		this.handlerChains.add(new HintParseHandler());
+		this.handlerChains.add(new SqlParseHandler());
+		this.handlerChains.add(new SqlRewriteHandler());
+		this.handlerChains.add(new ExecutionHandler());
+		this.handlerChains.add(new ResultMergeHandler());
+	}
 
-        }
-    }
+	// 执行调用链
+	public void execute() throws SQLException {
+		Handler currentHandler = null;
+		try {
+			for (Handler handler : handlerChains) {
+				currentHandler = handler;
+				handler.invoke(handlerContext);
+			}
+		} catch (Exception e) {
+			handlerContext.setThrowable(e);
+			throw new DragonException(
+			      "execute handler chain fail,current handler:" + currentHandler.getClass().getSimpleName(), e);
+		} finally {
+			// 不管成功还是失败，最终都走要StaticsHandler
+			try {
+				new StaticsHandler().invoke(handlerContext);
+			} catch (SQLException e) {
+				throw e;
+			}
 
-    public HandlerContext getHandlerContext() {
-        return handlerContext;
-    }
+		}
+	}
+
+	public HandlerContext getHandlerContext() {
+		return handlerContext;
+	}
 }
