@@ -1,19 +1,14 @@
 package com.tianshouzhi.dragon.ha.jdbc.statement;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
-import com.tianshouzhi.dragon.common.util.SqlTypeUtil;
+import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.ExecuteType.EXECUTE_BATCH;
 
@@ -21,7 +16,6 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.Execu
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
 public class DragonHAStatement extends DragonStatement implements Statement {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DragonHAStatement.class);
 
 	protected DragonHAConnection dragonHAConnection;
 
@@ -64,7 +58,6 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 			String dataSourceIndex = dragonHAConnection.getCurrentDBIndex();
 			ExceptionSorter exceptionSorter = dragonHAConnection.getExceptionSorter();
 			if (exceptionSorter.isExceptionFatal(e)) {// 如果是致命异常
-				LOGGER.error("fatal exception,sqlstate:{},error code:{},sql:{}", e.getSQLState(), e.getErrorCode(), sql);
 				dragonHAConnection.getHAConnectionManager().invalid(dataSourceIndex);
 				throw e;
 			} else {
@@ -186,7 +179,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 			batchExecuteResult = realStatement.executeBatch();
 			break;
 		default:
-			throw new DragonException("unkown excute type " + executeType + ",sql is " + sql);
+			throw new DragonHARuntimeException("unkown excute type " + executeType + ",sql :" + sql);
 		}
 		return isResultSet;
 	}

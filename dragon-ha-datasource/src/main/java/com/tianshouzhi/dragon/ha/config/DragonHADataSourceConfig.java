@@ -6,7 +6,7 @@ import java.util.List;
 
 @XmlRootElement(name = "dragonHADatasource")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DragonHAConfiguration {
+public class DragonHADataSourceConfig {
 	@XmlAttribute(name = "appName", required = true)
 	private String appName;
 
@@ -36,19 +36,16 @@ public class DragonHAConfiguration {
 		this.lazyInit = lazyInit;
 	}
 
-
-
 	public void setRealDataSourceConfigList(List<RealDatasourceConfig> realDataSourceConfigList) {
 		this.realDataSourceConfigList = realDataSourceConfigList;
 	}
-
 
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		DragonHAConfiguration that = (DragonHAConfiguration) o;
+		DragonHADataSourceConfig that = (DragonHADataSourceConfig) o;
 
 		if (!appName.equals(that.appName)) return false;
 		if (!lazyInit.equals(that.lazyInit)) return false;

@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.common.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import javax.sql.DataSource;
@@ -15,20 +17,11 @@ import java.util.logging.Logger;
  * Created by TIANSHOUZHI336 on 2016/11/30.
  */
 public abstract class DragonDataSource extends WrapperAdapter implements DataSource {
-	protected AtomicBoolean inited = new AtomicBoolean(false);
+	protected boolean inited = false;
 
 	protected int loginTimeout = 0;
 
 	private PrintWriter logWriter;
-
-	public void init() {
-		if (inited.compareAndSet(false, true)) {
-			doInit();
-		}
-	}
-
-	protected void doInit() {
-	};
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
@@ -52,7 +45,6 @@ public abstract class DragonDataSource extends WrapperAdapter implements DataSou
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		init();
 		return getConnection(null, null);
 	}
 

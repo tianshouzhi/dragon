@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector;
+package com.tianshouzhi.dragon.ha.router.weight;
 
 import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDatasourceWrapper;
 import org.slf4j.Logger;

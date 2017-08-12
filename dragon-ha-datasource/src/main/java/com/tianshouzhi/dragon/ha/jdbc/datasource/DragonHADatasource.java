@@ -1,15 +1,18 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonHAConfigException;
 import com.tianshouzhi.dragon.common.initailzer.DataSourceUtil;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
+import com.tianshouzhi.dragon.ha.config.DragonHADataSourceConfig;
 import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
-import com.tianshouzhi.dragon.ha.config.DragonHAConfiguration;
+import com.tianshouzhi.dragon.ha.config.manager.DragonHAConfigurationManager;
+import com.tianshouzhi.dragon.ha.config.manager.DragonHALocalConfigurationManager;
+import com.tianshouzhi.dragon.ha.exception.DragonHAConfigException;
+import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -19,103 +22,114 @@ import java.util.List;
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public class DragonHADatasource extends DragonDataSource {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
+    private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
 
-	private RealDataSourceWrapperManager realDataSourceWrapperManager;
+    private RealDataSourceWrapperManager realDataSourceManager;
+    private DragonHAConfigurationManager configurationManager;
+    private DragonHADataSourceConfig configuration;
 
-	private DragonHAConfiguration configuration;
+    public DragonHADatasource(String configFile) throws DragonHAException {
+        this(new DragonHALocalConfigurationManager(configFile));
+    }
 
-	public DragonHADatasource(DragonHAConfiguration configuration) throws Exception {
-		init(configuration);
-		this.configuration = configuration;
-	}
+    public DragonHADatasource(DragonHAConfigurationManager configurationManager) throws DragonHAException {
+        if (configurationManager == null) {
+            throw new NullPointerException("parameter 'configurationManager' can't be null");
+        }
+        DragonHADataSourceConfig configuration = configurationManager.getConfiguration();
+        checkDragonHAConfiguration(configuration);
 
-	private void init(DragonHAConfiguration configuration) throws SQLException {
-		checkDragonHAConfiguration(configuration);
-		HashMap<String, RealDatasourceWrapper> indexDSMap = new HashMap<String, RealDatasourceWrapper>();
-		for (RealDatasourceConfig realDatasourceConfig : configuration.getRealDataSourceConfigList()) {
-			String index = realDatasourceConfig.getIndex();
-			RealDatasourceWrapper wrapper = new RealDatasourceWrapper(realDatasourceConfig);
-			indexDSMap.put(index, wrapper);
-		}
+        HashMap<String, RealDatasourceWrapper> datasourceWrapperMap = getDatasourceWrapperMap(configuration);
+        if (!configuration.isLazyInit()) {
+            for (RealDatasourceWrapper wrapper : datasourceWrapperMap.values()) {
+                wrapper.init();
+            }
+        }
+        this.realDataSourceManager = new RealDataSourceWrapperManager(datasourceWrapperMap);
+        this.configurationManager = configurationManager;
+        this.configuration = configuration;
+    }
 
-		if (!configuration.isLazyInit()) {
-			for (RealDatasourceWrapper wrapper : indexDSMap.values()) {
-				wrapper.init();
-			}
-		}
+    private void checkDragonHAConfiguration(DragonHADataSourceConfig configuration) throws DragonHAConfigException {
+        if (configuration == null) {
+            throw new DragonHAConfigException("configuration can't be null");
+        }
 
-		this.realDataSourceWrapperManager = new RealDataSourceWrapperManager();
-		this.realDataSourceWrapperManager.refresh(indexDSMap);
-	}
+        String appName = configuration.getAppName();
+        if (StringUtils.isBlank(appName)) {
+            throw new DragonHAConfigException("appName can't be blank");
+        }
 
-	private void checkDragonHAConfiguration(DragonHAConfiguration configuration) throws DragonHAConfigException {
+        List<RealDatasourceConfig> configList = configuration.getRealDataSourceConfigList();
+        if (CollectionUtils.isEmpty(configList)) {
+            throw new DragonHAConfigException("no real datasource config!!!");
+        }
 
-		if(configuration==null){
-			throw new DragonHAConfigException("configuration can't be null");
-		}
+        for (RealDatasourceConfig config : configList) {
+            checkRealDatasourceConfig(config);
+        }
+    }
 
-		String appName = configuration.getAppName();
-		if(StringUtils.isBlank(appName)){
-			throw new DragonHAConfigException("appName can't be blank");
-		}
+    private void checkRealDatasourceConfig(RealDatasourceConfig config) throws DragonHAConfigException {
+        if (config == null) {
+            throw new NullPointerException();
+        }
 
-		List<RealDatasourceConfig> configList = configuration.getRealDataSourceConfigList();
-		if(CollectionUtils.isEmpty(configList)){
-			throw new DragonHAConfigException("no real datasource config!!!");
-		}
+        String index = config.getIndex();
 
-		for (RealDatasourceConfig config : configList) {
-			checkRealDatasourceConfig(config);
-		}
+        if (StringUtils.isBlank(index)) {
+            throw new DragonHAConfigException("parameter 'dataSourceIndex' can't be empty or blank");
+        }
 
-	}
+        Integer readWeight = config.getReadWeight();
+        Integer writeWeight = config.getWriteWeight();
 
-	private void checkRealDatasourceConfig(RealDatasourceConfig config) {
-		if (config == null) {
-			throw new NullPointerException();
-		}
+        if (readWeight < 0 || writeWeight < 0) {
+            throw new DragonHAConfigException(
+                    "'" + index + "' config error, both 'readWeight' and 'writeWeight' can't less than zero," +
+                            "current readWeight:" + readWeight + ",current writeWeight:" + writeWeight);
+        }
 
-		String index = config.getIndex();
+        try {
+            DataSourceUtil.checkConnection(config.getRealClass(), config.getPropertiesMap());
+        } catch (SQLException e) {
+            throw new DragonHAConfigException("'" + index + "'check connection error ,please check config【" + config + "】", e);
+        }
+    }
 
-		if (StringUtils.isBlank(index)) {
-			throw new IllegalArgumentException("parameter 'dataSourceIndex' can't be empty or blank");
-		}
+    public synchronized void refreshConfig(DragonHADataSourceConfig newConfiguration) throws DragonHAException {
+        if (newConfiguration == null || configuration.equals(newConfiguration)) {
+            return;
+        }
+        checkDragonHAConfiguration(newConfiguration);
+        HashMap<String, RealDatasourceWrapper> newDataSourceWrapperMap = getDatasourceWrapperMap(newConfiguration);
+        realDataSourceManager.refresh(newDataSourceWrapperMap);
+        this.configuration = newConfiguration;
+    }
 
-		Integer readWeight = config.getReadWeight();
-		Integer writeWeight = config.getWriteWeight();
+    private HashMap<String, RealDatasourceWrapper> getDatasourceWrapperMap(DragonHADataSourceConfig configuration) throws DragonHAException {
+        HashMap<String, RealDatasourceWrapper> indexDSMap = new HashMap<String, RealDatasourceWrapper>();
+        for (RealDatasourceConfig realDatasourceConfig : configuration.getRealDataSourceConfigList()) {
+            String index = realDatasourceConfig.getIndex();
+            RealDatasourceWrapper wrapper = new RealDatasourceWrapper(realDatasourceConfig);
+            indexDSMap.put(index, wrapper);
+        }
+        return indexDSMap;
+    }
 
-		if (readWeight < 0 || writeWeight < 0 ) {
-			throw new IllegalArgumentException(
-					"'"+ index + "' config error, both 'readWeight' and 'writeWeight' can't less than zero," +
-							"current readWeight:"+ readWeight + ",current writeWeight:" + writeWeight);
-		}
+    @Override
+    public DragonHAConnection getConnection(String username, String password) throws SQLException {
+        return new DragonHAConnection(username, password, realDataSourceManager);
+    }
 
-		try {
-			DataSourceUtil.checkConnection(config.getRealClass(), config.getPropertiesMap());
-		} catch (SQLException e) {
-			throw new IllegalArgumentException("config error ,please checkRealDatasourceConfig【"+config+"】",e);
-		}
-	}
-
-	@Override
-	public DragonHAConnection getConnection(String username, String password) throws SQLException {
-		return new DragonHAConnection(username, password, realDataSourceWrapperManager);
-	}
-
-	private synchronized void refreshConfig(DragonHAConfiguration newConfiguration) throws SQLException {
-		// init(newConfiguration);
-	}
-
-	@Override
-	public void close() throws SQLException {
-
-		for (RealDatasourceWrapper realDatasourceWrapper : realDataSourceWrapperManager.getIndexDSMap().values()) {
-			try {
-				DataSourceUtil.close(realDatasourceWrapper.getRealDataSource());
-			} catch (Exception e) {
-				LOGGER.error("close datasource '" + realDatasourceWrapper + "' error", e);
-			}
-		}
-	}
+    @Override
+    public void close() throws SQLException {
+        for (RealDatasourceWrapper realDatasourceWrapper : realDataSourceManager.getIndexDSMap().values()) {
+            try {
+                DataSourceUtil.close(realDatasourceWrapper.getRealDataSource());
+            } catch (Exception e) {
+                LOGGER.error("close datasource '" + realDatasourceWrapper + "' error", e);
+            }
+        }
+    }
 }

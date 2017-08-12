@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.console.web.rest.config;
 
 import com.tianshouzhi.dragon.console.domain.DragonHAConfigurationDTO;
 import com.tianshouzhi.dragon.console.domain.SingleDataSourceConfigDTO;
-import com.tianshouzhi.dragon.ha.config.DragonHAConfiguration;
+import com.tianshouzhi.dragon.ha.config.DragonHADataSourceConfig;
 import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +22,10 @@ public class DragonHAConfigController {
         String appName = configDTO.getAppName();
         String realClass = configDTO.getRealClass();
         List<RealDatasourceConfig> realDatasourceConfigList = transform(configDTO.getSingleDSConfigDTOList());
-        DragonHAConfiguration dragonHAConfiguration=new DragonHAConfiguration();
+        DragonHADataSourceConfig dragonHADataSourceConfig =new DragonHADataSourceConfig();
         List<RealDatasourceConfig> dsConfigList = new ArrayList<RealDatasourceConfig>();
 
-//        return DragonHAConfigParser.toXml();
+//        return DragonHAXmlConfigParser.toXml();
         return null;
     }
 

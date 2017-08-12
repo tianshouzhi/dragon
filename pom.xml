@@ -43,24 +43,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.4</version>
-            </dependency>
-            <dependency>
                 <groupId>com.tianshouzhi</groupId>
                 <artifactId>dragon-dynamic-datasource</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.20</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.1.7</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -74,38 +59,7 @@
                 <version>5.1.39</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
-            </dependency>
-            <!--用于sql解析-->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>1.0.24</version>
-            </dependency>
-            <!--用于支持spring整合-->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>4.3.3.RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>4.3.3.RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>1.9.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>19.0</version>
-            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <profiles>

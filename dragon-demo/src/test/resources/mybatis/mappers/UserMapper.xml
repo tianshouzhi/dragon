@@ -23,7 +23,7 @@
         </foreach>  ;
     </insert>
 
-    <select id="selectById" parameterType="int" resultType="User">
+    <select id="selectById" parameterType="int" resultMap="userWithAccountMap">
         SELECT id,name FROM user WHERE id=#{id};
     </select>
 

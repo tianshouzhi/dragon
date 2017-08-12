@@ -1,21 +1,19 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.DBSelector;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.ReadDBSelector;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.dbselector.WriteDBSelector;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
+import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
+import com.tianshouzhi.dragon.ha.router.weight.DBSelector;
+import com.tianshouzhi.dragon.ha.router.weight.ReadDBSelector;
+import com.tianshouzhi.dragon.ha.router.weight.WriteDBSelector;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,162 +22,219 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
 public class RealDataSourceWrapperManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RealDataSourceWrapperManager.class);
+    private static final Log LOGGER = LoggerFactory.getLogger(RealDataSourceWrapperManager.class);
 
-	private Map<String, RealDatasourceWrapper> indexDSMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
+    private Map<String, RealDatasourceWrapper> validDSMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
-	private Map<String, RealDatasourceWrapper> invalidDsMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
+    private Map<String, RealDatasourceWrapper> invalidDsMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
-	private DBSelector readDBSelector;
+    private volatile boolean isRebuiding = false;
 
-	private DBSelector writeDBSelector;
+    private Lock rebuildLock = new ReentrantLock();
 
-	private boolean isRebuiding = false;
+    private DBSelector readDBSelector;
+    private DBSelector writeDBSelector;
 
-	private Lock rebuildLock = new ReentrantLock();
+    public RealDataSourceWrapperManager(HashMap<String, RealDatasourceWrapper> datasourceWrapperMap) {
+        refresh(datasourceWrapperMap);
+        runInvalidRecoveryThread();
+    }
 
-	public RealDataSourceWrapperManager() {
-		runInvalidRecoveryThread();
-	}
+    public void refresh(Map<String, RealDatasourceWrapper> newIndexDSMap) {
+        try {
+            rebuildLock.lockInterruptibly();
+            isRebuiding = true;
+            long start = System.currentTimeMillis();
+            if (MapUtils.isEmpty(this.validDSMap) && MapUtils.isEmpty(invalidDsMap)) {
+                this.validDSMap = newIndexDSMap;
+            } else {
+                Map<String, RealDatasourceWrapper> originDataSourceWrapperMap = getIndexDSMap();
+                Map<String, RealDatasourceWrapper> needToAddMap = new HashMap<String, RealDatasourceWrapper>(4);
+                Map<String, RealDatasourceWrapper> needToChangeMap = new HashMap<String, RealDatasourceWrapper>(4);
 
-	public void refresh(Map<String, RealDatasourceWrapper> indexDSMap) {
-		try {
-			rebuildLock.lockInterruptibly();
-			isRebuiding = true;
-			LOGGER.info("start refresh RealDataSourceWrapperManager...");
-			long start = System.currentTimeMillis();
-			readDBSelector = new ReadDBSelector(indexDSMap);
-			writeDBSelector = new WriteDBSelector(indexDSMap);
-			this.indexDSMap = indexDSMap;
-			LOGGER.info("end refresh RealDataSourceWrapperManager ...elapse:{}ms", System.currentTimeMillis() - start);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} finally {
-			isRebuiding = false;
-			rebuildLock.unlock();
-		}
-	}
+                for (Map.Entry<String, RealDatasourceWrapper> entry : newIndexDSMap.entrySet()) {
+                    String newDataSourceIndex = entry.getKey();
+                    RealDatasourceWrapper newDataSourceWrapper = entry.getValue();
+                    if (originDataSourceWrapperMap.containsKey(newDataSourceIndex)) {
+                        if (!newDataSourceWrapper.getConfig().equals(originDataSourceWrapperMap.get(newDataSourceIndex).getConfig())) {
+                            needToChangeMap.put(newDataSourceIndex, newDataSourceWrapper);
+                        }
+                    } else {
+                        needToAddMap.put(newDataSourceIndex, newDataSourceWrapper);
+                    }
+                }
 
-	public String selectWriteDBIndex() {
-		while (!isRebuiding)
-			break;
-		return writeDBSelector.select();
-	}
+                HashMap<String, RealDatasourceWrapper> needToRemoveMap = new HashMap<String, RealDatasourceWrapper>(4);
+                for (Map.Entry<String, RealDatasourceWrapper> entry : originDataSourceWrapperMap.entrySet()) {
+                    String oldDataSourceIndex = entry.getKey();
+                    RealDatasourceWrapper oldDataSourceWrapper = entry.getValue();
+                    if (!newIndexDSMap.containsKey(oldDataSourceIndex)) {
+                        needToRemoveMap.put(oldDataSourceIndex, oldDataSourceWrapper);
+                    }
+                }
+                add(needToAddMap);
+                remove(needToRemoveMap.keySet());
+                change(needToChangeMap);
+            }
+            readDBSelector = new ReadDBSelector(validDSMap);
+            writeDBSelector = new WriteDBSelector(validDSMap);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            isRebuiding = false;
+            rebuildLock.unlock();
+        }
+    }
 
-	public String selectReadDBIndex() {
-		while (!isRebuiding)
-			break;
-		return readDBSelector.select();
-	}
+    private void add(Map<String, RealDatasourceWrapper> indexDSMap) {
+        if (MapUtils.isNotEmpty(indexDSMap)) {
+            validDSMap.putAll(indexDSMap);
+        }
+    }
 
-	public RealDatasourceWrapper getDatasourceWrapperByDbIndex(String dataSourceIndex) throws SQLException {
-		while (!isRebuiding)
-			break;
-		return indexDSMap.get(dataSourceIndex);
-	}
+    private void remove(Set<String> datasourceIndexes) {
+        if (CollectionUtils.isNotEmpty(datasourceIndexes)) {
+            for (String datasourceIndex : datasourceIndexes) {
+                RealDatasourceWrapper realDatasourceWrapper = getIndexDSMap().get(datasourceIndex);
+                if (realDatasourceWrapper != null) {
+                    realDatasourceWrapper.close();
+                }
+                validDSMap.remove(datasourceIndex);
+                invalidDsMap.remove(datasourceIndex);
+            }
+        }
+    }
 
-	public Connection getConnectionByDbIndex(String dataSourceIndex, String username, String password)
-	      throws SQLException {
-		while (!isRebuiding)
-			break;
-		RealDatasourceWrapper realDatasourceWrapper = indexDSMap.get(dataSourceIndex);
-		if (realDatasourceWrapper == null) {
-			throw new DragonException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
-		}
-		DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
-		Connection connection = null;
+    private void change(Map<String, RealDatasourceWrapper> indexDSMap) {
+        remove(indexDSMap.keySet());
+        add(indexDSMap);
+    }
 
-		if (StringUtils.isAnyBlank(username, password))
-			connection = realDataSource.getConnection();
-		else
-			connection = realDataSource.getConnection(username, password);// druid不支持这个方法
-		if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly()
-		      && indexDSMap.get(dataSourceIndex).isReadOnly()) {
-			connection.setReadOnly(true);
-		}
-		return connection;
-	}
+    public String selectWriteDBIndex() {
+        while (!isRebuiding)
+            break;
+        return writeDBSelector.select();
+    }
 
-	public Connection getConnectionByDbIndex(List<String> hintDataSourceIndices, String username, String password)
-	      throws SQLException {
-		while (!isRebuiding)
-			break;
-		if (hintDataSourceIndices == null && hintDataSourceIndices.size() == 0) {
-			throw new SQLException("hintDataSourceIndices can't be bull or empty");
-		}
-		if (hintDataSourceIndices.size() == 1) {
-			return getConnectionByDbIndex(hintDataSourceIndices.get(0), username, password);
-		}
-		int randomIndex = new Random().nextInt(hintDataSourceIndices.size());
-		return getConnectionByDbIndex(hintDataSourceIndices.get(randomIndex), username, password);
-	}
+    public String selectReadDBIndex() {
+        while (!isRebuiding)
+            break;
+        return readDBSelector.select();
+    }
+    public String selectReadDBIndexExclude(Set<String> excludes) {
+        Set<String> managedDataSourceIndices = readDBSelector.getManagedDBIndexes();
+        managedDataSourceIndices.removeAll(excludes);
+        if (managedDataSourceIndices.isEmpty()) {
+            return null;
+        }
+        return managedDataSourceIndices.iterator().next();
+    }
 
-	private void runInvalidRecoveryThread() {
-		Thread recoveryThread = new Thread("DRAGON-HA-RecoveryThread") {
-			@Override
-			public void run() {
+    public RealDatasourceWrapper getDatasourceWrapperByDbIndex(String dataSourceIndex) {
+        while (!isRebuiding)
+            break;
+        return validDSMap.get(dataSourceIndex);
+    }
 
-				while (true) {// 存在问题... cpu使用率必然变高，改成阻塞队列
-					if (!invalidDsMap.isEmpty()) {
-						for (Map.Entry<String, RealDatasourceWrapper> entry : invalidDsMap.entrySet()) {
-							String dsIndex = entry.getKey();
-							RealDatasourceWrapper realDatasourceWrapper = entry.getValue();
-							DataSource realDataSource = (DataSource) realDatasourceWrapper.getRealDataSource();
-							try {
-								Connection connection = realDataSource.getConnection();
-								if (connection.isValid(3000)) {
-									LOGGER.info("datasource '{}' is recovered,try to refresh.....", dsIndex);
-									invalidDsMap.remove(dsIndex);
-									indexDSMap.put(dsIndex, realDatasourceWrapper);
-									refresh(indexDSMap);
-								}
-							} catch (SQLException e) {
-								// 依然失败，将当前失败的加入队列最后一个，这样就能重试下一个失败的数据源，而不是总是重试第一个失败的数据源
-								LOGGER.error("try recover {} error", dsIndex, e);
-							}
-						}
-					}
-				}
-			}
-		};
-		recoveryThread.setDaemon(true);
-		recoveryThread.start();
-	}
+    public Connection getConnectionByDbIndex(String dataSourceIndex, String username, String password)
+            throws SQLException {
+        while (!isRebuiding)
+            break;
+        RealDatasourceWrapper realDatasourceWrapper = validDSMap.get(dataSourceIndex);
+        if (realDatasourceWrapper == null) {
+            throw new DragonHARuntimeException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
+        }
+        DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
+        Connection connection = null;
 
-	public void invalid(String dataSourceIndex) {
-		while (!isRebuiding)
-			break;
-		if (indexDSMap.get(dataSourceIndex) != null) {
-			RealDatasourceWrapper realDatasourceWrapper = indexDSMap.get(dataSourceIndex);
-			LOGGER.warn("invalid datasource {}", dataSourceIndex);
-			invalidDsMap.put(dataSourceIndex, realDatasourceWrapper);
-			indexDSMap.remove(dataSourceIndex);
-			refresh(indexDSMap);
-		}
-	}
+        if (StringUtils.isAnyBlank(username, password))
+            connection = realDataSource.getConnection();
+        else
+            connection = realDataSource.getConnection(username, password);// druid不支持这个方法
+        if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly()
+                && validDSMap.get(dataSourceIndex).isReadOnly()) {
+            connection.setReadOnly(true);
+        }
+        return connection;
+    }
 
-	public String selectReadDBIndexExclude(Set<String> excludes) {
-		Set<String> managedDataSourceIndices = readDBSelector.getManagedDBIndexes();
-		managedDataSourceIndices.removeAll(excludes);
-		if (managedDataSourceIndices.isEmpty()) {
-			return null;
-		}
-		return managedDataSourceIndices.iterator().next();
-	}
+    public Connection getConnectionByDbIndex(List<String> hintDataSourceIndices, String username, String password)
+            throws SQLException {
+        while (!isRebuiding)
+            break;
+        if (hintDataSourceIndices == null && hintDataSourceIndices.size() == 0) {
+            throw new SQLException("hintDataSourceIndices can't be bull or empty");
+        }
+        if (hintDataSourceIndices.size() == 1) {
+            return getConnectionByDbIndex(hintDataSourceIndices.get(0), username, password);
+        }
+        int randomIndex = new Random().nextInt(hintDataSourceIndices.size());
+        return getConnectionByDbIndex(hintDataSourceIndices.get(randomIndex), username, password);
+    }
 
-	public Map<String, RealDatasourceWrapper> getIndexDSMap() {
-		return indexDSMap;
-	}
+    private void runInvalidRecoveryThread() {
+        Thread recoveryThread = new Thread("DRAGON-HA-RecoveryThread") {
+            @Override
+            public void run() {
 
-	public void close() {
-		if (MapUtils.isNotEmpty(indexDSMap)) {
+                while (true) {// 存在问题... cpu使用率必然变高，改成阻塞队列
+                    if (!invalidDsMap.isEmpty()) {
+                        for (Map.Entry<String, RealDatasourceWrapper> entry : invalidDsMap.entrySet()) {
+                            String dsIndex = entry.getKey();
+                            RealDatasourceWrapper realDatasourceWrapper = entry.getValue();
+                            DataSource realDataSource = (DataSource) realDatasourceWrapper.getRealDataSource();
+                            try {
+                                Connection connection = realDataSource.getConnection();
+                                if (connection.isValid(3000)) {
+                                    LOGGER.info("datasource 【"+dsIndex+"】 became valid");
+                                    invalidDsMap.remove(dsIndex);
+                                    validDSMap.put(dsIndex, realDatasourceWrapper);
+                                    refresh(validDSMap);
+                                }
+                            } catch (SQLException e) {
+                                LOGGER.debug("datasource 【"+dsIndex+"】 still invalid");
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        recoveryThread.setDaemon(true);
+        recoveryThread.start();
+    }
 
-		}
-		if (MapUtils.isNotEmpty(invalidDsMap)) {
-			for (RealDatasourceWrapper wrapper : invalidDsMap.values()) {
-				DataSource physicalDataSource = wrapper.getRealDataSource();
+    public void invalid(String dataSourceIndex) {
+        while (!isRebuiding)
+            break;
+        if (validDSMap.get(dataSourceIndex) != null) {
+            RealDatasourceWrapper realDatasourceWrapper = validDSMap.get(dataSourceIndex);
+            LOGGER.warn("datasource 【"+dataSourceIndex+"】 became invalid");
+            invalidDsMap.put(dataSourceIndex, realDatasourceWrapper);
+            validDSMap.remove(dataSourceIndex);
+            refresh(validDSMap);
+        }
+    }
 
-			}
-		}
-	}
+    public Map<String, RealDatasourceWrapper> getIndexDSMap() {
+        Map<String, RealDatasourceWrapper> map = new HashMap<String, RealDatasourceWrapper>(4);
+        map.putAll(validDSMap);
+        map.putAll(invalidDsMap);
+        return map;
+    }
+
+    public Map<String, RealDatasourceWrapper> getValidDSMap() {
+        return validDSMap;
+    }
+
+    public void setValidDSMap(Map<String, RealDatasourceWrapper> validDSMap) {
+        this.validDSMap = validDSMap;
+    }
+
+    public Map<String, RealDatasourceWrapper> getInvalidDsMap() {
+        return invalidDsMap;
+    }
+
+    public void setInvalidDsMap(Map<String, RealDatasourceWrapper> invalidDsMap) {
+        this.invalidDsMap = invalidDsMap;
+    }
 }

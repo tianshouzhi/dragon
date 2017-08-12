@@ -1,9 +1,11 @@
-package com.tianshouzhi.dragon.common.exception;
+package com.tianshouzhi.dragon.ha.exception;
+
+import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 
 /**
  * Created by tianshouzhi on 2017/8/3.
  */
-public class DragonHAConfigException extends DragonConfigException{
+public class DragonHAConfigException extends DragonHAException {
     public DragonHAConfigException(String reason) {
         super(reason);
     }
