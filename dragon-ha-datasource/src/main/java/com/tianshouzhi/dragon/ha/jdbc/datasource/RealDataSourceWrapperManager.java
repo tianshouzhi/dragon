@@ -233,15 +233,7 @@ public class RealDataSourceWrapperManager {
         return validDSMap;
     }
 
-    public void setValidDSMap(Map<String, RealDatasourceWrapper> validDSMap) {
-        this.validDSMap = validDSMap;
-    }
-
     public Map<String, RealDatasourceWrapper> getInvalidDsMap() {
         return invalidDsMap;
-    }
-
-    public void setInvalidDsMap(Map<String, RealDatasourceWrapper> invalidDsMap) {
-        this.invalidDsMap = invalidDsMap;
     }
 }
