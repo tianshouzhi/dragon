@@ -10,11 +10,11 @@ public class DragonHAException extends DragonException{
         super(reason);
     }
 
-    public DragonHAException(InterruptedException e) {
+    public DragonHAException(Throwable e) {
         super(e);
     }
 
-    public DragonHAException(String message, Exception e) {
+    public DragonHAException(String message, Throwable e) {
         super(message, e);
     }
 }

@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.config.parser;
 
-import com.tianshouzhi.dragon.ha.config.DragonHADataSourceConfig;
+import com.tianshouzhi.dragon.ha.config.DragonHAConfiguration;
 import com.tianshouzhi.dragon.ha.exception.DragonHAConfigException;
 
 import javax.xml.bind.JAXBContext;
@@ -24,7 +24,7 @@ public class DragonHAXmlConfigParser {
 	private static Marshaller marshaller = null;
 	static {
 		try {
-			context = JAXBContext.newInstance(DragonHADataSourceConfig.class);
+			context = JAXBContext.newInstance(DragonHAConfiguration.class);
 			unmarshaller = context.createUnmarshaller();
 			marshaller = context.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);// 格式化输出
@@ -33,15 +33,15 @@ public class DragonHAXmlConfigParser {
 		}
 	}
 	
-	public static DragonHADataSourceConfig parse(String xmlConfig) throws DragonHAConfigException {
+	public static DragonHAConfiguration parse(String xmlConfig) throws DragonHAConfigException {
 		return parse(new ByteArrayInputStream(xmlConfig.getBytes(Charset.forName("UTF-8"))));
 	}
 
-	public static DragonHADataSourceConfig parse(InputStream config) throws DragonHAConfigException {
-		DragonHADataSourceConfig configuration = null;
+	public static DragonHAConfiguration parse(InputStream config) throws DragonHAConfigException {
+		DragonHAConfiguration configuration = null;
 		try {
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-			configuration = (DragonHADataSourceConfig) unmarshaller.unmarshal(config);
+			configuration = (DragonHAConfiguration) unmarshaller.unmarshal(config);
 			return configuration;
 		} catch (JAXBException e) {
 			throw new DragonHAConfigException("parse DragonHADataSource config error", e);
@@ -53,7 +53,7 @@ public class DragonHAXmlConfigParser {
 		}
 	}
 
-	public static String toXml(DragonHADataSourceConfig configuration) throws DragonHAConfigException {
+	public static String toXml(DragonHAConfiguration configuration) throws DragonHAConfigException {
 		StringWriter xml = new StringWriter();
 		try {
 			marshaller.marshal(configuration, xml);

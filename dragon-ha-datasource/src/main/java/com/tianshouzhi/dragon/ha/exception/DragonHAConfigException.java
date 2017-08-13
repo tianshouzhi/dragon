@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.ha.exception;
 
-import com.tianshouzhi.dragon.common.exception.DragonConfigException;
-
 /**
  * Created by tianshouzhi on 2017/8/3.
  */
@@ -10,11 +8,11 @@ public class DragonHAConfigException extends DragonHAException {
         super(reason);
     }
 
-    public DragonHAConfigException(InterruptedException e) {
+    public DragonHAConfigException(Throwable e) {
         super(e);
     }
 
-    public DragonHAConfigException(String message, Exception e) {
+    public DragonHAConfigException(String message, Throwable e) {
         super(message, e);
     }
 }

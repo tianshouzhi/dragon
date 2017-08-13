@@ -35,9 +35,7 @@ public abstract class AbstractDBSelector implements DBSelector {
 	}
 
 	private String buildLog(Map<WeightRange, String> rangeDBIndexMap, Map<String, RealDatasourceWrapper> filterResult) {
-		StringBuilder sb = new StringBuilder("\n");
-		sb.append("managed datasource num:" + filterResult.size());
-		sb.append(",total weight:" + totalWeight);
+		StringBuilder sb = new StringBuilder(200);
 		sb.append("\n[\n");
 		for (Map.Entry<String, RealDatasourceWrapper> entry : filterResult.entrySet()) {
 			RealDatasourceWrapper realDatasourceWrapper = entry.getValue();

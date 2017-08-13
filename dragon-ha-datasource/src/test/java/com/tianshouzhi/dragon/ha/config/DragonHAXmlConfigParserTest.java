@@ -12,7 +12,7 @@ public class DragonHAXmlConfigParserTest {
 	@Test
 	public void test() throws Exception {
 		InputStream stream = DragonHAXmlConfigParser.class.getClassLoader().getResourceAsStream("dragon-ha-config.xml");
-		DragonHADataSourceConfig configuration = DragonHAXmlConfigParser.parse(stream);
+		DragonHAConfiguration configuration = DragonHAXmlConfigParser.parse(stream);
 		System.out.println(DragonHAXmlConfigParser.toXml(configuration));
 	}
 }

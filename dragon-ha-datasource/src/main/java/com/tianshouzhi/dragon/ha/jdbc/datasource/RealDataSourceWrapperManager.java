@@ -72,8 +72,9 @@ public class RealDataSourceWrapperManager {
                         needToRemoveMap.put(oldDataSourceIndex, oldDataSourceWrapper);
                     }
                 }
-                add(needToAddMap);
+                //FIXME remove后，如果原来有read ，就必须还有read，原来有write，还必须有write 防止误操作
                 remove(needToRemoveMap.keySet());
+                add(needToAddMap);
                 change(needToChangeMap);
             }
             readDBSelector = new ReadDBSelector(validDSMap);
@@ -88,12 +89,15 @@ public class RealDataSourceWrapperManager {
 
     private void add(Map<String, RealDatasourceWrapper> indexDSMap) {
         if (MapUtils.isNotEmpty(indexDSMap)) {
+            LOGGER.info("add real datasources "+indexDSMap.keySet());
             validDSMap.putAll(indexDSMap);
         }
     }
 
     private void remove(Set<String> datasourceIndexes) {
+
         if (CollectionUtils.isNotEmpty(datasourceIndexes)) {
+            LOGGER.info("remove real datasource"+datasourceIndexes);
             for (String datasourceIndex : datasourceIndexes) {
                 RealDatasourceWrapper realDatasourceWrapper = getIndexDSMap().get(datasourceIndex);
                 if (realDatasourceWrapper != null) {
@@ -106,8 +110,11 @@ public class RealDataSourceWrapperManager {
     }
 
     private void change(Map<String, RealDatasourceWrapper> indexDSMap) {
-        remove(indexDSMap.keySet());
-        add(indexDSMap);
+        if(MapUtils.isNotEmpty(indexDSMap)){
+            LOGGER.info("repalce real datasource"+indexDSMap.keySet());
+            remove(indexDSMap.keySet());
+            add(indexDSMap);
+        }
     }
 
     public String selectWriteDBIndex() {
@@ -144,7 +151,7 @@ public class RealDataSourceWrapperManager {
         if (realDatasourceWrapper == null) {
             throw new DragonHARuntimeException("not found datasouce with dataSourceIndex:" + dataSourceIndex);
         }
-        DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
+        DataSource realDataSource  = realDatasourceWrapper.getRealDataSource();
         Connection connection = null;
 
         if (StringUtils.isAnyBlank(username, password))

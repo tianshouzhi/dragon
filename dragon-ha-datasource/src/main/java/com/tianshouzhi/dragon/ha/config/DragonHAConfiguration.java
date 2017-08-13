@@ -6,7 +6,7 @@ import java.util.List;
 
 @XmlRootElement(name = "dragonHADatasource")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DragonHADataSourceConfig {
+public class DragonHAConfiguration {
 	@XmlAttribute(name = "appName", required = true)
 	private String appName;
 
@@ -45,7 +45,7 @@ public class DragonHADataSourceConfig {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		DragonHADataSourceConfig that = (DragonHADataSourceConfig) o;
+		DragonHAConfiguration that = (DragonHAConfiguration) o;
 
 		if (!appName.equals(that.appName)) return false;
 		if (!lazyInit.equals(that.lazyInit)) return false;

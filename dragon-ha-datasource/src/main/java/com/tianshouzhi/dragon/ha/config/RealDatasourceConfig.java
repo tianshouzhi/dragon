@@ -88,6 +88,32 @@ public class RealDatasourceConfig {
 		public void setValue(String value) {
 			this.value = value;
 		}
+
+		@Override
+		public String toString() {
+			return "Property{" +
+					"name='" + name + '\'' +
+					", value='" + value + '\'' +
+					'}';
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			Property property = (Property) o;
+
+			if (!name.equals(property.name)) return false;
+			return value.equals(property.value);
+		}
+
+		@Override
+		public int hashCode() {
+			int result = name.hashCode();
+			result = 31 * result + value.hashCode();
+			return result;
+		}
 	}
 
 	public Map<String, String> getPropertiesMap() {
@@ -121,7 +147,6 @@ public class RealDatasourceConfig {
 		result = 31 * result + properties.hashCode();
 		return result;
 	}
-
 
 	@Override
 	public String toString() {

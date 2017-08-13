@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.jmx;
 
-import com.tianshouzhi.dragon.ha.config.DragonHADataSourceConfig;
+import com.tianshouzhi.dragon.ha.config.DragonHAConfiguration;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class DragonHAStaticsMBean {
     private String verison;
-    private DragonHADataSourceConfig configuration;
+    private DragonHAConfiguration configuration;
     private Map<String,RealDataSourceMBean> staticsMap;
 
 }
