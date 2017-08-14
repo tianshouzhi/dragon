@@ -18,140 +18,203 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public class DragonHADatasource extends DragonDataSource {
-    private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
+	private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
 
-    private RealDataSourceWrapperManager realDataSourceManager;
-    private DragonHAConfigurationManager configurationManager;
-    private DragonHAConfiguration configuration;
+	private RealDataSourceWrapperManager realDataSourceManager;
 
-    public DragonHADatasource(String configFile) throws DragonHAException {
-        this(new DragonHALocalConfigurationManager(configFile));
-    }
+	private DragonHAConfigurationManager configurationManager;
 
-    public DragonHADatasource(DragonHAConfigurationManager configurationManager) throws DragonHAException {
-        this(configurationManager.getConfiguration());
-        configurationManager.setDragonHADataSource(this);
-        this.configurationManager = configurationManager;
-    }
+	private DragonHAConfiguration configuration;
 
-    public DragonHADatasource(DragonHAConfiguration configuration) throws DragonHAException {
-        checkDragonHAConfiguration(configuration);
-        HashMap<String, RealDatasourceWrapper> datasourceWrapperMap = getDatasourceWrapperMap(configuration);
-        if (!configuration.isLazyInit()) {
-            for (RealDatasourceWrapper wrapper : datasourceWrapperMap.values()) {
-                wrapper.init();
-            }
-        }
-        this.realDataSourceManager = new RealDataSourceWrapperManager(datasourceWrapperMap);
-        this.configuration = configuration;
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                try {
-                    close();
-                } catch (SQLException ignore) {
-                }
-            }
-        });
-    }
+	public DragonHADatasource(String configFile) throws DragonHAException {
+		this(new DragonHALocalConfigurationManager(configFile));
+	}
 
-    public synchronized void refreshConfig(DragonHAConfiguration newConfiguration) throws DragonHAException {
-        if (newConfiguration == null || configuration.equals(newConfiguration)) {
-            return;
-        }
-        StringBuilder refreshMsg = new StringBuilder(200);
-        refreshMsg.append("refresh ha config .\n");
-        refreshMsg.append("======================origin ha config==================.\n");
-        refreshMsg.append(DragonHAXmlConfigParser.toXml(configuration));
-        refreshMsg.append("======================new ha config==================.\n");
-        refreshMsg.append(DragonHAXmlConfigParser.toXml(newConfiguration));
+	public DragonHADatasource(DragonHAConfigurationManager configurationManager) throws DragonHAException {
+		this(configurationManager.getConfiguration());
+		configurationManager.setDragonHADataSource(this);
+		this.configurationManager = configurationManager;
+	}
 
-        try {
-            checkDragonHAConfiguration(newConfiguration);
-            HashMap<String, RealDatasourceWrapper> newDataSourceWrapperMap = getDatasourceWrapperMap(newConfiguration);
-            realDataSourceManager.refresh(newDataSourceWrapperMap);
-            this.configuration = newConfiguration;
-        } catch (Throwable e) {
-            throw new DragonHAConfigException("refresh ha config error,will keep the origin config", e);
-        }
-    }
+	public DragonHADatasource(DragonHAConfiguration configuration) throws DragonHAException {
+		checkDragonHAConfiguration(configuration);
+		HashMap<String, RealDatasourceWrapper> datasourceWrapperMap = getDatasourceWrapperMap(configuration);
+		if (!configuration.isLazyInit()) {
+			for (RealDatasourceWrapper wrapper : datasourceWrapperMap.values()) {
+				wrapper.init();
+			}
+		}
+		this.realDataSourceManager = new RealDataSourceWrapperManager(datasourceWrapperMap);
+		this.configuration = configuration;
 
-    private void checkDragonHAConfiguration(DragonHAConfiguration configuration) throws DragonHAConfigException {
-        if (configuration == null) {
-            throw new DragonHAConfigException("configuration can't be null");
-        }
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				try {
+					close();
+				} catch (SQLException ignore) {
+				}
+			}
+		});
+	}
 
-        String appName = configuration.getAppName();
-        if (StringUtils.isBlank(appName)) {
-            throw new DragonHAConfigException("appName can't be blank");
-        }
+	private void checkDragonHAConfiguration(DragonHAConfiguration configuration) throws DragonHAConfigException {
+		if (configuration == null) {
+			throw new DragonHAConfigException("configuration can't be null");
+		}
 
-        List<RealDatasourceConfig> configList = configuration.getRealDataSourceConfigList();
-        if (CollectionUtils.isEmpty(configList)) {
-            throw new DragonHAConfigException("no real datasource config!!!");
-        }
+		String appName = configuration.getAppName();
+		if (StringUtils.isBlank(appName)) {
+			throw new DragonHAConfigException("appName can't be blank");
+		}
 
-        for (RealDatasourceConfig config : configList) {
-            checkRealDatasourceConfig(config);
-        }
-    }
+		List<RealDatasourceConfig> configList = configuration.getRealDataSourceConfigList();
+		if (CollectionUtils.isEmpty(configList)) {
+			throw new DragonHAConfigException("no real datasource config!!!");
+		}
 
-    private void checkRealDatasourceConfig(RealDatasourceConfig config) throws DragonHAConfigException {
-        if (config == null) {
-            throw new NullPointerException();
-        }
+		for (RealDatasourceConfig config : configList) {
+			checkRealDatasourceConfig(config);
+		}
+	}
 
-        String index = config.getIndex();
+	private void checkRealDatasourceConfig(RealDatasourceConfig config) throws DragonHAConfigException {
+		if (config == null) {
+			throw new NullPointerException();
+		}
 
-        if (StringUtils.isBlank(index)) {
-            throw new DragonHAConfigException("parameter 'dataSourceIndex' can't be empty or blank");
-        }
+		String index = config.getIndex();
 
-        Integer readWeight = config.getReadWeight();
-        Integer writeWeight = config.getWriteWeight();
+		if (StringUtils.isBlank(index)) {
+			throw new DragonHAConfigException("parameter 'dataSourceIndex' can't be empty or blank");
+		}
 
-        if (readWeight < 0 || writeWeight < 0) {
-            throw new DragonHAConfigException(
-                    "'" + index + "' config error, both 'readWeight' and 'writeWeight' can't less than zero," +
-                            "current readWeight:" + readWeight + ",current writeWeight:" + writeWeight);
-        }
+		Integer readWeight = config.getReadWeight();
+		Integer writeWeight = config.getWriteWeight();
 
-        try {
-            DataSourceUtil.checkConnection(config.getRealClass(), config.getPropertiesMap());
-        } catch (SQLException e) {
-            throw new DragonHAConfigException("'" + index + "'check connection error ,please check config【" + config + "】", e);
-        }
-    }
+		if (readWeight < 0 || writeWeight < 0) {
+			throw new DragonHAConfigException(
+					"'" + index + "' config error, both 'readWeight' and 'writeWeight' can't less than zero,"
+							+ "current readWeight:" + readWeight + ",current writeWeight:" + writeWeight);
+		}
 
-    private HashMap<String, RealDatasourceWrapper> getDatasourceWrapperMap(DragonHAConfiguration configuration) throws DragonHAException {
-        HashMap<String, RealDatasourceWrapper> datasourceWrapperMap = new HashMap<String, RealDatasourceWrapper>();
-        for (RealDatasourceConfig realDatasourceConfig : configuration.getRealDataSourceConfigList()) {
-            String index = realDatasourceConfig.getIndex();
-            RealDatasourceWrapper wrapper = new RealDatasourceWrapper(realDatasourceConfig);
-            datasourceWrapperMap.put(index, wrapper);
-        }
+		try {
+			DataSourceUtil.checkConnection(config.getRealClass(), config.getPropertiesMap());
+		} catch (SQLException e) {
+			throw new DragonHAConfigException("'" + index + "'check connection error ,please check config【" + config + "】",
+					e);
+		}
+	}
 
-        return datasourceWrapperMap;
-    }
+	private HashMap<String, RealDatasourceWrapper> getDatasourceWrapperMap(DragonHAConfiguration configuration)
+			throws DragonHAException {
+		HashMap<String, RealDatasourceWrapper> datasourceWrapperMap = new HashMap<String, RealDatasourceWrapper>();
+		for (RealDatasourceConfig realDatasourceConfig : configuration.getRealDataSourceConfigList()) {
+			String index = realDatasourceConfig.getIndex();
+			RealDatasourceWrapper wrapper = new RealDatasourceWrapper(realDatasourceConfig);
+			datasourceWrapperMap.put(index, wrapper);
+		}
 
-    @Override
-    public DragonHAConnection getConnection(String username, String password) throws SQLException {
-        return new DragonHAConnection(username, password, realDataSourceManager);
-    }
+		return datasourceWrapperMap;
+	}
 
-    @Override
-    public void close() throws SQLException {
-        LOGGER.info("close dragon ha datasource");
-        for (RealDatasourceWrapper realDatasourceWrapper : realDataSourceManager.getIndexDSMap().values()) {
-            try {
-                realDatasourceWrapper.close();
-            } catch (Throwable ignore) {
-            }
-        }
-    }
+	public synchronized void refreshConfig(DragonHAConfiguration newConfiguration) throws DragonHAException {
+		if (newConfiguration == null || configuration.equals(newConfiguration)) {
+			return;
+		} else {
+			logRefresh(newConfiguration);
+		}
+
+		if (!this.configuration.getRealDataSourceConfigList().equals(newConfiguration.getRealDataSourceConfigList())) {
+			try {
+				Map<String, RealDatasourceWrapper> originIndexDSMap = this.realDataSourceManager.getIndexDSMap();
+				HashMap<String, RealDatasourceWrapper> newIndexDSMap = getDatasourceWrapperMap(newConfiguration);
+
+				//calculate change info
+				Map<String, RealDatasourceWrapper> needToAddMap = new HashMap<String, RealDatasourceWrapper>(4);
+				Map<String, RealDatasourceWrapper> needToReplaceMap = new HashMap<String, RealDatasourceWrapper>(4);
+				HashMap<String, RealDatasourceWrapper> needToRemoveMap = new HashMap<String, RealDatasourceWrapper>(4);
+
+				for (Map.Entry<String, RealDatasourceWrapper> entry : newIndexDSMap.entrySet()) {
+					String newDataSourceIndex = entry.getKey();
+					RealDatasourceWrapper newDataSourceWrapper = entry.getValue();
+					if (originIndexDSMap.containsKey(newDataSourceIndex)) {
+						if (!newDataSourceWrapper.getConfig().equals(originIndexDSMap.get(newDataSourceIndex).getConfig())) {
+							needToReplaceMap.put(newDataSourceIndex, newDataSourceWrapper);
+						}
+					} else {
+						needToAddMap.put(newDataSourceIndex, newDataSourceWrapper);
+					}
+				}
+
+				for (Map.Entry<String, RealDatasourceWrapper> entry : originIndexDSMap.entrySet()) {
+					String oldDataSourceIndex = entry.getKey();
+					RealDatasourceWrapper oldDataSourceWrapper = entry.getValue();
+					if (!newIndexDSMap.containsKey(oldDataSourceIndex)) {
+						needToRemoveMap.put(oldDataSourceIndex, oldDataSourceWrapper);
+					}
+				}
+
+				// check needToAddMap and needToReplaceMap,there is no need to check needToRemoveMap,just remove it
+				for (RealDatasourceWrapper realDatasourceWrapper : needToAddMap.values()) {
+					checkRealDatasourceConfig(realDatasourceWrapper.getConfig());
+				}
+
+				for (RealDatasourceWrapper realDatasourceWrapper : needToReplaceMap.values()) {
+					checkRealDatasourceConfig(realDatasourceWrapper.getConfig());
+				}
+
+				//init after check passed
+				if(!newConfiguration.isLazyInit()){
+					for (RealDatasourceWrapper realDatasourceWrapper : needToAddMap.values()) {
+						realDatasourceWrapper.init();
+					}
+					for (RealDatasourceWrapper realDatasourceWrapper : needToReplaceMap.values()) {
+						realDatasourceWrapper.init();
+					}
+				}
+
+				//refresh,it will be very fast (all prepare work,eg :calculate change and init, has been done,just
+				// need to reset the map)
+				realDataSourceManager.refresh(needToAddMap, needToReplaceMap, needToRemoveMap.keySet());
+
+				this.configuration = newConfiguration;
+			} catch (Throwable e) {
+				throw new DragonHAConfigException("refresh ha config error,will keep the origin config", e);
+			}
+		} else {
+			this.configuration = newConfiguration;
+		}
+	}
+
+	@Override
+	public DragonHAConnection getConnection(String username, String password) throws SQLException {
+		return new DragonHAConnection(username, password, realDataSourceManager);
+	}
+
+	@Override
+	public void close() throws SQLException {
+		LOGGER.info("close dragon ha datasource");
+		for (RealDatasourceWrapper realDatasourceWrapper : realDataSourceManager.getIndexDSMap().values()) {
+			try {
+				realDatasourceWrapper.close();
+			} catch (Throwable ignore) {
+			}
+		}
+	}
+
+	private void logRefresh(DragonHAConfiguration newConfiguration) throws DragonHAConfigException {
+		String msg = "try to refresh ha config .\n";
+		msg += "======================origin ha config==================.\n";
+		msg += DragonHAXmlConfigParser.toXml(this.configuration);
+		msg += "======================new ha config==================.\n";
+		msg += DragonHAXmlConfigParser.toXml(newConfiguration);
+		LOGGER.info(msg);
+	}
 }

@@ -16,8 +16,11 @@ import javax.sql.DataSource;
  */
 public class RealDatasourceWrapper {
 	private static final Log LOGGER = LoggerFactory.getLogger(RealDatasourceWrapper.class);
+
 	private DataSource realDataSource;
-	private volatile boolean  init=false;
+
+	private volatile boolean init = false;
+
 	private boolean isReadOnly;
 
 	private ExceptionSorter exceptionSorter = new MySqlExceptionSorter();
@@ -38,14 +41,14 @@ public class RealDatasourceWrapper {
 	}
 
 	public synchronized void init() throws DragonHAException {
-		if(init){
+		if (init) {
 			return;
 		}
 		try {
 			this.realDataSource = createRealDataSource(this.config);
-			DataSourceUtil.init(this.realDataSource );
-			init=true;
-			LOGGER.info("init real datasource '"+config.getIndex()+"' success!");
+			DataSourceUtil.init(this.realDataSource);
+			init = true;
+			LOGGER.info("init real datasource '" + config.getIndex() + "' success!");
 		} catch (Exception e) {
 			throw new DragonHAException("init real datasource '" + config.getIndex() + "' error!", e);
 		}
@@ -59,8 +62,8 @@ public class RealDatasourceWrapper {
 		return config.getWriteWeight();
 	}
 
-	public DataSource getRealDataSource(){
-		if(this.realDataSource==null){
+	public DataSource getRealDataSource() {
+		if (this.realDataSource == null) {
 			try {
 				init();
 			} catch (DragonHAException e) {
@@ -86,9 +89,8 @@ public class RealDatasourceWrapper {
 		this.config = config;
 	}
 
-
 	public void close() {
-		LOGGER.info("close real datasource '"+config.getIndex()+"'!!!");
+		LOGGER.info("close real datasource '" + config.getIndex() + "'!!!");
 		DataSourceUtil.close(realDataSource);
 	}
 }
