@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.sharding.pipeline;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.execution.ExecutionHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.hint.HintParseHandler;
@@ -8,7 +8,6 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge.ResultMergeH
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlparse.SqlParseHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriteHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.statics.StaticsHandler;
-import groovy.sql.Sql;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class Pipeline {
 			}
 		} catch (Exception e) {
 			handlerContext.setThrowable(e);
-			throw new DragonException(
+			throw new DragonRuntimeException(
 			      "execute handler chain fail,current handler:" + currentHandler.getClass().getSimpleName(), e);
 		} finally {
 			// 不管成功还是失败，最终都走要StaticsHandler

@@ -5,7 +5,7 @@ import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
@@ -43,7 +43,7 @@ public class SqlRewriteHandler implements Handler {
 				new MysqlSelectStatementRewriter().rewrite(context);
 				isQuery = true;
 			} else {
-				throw new DragonException("only support insert、delete、update、select statement，current sql："
+				throw new DragonRuntimeException("only support insert、delete、update、select statement，current sql："
 				      + context.getShardingStatement().getSql());
 			}
 		}

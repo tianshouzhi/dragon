@@ -2,6 +2,7 @@ package com.tianshouzhi.dragon.sharding.route;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -63,12 +64,12 @@ public class LogicTable extends LogicConfig {
 	 * @param shardColumnValuesMap
 	 * @return
 	 */
-	public String getRealDBName(Map<String, Object> shardColumnValuesMap) throws DragonException {
+	public String getRealDBName(Map<String, Object> shardColumnValuesMap) {
 		Long realDBIndex = getRealIndex(shardColumnValuesMap, dbRouteRules);
 		return logicDatasource.format(realDBIndex);
 	}
 
-	public String getRealTBName(Map<String, Object> shardColumnValuesMap) throws DragonException {
+	public String getRealTBName(Map<String, Object> shardColumnValuesMap) {
 		Long realTBIndex = getRealIndex(shardColumnValuesMap, tbRouteRules);
 		return format(realTBIndex);
 	}
@@ -79,11 +80,11 @@ public class LogicTable extends LogicConfig {
 	 * @param realTBName
 	 * @return
 	 */
-	public Long parseRealTBIndex(String realTBName) throws DragonException {
+	public Long parseRealTBIndex(String realTBName) {
 		return super.parseIndex(realTBName);
 	}
 
-	public Long parseRealDBIndex(String realDBName) throws DragonException {
+	public Long parseRealDBIndex(String realDBName){
 		return logicDatasource.parseIndex(realDBName);
 	}
 
@@ -120,7 +121,7 @@ public class LogicTable extends LogicConfig {
 	 * @param params
 	 * @return
 	 */
-	protected Long getRealIndex(Map<String, Object> params, Set<RouteRule> routeRules) throws DragonException {
+	protected Long getRealIndex(Map<String, Object> params, Set<RouteRule> routeRules) {
 		if (params == null) {
 			throw new NullPointerException();
 		}
@@ -132,7 +133,7 @@ public class LogicTable extends LogicConfig {
 			}
 		}
 		if (selectedRouteRule == null) {
-			throw new DragonException("no matched route rule found !!!");
+			throw new DragonRuntimeException("no matched route rule found !!!");
 		}
 
 		Object eval = DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);

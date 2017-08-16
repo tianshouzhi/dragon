@@ -5,7 +5,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
@@ -54,15 +54,15 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
         doRewrite(context);
     }
 
-    protected DragonPrepareStatement.ParamSetting getParamSetting(int paramterIndex) throws DragonException{
+    protected DragonPrepareStatement.ParamSetting getParamSetting(int paramterIndex){
         if(!isPrepare){
-            throw new DragonException("current sql is not PreparedStatement!!!");
+            throw new DragonRuntimeException("current sql is not PreparedStatement!!!");
         }
         if(originParameters ==null){
-            throw new DragonException("no params set for sql");
+            throw new DragonRuntimeException("no params set for sql");
         }
         if(paramterIndex> originParameters.size()){
-            throw new DragonException("ParamterIndex>originParameters.size()");
+            throw new DragonRuntimeException("ParamterIndex>originParameters.size()");
         }
         return originParameters.get(paramterIndex);
     }
@@ -113,12 +113,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
 
         if(tableSource instanceof SQLUnionQueryTableSource){
-            throw new DragonException("don't support union operate,sql:"+originSql);
+            throw new DragonRuntimeException("don't support union operate,sql:"+originSql);
         }
         if(tableSource instanceof SQLSubqueryTableSource){
-            throw new DragonException("don't support subQuery,sql:"+originSql);
+            throw new DragonRuntimeException("don't support subQuery,sql:"+originSql);
         }
-        throw new DragonException("don't support sql:"+originSql);
+        throw new DragonRuntimeException("don't support sql:"+originSql);
 
     }
     //判断是否是jdbc ？占位符
@@ -301,12 +301,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             }
             return logicTable;
         }
-        throw new DragonException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
+        throw new DragonRuntimeException("can't decide shardColumnExpr:"+shardColumnExpr+" belong to which logic table");
     }
 
 
     //根据主维度表生成路由规则
-    private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) throws DragonException {
+    private void addRouteInfo(LogicTable primaryLogicTable ,Map<String, Object> binaryShardConditionMap) {
         String realDBName = primaryLogicTable.getRealDBName(binaryShardConditionMap);
         String primaryTBName = primaryLogicTable.getRealTBName(binaryShardConditionMap);
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap = context.getSqlRouteMap();
@@ -331,7 +331,7 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     }
 
-    protected void makeRouteMap() throws DragonException{
+    protected void makeRouteMap(){
         //如果sql中只包含一个表，则可以执行
         //主维度表
         LogicTable primaryLogicTable = sqlRouteParams.getPrimaryLogicTable();
@@ -439,12 +439,12 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
 
     }
 
-    private void makeRouteAllParamsMap() throws DragonException{
+    private void makeRouteAllParamsMap(){
         Map<String, Map<String, SqlRouteInfo>> sqlRouteMap=new HashMap<String, Map<String, SqlRouteInfo>>();
         for (LogicTable logicTable : parsedLogicTableList) { //check每个逻辑表都应该配置了真实库与表的映射关系
             Map<String, List<String>> realDBTBMap = logicTable.getRealDBTBMap();
             if(MapUtils.isEmpty(realDBTBMap)){//全局路由必须要配置 realDBTBMap
-                throw new DragonException("logic table '"+logicTable.getLogicTableName()+"' don't config realDBTBMap ,so sql '"+originSql+"' must contains route condition!!!");
+                throw new DragonRuntimeException("logic table '"+logicTable.getLogicTableName()+"' don't config realDBTBMap ,so sql '"+originSql+"' must contains route condition!!!");
             }
         }
         LogicTable primaryLogicTable = parsedLogicTableList.get(0);//因为没有分区条件，随机选择一个表作为主维度表，这里选择第一个

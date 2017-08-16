@@ -4,7 +4,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.alibaba.druid.util.JdbcConstants;
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
@@ -47,7 +47,7 @@ public class SqlParseHandler implements Handler {
 		}
 	}
 
-	private SQLStatement parseSqlAST(HandlerContext context, String sql) throws DragonException {
+	private SQLStatement parseSqlAST(HandlerContext context, String sql) {
 		SQLStatement sqlStatement;
 		long start = System.currentTimeMillis();
 		SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql, JdbcConstants.MYSQL);
@@ -55,7 +55,7 @@ public class SqlParseHandler implements Handler {
 		if (sqlStatements.size() == 1) {
 			sqlStatement = sqlStatements.get(0);
 		} else {
-			throw new DragonException("only support one sql!!");
+			throw new DragonRuntimeException("only support one sql!!");
 		}
 		context.setSqlParseTimeMillis(System.currentTimeMillis() - start);
 		return sqlStatement;

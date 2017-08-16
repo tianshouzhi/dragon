@@ -16,10 +16,10 @@
         INSERT INTO user (id,name) VALUES (#{id},#{name});
     </insert>
 
-    <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO user (id,name) VALUES
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO user (name) VALUES
         <foreach collection="list"  item="user" index="index" separator="," >
-            (#{user.id},#{user.name})
+            (#{user.name})
         </foreach>  ;
     </insert>
 

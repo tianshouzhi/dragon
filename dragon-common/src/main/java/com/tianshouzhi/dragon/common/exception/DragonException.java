@@ -1,7 +1,5 @@
 package com.tianshouzhi.dragon.common.exception;
 
-import java.sql.SQLException;
-
 /**
  * Created by TIANSHOUZHI336 on 2016/12/6.
  */
@@ -10,11 +8,11 @@ public class DragonException extends Exception {
 		super(reason);
 	}
 
-	public DragonException(InterruptedException e) {
+	public DragonException(Throwable e) {
 		super(e);
 	}
 
-	public DragonException(String message, Exception e) {
+	public DragonException(String message, Throwable e) {
 		super(message, e);
 	}
 }

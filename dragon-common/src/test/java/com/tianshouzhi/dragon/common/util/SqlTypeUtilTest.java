@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.common.util;
 
+import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlType;
+import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by tianshouzhi on 2017/6/25.

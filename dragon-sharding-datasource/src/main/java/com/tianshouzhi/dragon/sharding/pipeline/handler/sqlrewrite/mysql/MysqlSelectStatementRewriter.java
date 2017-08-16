@@ -7,7 +7,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
@@ -73,7 +73,7 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
     }
 
     //修改limit起始语句：limt 2,2 从第二位开始，查询2个 也就是 2、3两条记录，originOffset要改为0，rowCount要改为originOffset+rowCount
-    private void alterLimit(HandlerContext context, MySqlSelectQueryBlock query) throws DragonException {
+    private void alterLimit(HandlerContext context, MySqlSelectQueryBlock query) {
         MySqlSelectQueryBlock.Limit limit = query.getLimit();
         //记录原始的offset和rowcount
         SQLExpr offset = limit.getOffset();
@@ -107,7 +107,7 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         context.setRowCount(originRowCount.longValue());
     }
 
-    private boolean needAlterLimit(MySqlSelectQueryBlock query, Map<String, Map<String, SqlRouteInfo>> sqlRouteMap) throws DragonException {
+    private boolean needAlterLimit(MySqlSelectQueryBlock query, Map<String, Map<String, SqlRouteInfo>> sqlRouteMap){
         if(query.getLimit()==null){
             return false;
         }
@@ -120,10 +120,10 @@ public class MysqlSelectStatementRewriter extends AbstractMysqlSqlRewriter {
         }
         //realSqlSize>1 ,需要到多个表查询，order by应该是必须指定的，否则只指定limit，因为多个表查出来的结果是随机合并的，会导致每次显示的结果不同
         if(query.getOrderBy()==null){
-            throw new DragonException("sql which only route to one real table can ignore order by clause!!!");
+            throw new DragonRuntimeException("sql which only route to one real table can ignore order by clause!!!");
         }
         if(query.getOrderBy().getItems().size()>1){
-            throw new DragonException("group by only support one column!!!");
+            throw new DragonRuntimeException("group by only support one column!!!");
         }
 
         return true;

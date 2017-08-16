@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.sharding.route;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
-import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
@@ -35,7 +35,7 @@ public abstract class LogicConfig {
 		return messageFormat.format(new Object[] { caculatedIndex });
 	}
 
-	public Long parseIndex(String realName) throws DragonException {
+	public Long parseIndex(String realName){
 		try {
 
 			Object o = messageFormat.parse(realName)[0];
@@ -46,7 +46,7 @@ public abstract class LogicConfig {
 			}
 
 		} catch (ParseException e) {
-			throw new DragonException(realName, e);
+			throw new DragonRuntimeException(realName, e);
 		}
 	}
 }

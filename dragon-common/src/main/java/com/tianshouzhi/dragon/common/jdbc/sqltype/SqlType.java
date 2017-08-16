@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.common.util;
+package com.tianshouzhi.dragon.common.jdbc.sqltype;
 
 import java.util.regex.Pattern;
 

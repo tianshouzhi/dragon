@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.common.util;
+package com.tianshouzhi.dragon.common.jdbc.sqltype;
 
 import com.tianshouzhi.dragon.common.cache.DragonCache;
 import com.tianshouzhi.dragon.common.cache.DragonCacheBuilder;
@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

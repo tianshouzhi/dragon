@@ -76,7 +76,8 @@ public class RealDataSourceWrapperManager {
 		if (CollectionUtils.isNotEmpty(datasourceIndexes)) {
 			LOGGER.info("remove real datasource" + datasourceIndexes);
 			for (String datasourceIndex : datasourceIndexes) {
-				RealDatasourceWrapper realDatasourceWrapper = getIndexDSMap().get(datasourceIndex);
+				Map<String, RealDatasourceWrapper> all = getIndexDSMap();
+				RealDatasourceWrapper realDatasourceWrapper = all.get(datasourceIndex);
 				this.validDSMap.remove(datasourceIndex);
 				this.invalidDsMap.remove(datasourceIndex);
 				if (realDatasourceWrapper != null) {
