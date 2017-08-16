@@ -1,6 +1,5 @@
 package com.tianshouzhi.dragon.ha.jdbc.statement;
 
-import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
@@ -37,33 +36,20 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 		this.dragonHAConnection = dragonConnection;
 	}
 
-	// 只有单条sql的时候，应该调用这个方法，batch和callablestatemnt自行处理
 	public boolean doExecute() throws SQLException {
 		if (resultSet != null) {// jdbc规范规定，每次执行的时候，如果当前ResultSet不为空，需要显式关闭，因此最好一个Statement执行一个sql
 			resultSet.close();
 		}
 		Connection realConnection = null;
-		try {
-			if (executeType != EXECUTE_BATCH) {
-				realConnection = dragonHAConnection.getRealConnection(sql, useSqlTypeCache());
-			} else {// 批处理操作，没有sql可以判断
-				realConnection = dragonHAConnection.buildNewWriteConnectionIfNeed();
-			}
-			createRealStatement(realConnection);
-			boolean isResultSet = doExecuteByType();
-			setExecuteResult(isResultSet);
-			return isResultSet; // 正常执行完成，跳出循环，不进行重试
-		} catch (SQLException e) {
-			// 出现异常
-			String dataSourceIndex = dragonHAConnection.getCurrentDBIndex();
-			ExceptionSorter exceptionSorter = dragonHAConnection.getExceptionSorter();
-			if (exceptionSorter.isExceptionFatal(e)) {// 如果是致命异常
-				dragonHAConnection.getHAConnectionManager().invalid(dataSourceIndex);
-				throw e;
-			} else {
-				throw e;
-			}
+		if (executeType != EXECUTE_BATCH) {
+			realConnection = dragonHAConnection.getRealConnection(sql, useSqlTypeCache());
+		} else {// 批处理操作
+			realConnection = dragonHAConnection.buildNewWriteConnectionIfNeed();
 		}
+		createRealStatement(realConnection);
+		boolean isResultSet = doExecuteByType();
+		setExecuteResult(isResultSet);
+		return isResultSet; // 正常执行完成，跳出循环，不进行重试
 	}
 
 	protected void createRealStatement(Connection realConnection) throws SQLException {
@@ -121,7 +107,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	protected boolean failRetry() throws SQLException {
 		return false;
 		/*
-		 * return dragonHAConnection.getCurrentRealConnection().getAutoCommit() == true && executeType !=EXECUTE_BATCH
+		 * return dragonHAConnection.getRealConnection().getAutoCommit() == true && executeType !=EXECUTE_BATCH
 		 * //batchexecute的情况下，不判断sql && SqlTypeUtil.isQuery(sql,useSqlTypeCache());
 		 */
 	}

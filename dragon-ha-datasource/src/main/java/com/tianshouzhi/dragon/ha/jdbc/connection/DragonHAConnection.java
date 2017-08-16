@@ -1,14 +1,12 @@
 package com.tianshouzhi.dragon.ha.jdbc.connection;
 
-import com.tianshouzhi.dragon.common.exception.ExceptionSorter;
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
+import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
-import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.hint.SqlHintUtil;
 import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapperManager;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDatasourceWrapper;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 
@@ -125,7 +123,10 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	}
 
 	/**
-	 * 因为不知道存储过程中到底执行了什么，所以： 1、CallableStatement总是应该获取写连接 2、CallableStatement不重试，不需要建立一个类似的DragonHACallableStatement 3、Hint的问题
+	 * 因为不知道存储过程中到底执行了什么，所以：
+	 * 1、CallableStatement总是应该获取写连接
+	 * 2、CallableStatement不重试，不需要建立一个类似的DragonHACallableStatement
+	 * 3、Hint的问题
 	 *
 	 * @param sql
 	 * @return
@@ -164,7 +165,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	public Connection getRealConnection(String sql, boolean useSqlTypeCache) throws SQLException {
 
 		// 如果已经开启了事务 总是获取写连接
-		if (autoCommit == false) {
+		if (!autoCommit) {
 			return buildNewWriteConnectionIfNeed();
 		}
 		// 如果没有开启事务
@@ -236,7 +237,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		if (realConnection == null || realConnection.isReadOnly()) {
 			if (realConnection != null) {
 				realConnection.close();
-			};
+			}
 			dataSourceIndex = dataSourceManager.selectWriteDBIndex();
 			realConnection = dataSourceManager.getConnectionByDbIndex(dataSourceIndex, username, password);
 			setConnectionParams(realConnection);
@@ -244,10 +245,6 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		}
 		setConnectionParams(realConnection);
 		return realConnection;
-	}
-
-	public RealDataSourceWrapperManager getHAConnectionManager() {
-		return dataSourceManager;
 	}
 
 	/**
@@ -433,12 +430,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		return realConnection.createSQLXML();
 	}
 
-	public String getCurrentDBIndex() {
+	public String getDatasourceIndex() {
 		return dataSourceIndex;
-	}
-
-	public Connection getCurrentRealConnection() {
-		return realConnection;
 	}
 
 	@Override
@@ -446,12 +439,6 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		checkClosed();
 		buildNewWriteConnectionIfNeed();
 		return realConnection.nativeSQL(sql);
-	}
-
-	public ExceptionSorter getExceptionSorter() throws SQLException {
-		RealDatasourceWrapper realDatasourceWrapper = dataSourceManager.getDatasourceWrapperByDbIndex(dataSourceIndex);
-		ExceptionSorter exceptionSorter = realDatasourceWrapper.getExceptionSorter();
-		return exceptionSorter;
 	}
 
 	@Override

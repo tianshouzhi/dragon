@@ -22,7 +22,7 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatemen
 public class DragonHAPrepareStatement extends DragonHAStatement implements DragonPrepareStatement {
 	protected Map<Integer, DragonPrepareStatement.ParamSetting> params = new LinkedHashMap<Integer, DragonPrepareStatement.ParamSetting>();
 
-	protected DragonPrepareStatement.PrepareExecuteType prepareExcuteType;
+	protected DragonPrepareStatement.PrepareExecuteType prepareExecuteType;
 
 	protected DragonPrepareStatement.PrepareCreateType prepareCreateType;
 
@@ -98,19 +98,19 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 	}
 
 	public ResultSet executeQuery() throws SQLException {
-		prepareExcuteType = PREPARE_EXECUTE_QUERY;
+		prepareExecuteType = PREPARE_EXECUTE_QUERY;
 		doExecute();
 		return this.resultSet;
 	}
 
 	public int executeUpdate() throws SQLException {
-		prepareExcuteType = PREPARE_EXECUTE_UPDATE;
+		prepareExecuteType = PREPARE_EXECUTE_UPDATE;
 		doExecute();
 		return this.updateCount;
 	}
 
 	public boolean execute() throws SQLException {
-		prepareExcuteType = PREPARE_EXECUTE;
+		prepareExecuteType = PREPARE_EXECUTE;
 		return doExecute();
 	}
 
@@ -125,8 +125,8 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 	@Override
 	protected boolean doExecuteByType() throws SQLException {
 		boolean isResultSet = false;
-		if (prepareExcuteType != null) {
-			switch (prepareExcuteType) {
+		if (prepareExecuteType != null) {
+			switch (prepareExecuteType) {
 			case PREPARE_EXECUTE:
 				isResultSet = ((PreparedStatement) realStatement).execute();
 				break;

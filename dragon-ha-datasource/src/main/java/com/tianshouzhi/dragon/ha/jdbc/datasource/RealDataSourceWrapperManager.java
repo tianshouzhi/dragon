@@ -8,12 +8,14 @@ import com.tianshouzhi.dragon.ha.router.weight.ReadDBSelector;
 import com.tianshouzhi.dragon.ha.router.weight.WriteDBSelector;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,7 +60,7 @@ public class RealDataSourceWrapperManager {
 		}
 	}
 
-	private synchronized void rebuildRouter() {
+	private synchronized void rebuildRouter() { //fixme optimize ，just need dsIndex and weight，doesn't need the whole map
 		ReadDBSelector readDBSelector = new ReadDBSelector(this.validDSMap);
 		WriteDBSelector writeDBSelector = new WriteDBSelector(this.validDSMap);
 		this.readDBSelector = readDBSelector;
@@ -116,46 +118,30 @@ public class RealDataSourceWrapperManager {
 		return managedDataSourceIndices.iterator().next();
 	}
 
-	public RealDatasourceWrapper getDatasourceWrapperByDbIndex(String dataSourceIndex) {
-		while (!isRebuiding)
-			break;
-		return validDSMap.get(dataSourceIndex);
-	}
-
 	public Connection getConnectionByDbIndex(String dataSourceIndex, String username, String password)
 	      throws SQLException {
 		while (!isRebuiding)
 			break;
-		RealDatasourceWrapper realDatasourceWrapper = validDSMap.get(dataSourceIndex);
+		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper == null) {
-			throw new DragonHARuntimeException("not found datasource with dataSourceIndex:" + dataSourceIndex);
+			throw new DragonHARuntimeException("not valid datasource found with dataSourceIndex:" + dataSourceIndex);
 		}
-		DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
-		Connection connection = null;
 
-		if (StringUtils.isAnyBlank(username, password))
-			connection = realDataSource.getConnection();
-		else
-			connection = realDataSource.getConnection(username, password);// druid不支持这个方法
+		Connection connection = null;
+		try {
+			connection = realDatasourceWrapper.getRealConnection(username, password);
+		} catch (SQLException e) {
+			if (realDatasourceWrapper.getExceptionSorter().isExceptionFatal(e)) {
+				invalid(realDatasourceWrapper.getConfig().getIndex());
+			}
+			throw e;
+		}
+
 		if (!connection.isReadOnly() && realDatasourceWrapper.isReadOnly()
 		      && this.validDSMap.get(dataSourceIndex).isReadOnly()) {
 			connection.setReadOnly(true);
 		}
 		return connection;
-	}
-
-	public Connection getConnectionByDbIndex(List<String> hintDataSourceIndices, String username, String password)
-	      throws SQLException {
-		while (!isRebuiding)
-			break;
-		if (CollectionUtils.isEmpty(hintDataSourceIndices)) {
-			throw new SQLException("hintDataSourceIndices can't be bull or empty");
-		}
-		if (hintDataSourceIndices.size() == 1) {
-			return getConnectionByDbIndex(hintDataSourceIndices.get(0), username, password);
-		}
-		int randomIndex = new Random().nextInt(hintDataSourceIndices.size());
-		return getConnectionByDbIndex(hintDataSourceIndices.get(randomIndex), username, password);
 	}
 
 	private void runInvalidRecoveryThread() {
@@ -189,11 +175,11 @@ public class RealDataSourceWrapperManager {
 		recoveryThread.start();
 	}
 
-	public void invalid(String dataSourceIndex) {
+	public void invalid(String dataSourceIndex) {//fixme optimize need lock
 		while (!this.isRebuiding)
 			break;
-		if (this.validDSMap.get(dataSourceIndex) != null) {
-			RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
+		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
+		if (realDatasourceWrapper != null) {
 			LOGGER.warn("datasource 【" + dataSourceIndex + "】 became invalid!!");
 			this.invalidDsMap.put(dataSourceIndex, realDatasourceWrapper);
 			this.validDSMap.remove(dataSourceIndex);

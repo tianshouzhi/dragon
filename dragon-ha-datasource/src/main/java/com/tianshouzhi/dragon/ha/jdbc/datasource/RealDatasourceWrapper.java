@@ -8,8 +8,11 @@ import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
@@ -92,5 +95,14 @@ public class RealDatasourceWrapper {
 	public void close() {
 		LOGGER.info("close real datasource '" + config.getIndex() + "'!!!");
 		DataSourceUtil.close(realDataSource);
+	}
+
+	public Connection getRealConnection(String username, String password) throws SQLException {
+		Connection realConnection = null;
+		if (StringUtils.isAnyBlank(username, password))
+			realConnection = this.realDataSource.getConnection();
+		else
+			realConnection = this.realDataSource.getConnection(username, password);// druid不支持这个方法
+		return realConnection;
 	}
 }
