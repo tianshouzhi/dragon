@@ -107,7 +107,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	protected boolean failRetry() throws SQLException {
 		return false;
 		/*
-		 * return dragonHAConnection.getRealConnection().getAutoCommit() == true && executeType !=EXECUTE_BATCH
+		 * return dragonHAConnection.getConnection().getAutoCommit() == true && executeType !=EXECUTE_BATCH
 		 * //batchexecute的情况下，不判断sql && SqlTypeUtil.isQuery(sql,useSqlTypeCache());
 		 */
 	}

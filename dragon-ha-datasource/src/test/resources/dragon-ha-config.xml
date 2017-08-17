@@ -3,7 +3,7 @@
 <dragonHADatasource appName="DragonHA" lazyInit="false">
     <realDataSource index="master" readWeight="0" writeWeight="10" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url"
-                  value="jdbc:mysql://115.28.171.77:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
+                  value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
@@ -17,7 +17,7 @@
         <property name="validationQuery" value="select 'x'"></property>
     </realDataSource>
     <realDataSource index="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
-        <property name="url" value="jdbc:mysql://115.28.171.77:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
@@ -31,7 +31,7 @@
         <property name="validationQuery" value="select 'x'"></property>
     </realDataSource>
     <realDataSource index="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
-        <property name="url" value="jdbc:mysql://115.28.171.77:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/dragon_ha?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="dragon_ha"></property>
         <property name="password" value="dragon_ha"></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>

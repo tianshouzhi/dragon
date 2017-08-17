@@ -25,7 +25,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	public void testDelete() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM user WHERE id=?");
-		preparedStatement.setInt(1, 11);
+		preparedStatement.setInt(1, 16);
 		int i = preparedStatement.executeUpdate();
 		Assert.assertTrue(i <= 1);
 	}
@@ -44,7 +44,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	public void testQuery() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		PreparedStatement preparedStatement = connection
-		      .prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =slave2)*/SELECT * from user");
+		      .prepareStatement("SELECT * from user");
 		preparedStatement.executeQuery();
 		ResultSet resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -58,7 +58,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	public void mixTest() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		PreparedStatement preparedStatement = connection
-		      .prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =master)*/SELECT * from user");
+		      .prepareStatement("/*master*/SELECT * from user");
 		preparedStatement.executeQuery();
 		ResultSet resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -72,7 +72,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 		int i = preparedStatement.executeUpdate();
 		Assert.assertEquals("insert success", i, 1);
 
-		preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =master)*/SELECT * from user");
+		preparedStatement = connection.prepareStatement("/*master*/SELECT * from user");
 		preparedStatement.executeQuery();
 		resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -85,7 +85,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 		preparedStatement.setString(1, "wanghanao");
 		preparedStatement.executeUpdate();
 
-		preparedStatement = connection.prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =slave1)*/SELECT * from user");
+		preparedStatement = connection.prepareStatement("SELECT * from user");
 		preparedStatement.executeQuery();
 		resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -117,7 +117,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	public void testReuse() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		PreparedStatement preparedStatement = connection
-		      .prepareStatement("/*DRAGON_HA( PHYSICAL_DS_INDEXES =slave2)*/SELECT * from user");
+		      .prepareStatement("SELECT * from user");
 		preparedStatement.executeQuery();
 		ResultSet resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {

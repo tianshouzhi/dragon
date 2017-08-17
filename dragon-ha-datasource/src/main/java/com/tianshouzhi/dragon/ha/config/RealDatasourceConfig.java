@@ -14,10 +14,10 @@ public class RealDatasourceConfig {
 	private String index;
 
 	@XmlAttribute(name = "readWeight", required = true)
-	private int readWeight=10;
+	private int readWeight = -1;
 
 	@XmlAttribute(name = "writeWeight", required = true)
-	private int writeWeight=10;
+	private int writeWeight = -1;
 
 	@XmlAttribute(name = "realClass", required = true)
 	private String realClass;
@@ -91,20 +91,20 @@ public class RealDatasourceConfig {
 
 		@Override
 		public String toString() {
-			return "Property{" +
-					"name='" + name + '\'' +
-					", value='" + value + '\'' +
-					'}';
+			return "Property{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
 		}
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 
 			Property property = (Property) o;
 
-			if (!name.equals(property.name)) return false;
+			if (!name.equals(property.name))
+				return false;
 			return value.equals(property.value);
 		}
 
@@ -126,15 +126,21 @@ public class RealDatasourceConfig {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
 		RealDatasourceConfig that = (RealDatasourceConfig) o;
 
-		if (readWeight != that.readWeight) return false;
-		if (writeWeight != that.writeWeight) return false;
-		if (!index.equals(that.index)) return false;
-		if (!realClass.equals(that.realClass)) return false;
+		if (readWeight != that.readWeight)
+			return false;
+		if (writeWeight != that.writeWeight)
+			return false;
+		if (!index.equals(that.index))
+			return false;
+		if (!realClass.equals(that.realClass))
+			return false;
 		return properties.equals(that.properties);
 	}
 
@@ -150,12 +156,7 @@ public class RealDatasourceConfig {
 
 	@Override
 	public String toString() {
-		return "RealDatasourceConfig{" +
-				"index='" + index + '\'' +
-				", readWeight=" + readWeight +
-				", writeWeight=" + writeWeight +
-				", realClass='" + realClass + '\'' +
-				", properties=" + properties +
-				'}';
+		return "RealDatasourceConfig{" + "index='" + index + '\'' + ", readWeight=" + readWeight + ", writeWeight="
+		      + writeWeight + ", realClass='" + realClass + '\'' + ", properties=" + properties + '}';
 	}
 }

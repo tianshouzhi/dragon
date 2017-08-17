@@ -161,7 +161,7 @@ public class DragonHADatasource extends DragonDataSource {
 					}
 				}
 
-				// check needToAddMap and needToReplaceMap,there is no need to check needToRemoveMap,just remove it
+				// check needToAddMap and needToReplaceMap,there is no need to check needToRemoveMap,just clearThreadLocalHint it
 				for (RealDatasourceWrapper realDatasourceWrapper : needToAddMap.values()) {
 					checkRealDatasourceConfig(realDatasourceWrapper.getConfig());
 				}

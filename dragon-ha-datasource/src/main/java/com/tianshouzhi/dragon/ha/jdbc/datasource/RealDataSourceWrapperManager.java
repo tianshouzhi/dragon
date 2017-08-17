@@ -2,10 +2,9 @@ package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
+import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import com.tianshouzhi.dragon.ha.router.weight.DBSelector;
-import com.tianshouzhi.dragon.ha.router.weight.ReadDBSelector;
-import com.tianshouzhi.dragon.ha.router.weight.WriteDBSelector;
+import com.tianshouzhi.dragon.ha.router.RouterManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
@@ -17,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,9 +34,7 @@ public class RealDataSourceWrapperManager {
 
 	private Lock rebuildLock = new ReentrantLock();
 
-	private DBSelector readDBSelector;
-
-	private DBSelector writeDBSelector;
+	private volatile RouterManager routerManager;
 
 	public RealDataSourceWrapperManager(HashMap<String, RealDatasourceWrapper> datasourceWrapperMap) {
 		refresh(datasourceWrapperMap, null, null);
@@ -60,11 +58,14 @@ public class RealDataSourceWrapperManager {
 		}
 	}
 
-	private synchronized void rebuildRouter() { //fixme optimize ，just need dsIndex and weight，doesn't need the whole map
-		ReadDBSelector readDBSelector = new ReadDBSelector(this.validDSMap);
-		WriteDBSelector writeDBSelector = new WriteDBSelector(this.validDSMap);
-		this.readDBSelector = readDBSelector;
-		this.writeDBSelector = writeDBSelector;
+	private synchronized void rebuildRouter() {
+		Map<String, RealDatasourceConfig> validConfigMap = new HashMap<String, RealDatasourceConfig>(4);
+		for (Map.Entry<String, RealDatasourceWrapper> entry : validDSMap.entrySet()) {
+			String datasourceIndex = entry.getKey();
+			RealDatasourceConfig config = entry.getValue().getConfig();
+			validConfigMap.put(datasourceIndex, config);
+		}
+		this.routerManager = new RouterManager(validConfigMap);
 	}
 
 	private void add(Map<String, RealDatasourceWrapper> indexDSMap) {
@@ -76,7 +77,7 @@ public class RealDataSourceWrapperManager {
 
 	private void remove(Set<String> datasourceIndexes) {
 		if (CollectionUtils.isNotEmpty(datasourceIndexes)) {
-			LOGGER.info("remove real datasource" + datasourceIndexes);
+			LOGGER.info("clearThreadLocalHint real datasource" + datasourceIndexes);
 			for (String datasourceIndex : datasourceIndexes) {
 				Map<String, RealDatasourceWrapper> all = getIndexDSMap();
 				RealDatasourceWrapper realDatasourceWrapper = all.get(datasourceIndex);
@@ -97,31 +98,33 @@ public class RealDataSourceWrapperManager {
 		}
 	}
 
-	public String selectWriteDBIndex() {
-		while (!isRebuiding)
-			break;
-		return writeDBSelector.select();
+	public String selectReadIndex(String... excludes) {
+		checkRebuilding();
+		return routerManager.routeRead(excludes);
 	}
 
-	public String selectReadDBIndex() {
-		while (!isRebuiding)
-			break;
-		return readDBSelector.select();
-	}
-
-	public String selectReadDBIndexExclude(Set<String> excludes) {
-		Set<String> managedDataSourceIndices = readDBSelector.getManagedDBIndexes();
-		managedDataSourceIndices.removeAll(excludes);
-		if (managedDataSourceIndices.isEmpty()) {
-			return null;
+	private void checkRebuilding() {
+		if (!isRebuiding) {
+			return;
+		} else {
+			while (isRebuiding) {
+				try {//wait 5 millis,or the cpu usage will be very high
+					TimeUnit.MILLISECONDS.sleep(5);
+				} catch (InterruptedException e) {
+					throw new DragonHARuntimeException(e);
+				}
+			}
 		}
-		return managedDataSourceIndices.iterator().next();
 	}
 
+	public String selectWriteIndex(String... excludes) {
+		checkRebuilding();
+		return routerManager.routeWrite(excludes);
+	}
+
+	// specify dataSourceIndex ,no retry
 	public Connection getConnectionByDbIndex(String dataSourceIndex, String username, String password)
 	      throws SQLException {
-		while (!isRebuiding)
-			break;
 		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper == null) {
 			throw new DragonHARuntimeException("not valid datasource found with dataSourceIndex:" + dataSourceIndex);
@@ -129,7 +132,7 @@ public class RealDataSourceWrapperManager {
 
 		Connection connection = null;
 		try {
-			connection = realDatasourceWrapper.getRealConnection(username, password);
+			connection = realDatasourceWrapper.getConnection(username, password);
 		} catch (SQLException e) {
 			if (realDatasourceWrapper.getExceptionSorter().isExceptionFatal(e)) {
 				invalid(realDatasourceWrapper.getConfig().getIndex());
@@ -175,9 +178,8 @@ public class RealDataSourceWrapperManager {
 		recoveryThread.start();
 	}
 
-	public void invalid(String dataSourceIndex) {//fixme optimize need lock
-		while (!this.isRebuiding)
-			break;
+	public void invalid(String dataSourceIndex) {// fixme optimize need lock
+		checkRebuilding();
 		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper != null) {
 			LOGGER.warn("datasource 【" + dataSourceIndex + "】 became invalid!!");

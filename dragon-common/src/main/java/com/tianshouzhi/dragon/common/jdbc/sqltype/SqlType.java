@@ -6,10 +6,13 @@ import java.util.regex.Pattern;
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
 public enum SqlType {
+	//read sql type
+	SELECT(true),
+	SHOW(true),
+	DEBUG(true),
+	EXPLAIN(true),
 
-	SELECT(true), SHOW(true), DEBUG(true), EXPLAIN(true), DUMP,
-
-	INSERT, UPDATE, DELETE, REPLACE, TRUNCATE, CREATE, DROP, LOAD, MERGE, ALTER, RENAME, CALL;
+	DUMP, INSERT, UPDATE, DELETE, REPLACE, TRUNCATE, CREATE, DROP, LOAD, MERGE, ALTER, RENAME, CALL;
 
 	private Pattern pattern;
 

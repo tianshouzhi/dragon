@@ -97,12 +97,12 @@ public class RealDatasourceWrapper {
 		DataSourceUtil.close(realDataSource);
 	}
 
-	public Connection getRealConnection(String username, String password) throws SQLException {
+	public Connection getConnection(String username, String password) throws SQLException {
 		Connection realConnection = null;
 		if (StringUtils.isAnyBlank(username, password))
-			realConnection = this.realDataSource.getConnection();
+			realConnection = getRealDataSource().getConnection();
 		else
-			realConnection = this.realDataSource.getConnection(username, password);// druid不支持这个方法
+			realConnection = getRealDataSource().getConnection(username, password);// druid不支持这个方法
 		return realConnection;
 	}
 }

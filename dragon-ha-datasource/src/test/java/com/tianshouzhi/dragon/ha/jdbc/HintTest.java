@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc;
 
-import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
+import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class HintTest extends BaseTest {
 			System.out.println("id:" + id + ",name:" + tag_name);
 		}
 		preparedStatement = connection
-		      .prepareStatement("/*DRAGON_HA ( PHYSICAL_DS_INDEXES = master )*/ SELECT * FROM user ");
+		      .prepareStatement("/*master*/ SELECT * FROM user ");
 
 		resultSet = preparedStatement.executeQuery();
 		while (resultSet.next()) {
@@ -39,7 +39,7 @@ public class HintTest extends BaseTest {
 
 	@Test
 	public void threadLocalHintTest() throws SQLException {
-		ThreadLocalHintUtil.setDBIndexes("dragon_ha_master");
+		DragonHAHintUtil.setHintMaster(true);
 		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 		ResultSet resultSet = preparedStatement.executeQuery();
 		while (resultSet.next()) {
@@ -47,7 +47,7 @@ public class HintTest extends BaseTest {
 			String tag_name = resultSet.getString("name");
 			System.out.println("id:" + id + ",name:" + tag_name);
 		}
-		ThreadLocalHintUtil.remove();
+		DragonHAHintUtil.clearHintMaster();
 		resultSet.close();
 		preparedStatement.close();
 		connection.close();

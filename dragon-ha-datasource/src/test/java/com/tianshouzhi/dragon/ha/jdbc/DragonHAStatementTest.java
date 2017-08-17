@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc;
 
-import com.tianshouzhi.dragon.ha.hint.ThreadLocalHintUtil;
+import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class DragonHAStatementTest extends BaseTest {
 
 	@Test
 	public void testQuery() throws SQLException {
-		ThreadLocalHintUtil.setDBIndexes("master");
+		DragonHAHintUtil.setHintMaster(true);
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM user ");
@@ -52,7 +52,7 @@ public class DragonHAStatementTest extends BaseTest {
 			String name = resultSet.getString("name");
 			System.out.println("id:" + id + ",name:" + name);
 		}
-		ThreadLocalHintUtil.remove();
+		DragonHAHintUtil.clearHintMaster();
 	}
 
 	@Test
