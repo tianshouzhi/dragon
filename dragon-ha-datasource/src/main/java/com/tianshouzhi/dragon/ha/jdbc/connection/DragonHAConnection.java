@@ -181,11 +181,10 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 
 	private Connection buildNewReadConnectionIfNeed(String... excludes) throws SQLException {
 		if (this.realConnection != null) {
-			setConnectionParams(this.realConnection);
 			return realConnection;
 		}
 		this.dataSourceIndex = this.dataSourceManager.selectReadIndex(excludes);
-		this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex, username, password);
+		this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
 		setConnectionParams(this.realConnection);
 		return realConnection;
 	}
@@ -196,11 +195,10 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 				this.realConnection.close();
 			}
 			this.dataSourceIndex = this.dataSourceManager.selectWriteIndex(excludes);
-			this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex, username, password);
+			this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;
 		}
-		setConnectionParams(this.realConnection);
 		return this.realConnection;
 	}
 

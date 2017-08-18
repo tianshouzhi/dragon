@@ -36,10 +36,9 @@
         <module>dragon-sharding-datasource</module>
         <module>dragon-ha-datasource</module>
         <module>dragon-common</module>
-        <module>dragon-idgen</module>
         <module>dragon-console</module>
         <module>dragon-demo</module>
-        <module>dragon_test</module>
+        <module>dragon-real-datasource</module>
     </modules>
     <dependencyManagement>
         <dependencies>

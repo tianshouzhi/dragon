@@ -8,7 +8,6 @@ import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -65,7 +64,7 @@ public class RealDatasourceWrapper {
 		return config.getWriteWeight();
 	}
 
-	public DataSource getRealDataSource() {
+	private DataSource getRealDataSource() {
 		if (this.realDataSource == null) {
 			try {
 				init();
@@ -97,12 +96,8 @@ public class RealDatasourceWrapper {
 		DataSourceUtil.close(realDataSource);
 	}
 
-	public Connection getConnection(String username, String password) throws SQLException {
-		Connection realConnection = null;
-		if (StringUtils.isAnyBlank(username, password))
-			realConnection = getRealDataSource().getConnection();
-		else
-			realConnection = getRealDataSource().getConnection(username, password);// druid不支持这个方法
-		return realConnection;
+	public Connection getRealConnection() throws SQLException {
+		Connection connection = getRealDataSource().getConnection();
+		return connection;
 	}
 }

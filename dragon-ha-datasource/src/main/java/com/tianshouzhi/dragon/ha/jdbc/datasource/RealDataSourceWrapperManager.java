@@ -8,7 +8,6 @@ import com.tianshouzhi.dragon.ha.router.RouterManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -26,6 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RealDataSourceWrapperManager {
 	private static final Log LOGGER = LoggerFactory.getLogger(RealDataSourceWrapperManager.class);
 
+	private HashMap<String, RealDatasourceWrapper> datasourceWrapperMap;
+
 	private Map<String, RealDatasourceWrapper> validDSMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
 
 	private Map<String, RealDatasourceWrapper> invalidDsMap = new ConcurrentHashMap<String, RealDatasourceWrapper>();
@@ -37,6 +38,10 @@ public class RealDataSourceWrapperManager {
 	private volatile RouterManager routerManager;
 
 	public RealDataSourceWrapperManager(HashMap<String, RealDatasourceWrapper> datasourceWrapperMap) {
+		if(MapUtils.isEmpty(datasourceWrapperMap)){
+			throw new DragonHARuntimeException("datasourceWrapperMap can't be empty!");
+		}
+		this.datasourceWrapperMap = datasourceWrapperMap;
 		refresh(datasourceWrapperMap, null, null);
 		runInvalidRecoveryThread();
 	}
@@ -66,6 +71,7 @@ public class RealDataSourceWrapperManager {
 			validConfigMap.put(datasourceIndex, config);
 		}
 		this.routerManager = new RouterManager(validConfigMap);
+		LOGGER.info("build routerManager success!!!");
 	}
 
 	private void add(Map<String, RealDatasourceWrapper> indexDSMap) {
@@ -77,10 +83,9 @@ public class RealDataSourceWrapperManager {
 
 	private void remove(Set<String> datasourceIndexes) {
 		if (CollectionUtils.isNotEmpty(datasourceIndexes)) {
-			LOGGER.info("clearThreadLocalHint real datasource" + datasourceIndexes);
+			LOGGER.info("remove real datasource " + datasourceIndexes+" from datasource manager!");
 			for (String datasourceIndex : datasourceIndexes) {
-				Map<String, RealDatasourceWrapper> all = getIndexDSMap();
-				RealDatasourceWrapper realDatasourceWrapper = all.get(datasourceIndex);
+				RealDatasourceWrapper realDatasourceWrapper = datasourceWrapperMap.get(datasourceIndex);
 				this.validDSMap.remove(datasourceIndex);
 				this.invalidDsMap.remove(datasourceIndex);
 				if (realDatasourceWrapper != null) {
@@ -108,7 +113,7 @@ public class RealDataSourceWrapperManager {
 			return;
 		} else {
 			while (isRebuiding) {
-				try {//wait 5 millis,or the cpu usage will be very high
+				try {// wait 5 millis,or the cpu usage will be very high
 					TimeUnit.MILLISECONDS.sleep(5);
 				} catch (InterruptedException e) {
 					throw new DragonHARuntimeException(e);
@@ -122,8 +127,7 @@ public class RealDataSourceWrapperManager {
 		return routerManager.routeWrite(excludes);
 	}
 
-	// specify dataSourceIndex ,no retry
-	public Connection getConnectionByDbIndex(String dataSourceIndex, String username, String password)
+	public Connection getConnectionByDbIndex(String dataSourceIndex)
 	      throws SQLException {
 		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper == null) {
@@ -132,7 +136,7 @@ public class RealDataSourceWrapperManager {
 
 		Connection connection = null;
 		try {
-			connection = realDatasourceWrapper.getConnection(username, password);
+			connection = realDatasourceWrapper.getRealConnection();
 		} catch (SQLException e) {
 			if (realDatasourceWrapper.getExceptionSorter().isExceptionFatal(e)) {
 				invalid(realDatasourceWrapper.getConfig().getIndex());
@@ -157,9 +161,8 @@ public class RealDataSourceWrapperManager {
 						for (Map.Entry<String, RealDatasourceWrapper> entry : invalidDsMap.entrySet()) {
 							String dsIndex = entry.getKey();
 							RealDatasourceWrapper realDatasourceWrapper = entry.getValue();
-							DataSource realDataSource = realDatasourceWrapper.getRealDataSource();
 							try {
-								Connection connection = realDataSource.getConnection();
+								Connection connection = realDatasourceWrapper.getRealConnection();
 								if (connection.isValid(3000)) {
 									LOGGER.info("datasource 【" + dsIndex + "】 became valid");
 									RealDataSourceWrapperManager.this.invalidDsMap.remove(dsIndex);
@@ -178,7 +181,7 @@ public class RealDataSourceWrapperManager {
 		recoveryThread.start();
 	}
 
-	public void invalid(String dataSourceIndex) {// fixme optimize need lock
+	public synchronized void invalid(String dataSourceIndex) {
 		checkRebuilding();
 		RealDatasourceWrapper realDatasourceWrapper = this.validDSMap.get(dataSourceIndex);
 		if (realDatasourceWrapper != null) {
@@ -190,10 +193,7 @@ public class RealDataSourceWrapperManager {
 	}
 
 	public Map<String, RealDatasourceWrapper> getIndexDSMap() {
-		Map<String, RealDatasourceWrapper> map = new HashMap<String, RealDatasourceWrapper>(4);
-		map.putAll(validDSMap);
-		map.putAll(invalidDsMap);
-		return Collections.unmodifiableMap(map);
+		return Collections.unmodifiableMap(datasourceWrapperMap);
 	}
 
 	public Map<String, RealDatasourceWrapper> getValidDSMap() {
