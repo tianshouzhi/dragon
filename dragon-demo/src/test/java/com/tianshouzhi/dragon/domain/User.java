@@ -4,47 +4,46 @@ package com.tianshouzhi.dragon.domain;
  * Created by TIANSHOUZHI336 on 2017/3/28.
  */
 public class User {
-    private Integer id;
-    private String name="tianshouzhi";
-    private UserAccount userAccount;
-    public User() {
-    }
+	private Integer id;
 
-    public User(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	private String name = "tianshouzhi";
 
-    public Integer getId() {
-        return id;
-    }
+	private UserAccount userAccount;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public User() {
+	}
 
-    public String getName() {
-        return name;
-    }
+	public User(Integer id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public UserAccount getUserAccount() {
-        return userAccount;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", userAccount=" + userAccount +
-                '}';
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public UserAccount getUserAccount() {
+		return userAccount;
+	}
+
+	public void setUserAccount(UserAccount userAccount) {
+		this.userAccount = userAccount;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" + "id=" + id + ", name='" + name + '\'' + ", userAccount=" + userAccount + '}';
+	}
 }
