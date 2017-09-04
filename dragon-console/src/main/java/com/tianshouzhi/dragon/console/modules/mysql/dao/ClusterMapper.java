@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.console.modules.mysql.dao;
 
-import com.tianshouzhi.dragon.console.modules.base.BaseMapper;
+import com.tianshouzhi.dragon.console.base.BaseMapper;
 import com.tianshouzhi.dragon.console.modules.mysql.entity.Cluster;
 
 /**

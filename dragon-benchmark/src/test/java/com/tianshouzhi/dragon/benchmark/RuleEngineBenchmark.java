@@ -20,7 +20,6 @@ public class RuleEngineBenchmark extends AbstractBenchmark{
 
     static RuleEngine javaRuleEngine=new JavaRuleEngine();
     static RuleEngine groovyEngine= (RuleEngine) getGroovyEngine("src/test/resources/GroovyRuleEngine.groovy");
-    static RuleEngine groovyCompileStaticEngine= (RuleEngine) getGroovyEngine("src/test/resources/GroovyRuleEngineStatic.groovy");
     static HashMap<String, Object> params = new HashMap<String, Object>(){{
         put("id", "0101");
     }};
@@ -42,11 +41,7 @@ public class RuleEngineBenchmark extends AbstractBenchmark{
     public void testGroovy() {
         groovyEngine.eval(params);
     }
-    @Test
-    @BenchmarkOptions( benchmarkRounds = 1000000, warmupRounds = 1000,concurrency = 100)
-    public void testGroovyCompileStatic() {
-        groovyCompileStaticEngine.eval(params);
-    }
+
 
     @Test
     @BenchmarkOptions( benchmarkRounds = 1000000, warmupRounds = 1000,concurrency = 100)

@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.console.modules.ds_config.entity;
+package com.tianshouzhi.dragon.console.modules.datasource_config.entity;
 
 import java.util.Date;
 

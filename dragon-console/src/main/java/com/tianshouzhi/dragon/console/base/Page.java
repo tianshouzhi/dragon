@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.console.modules.base;
+package com.tianshouzhi.dragon.console.base;
 
 import java.util.List;
 
@@ -12,21 +12,21 @@ public class Page {
 
 	private List<?> records;
 
-	private PageRequest pageRequest;
+	private BaseRequest request;
 
-	public Page(Long recordsTotal, Long recordsFiltered, List<?> records, PageRequest pageRequest) {
+	public Page(Long recordsTotal, Long recordsFiltered, List<?> records, BaseRequest request) {
 		this.recordsTotal = recordsTotal;
 		this.recordsFiltered = recordsFiltered;
 		this.records = records;
-		this.pageRequest = pageRequest;
+		this.request = request;
 	}
 
-	public PageRequest getPageRequest() {
-		return pageRequest;
+	public BaseRequest getRequest() {
+		return request;
 	}
 
-	public void setPageRequest(PageRequest pageRequest) {
-		this.pageRequest = pageRequest;
+	public void setRequest(BaseRequest request) {
+		this.request = request;
 	}
 
 	public Long getRecordsTotal() {

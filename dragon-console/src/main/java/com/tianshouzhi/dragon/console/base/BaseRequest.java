@@ -1,16 +1,12 @@
-package com.tianshouzhi.dragon.console.modules.base;
-
-import java.util.Map;
+package com.tianshouzhi.dragon.console.base;
 
 /**
  * Created by tianshouzhi on 2017/6/27.
  */
-public class PageRequest {
+public class BaseRequest {
 	private Integer currentPage = 1;
 
 	private Integer pageSize = 10;
-
-	private Map<String, Object> queryParams;
 
 	public Integer getCurrentPage() {
 		return currentPage;
@@ -30,13 +26,5 @@ public class PageRequest {
 
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
-	}
-
-	public Map<String, Object> getQueryParams() {
-		return queryParams;
-	}
-
-	public void setQueryParams(Map<String, Object> queryParams) {
-		this.queryParams = queryParams;
 	}
 }

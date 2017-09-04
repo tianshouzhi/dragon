@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.console.modules.mysql.service.impl;
 
-import com.tianshouzhi.dragon.console.modules.base.BaseServiceImpl;
+import com.tianshouzhi.dragon.console.base.BaseServiceImpl;
 import com.tianshouzhi.dragon.console.modules.mysql.service.ClusterService;
 
 /**

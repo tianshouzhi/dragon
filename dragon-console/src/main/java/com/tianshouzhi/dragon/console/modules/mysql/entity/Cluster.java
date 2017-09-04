@@ -91,15 +91,8 @@ public class Cluster {
 
 	@Override
 	public String toString() {
-		return "Cluster{" +
-				"id=" + id +
-				", name='" + name + '\'' +
-				", description='" + description + '\'' +
-				", databaseVersion='" + databaseVersion + '\'' +
-				", vip='" + vip + '\'' +
-				", environment=" + environment +
-				", gmtCreate=" + gmtCreate +
-				", gmtUpdate=" + gmtUpdate +
-				'}';
+		return "Cluster{" + "id=" + id + ", name='" + name + '\'' + ", description='" + description + '\''
+		      + ", databaseVersion='" + databaseVersion + '\'' + ", vip='" + vip + '\'' + ", environment=" + environment
+		      + ", gmtCreate=" + gmtCreate + ", gmtUpdate=" + gmtUpdate + '}';
 	}
 }
