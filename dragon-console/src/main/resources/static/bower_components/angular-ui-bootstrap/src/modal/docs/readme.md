@@ -45,13 +45,13 @@ The `$uibModal` service has only one method: `open(options)`.
 
   * `dismiss` - A method that can be used to dismiss a modal, passing a result. The result must be passed in this format: `{$value: myRejectedResult}`
 
-  * `modalInstance` - The modal instance. This is the same `$uibModalInstance` injectable found when using `controller`.
+  * `modalInstance` - The modal clusterInstance. This is the same `$uibModalInstance` injectable found when using `controller`.
 
   * `resolve` - An object of the modal resolve values. See [UI Router resolves](#ui-router-resolves) for details.
 
 * `controller`
   _(Type: `function|string|array`, Example: `MyModalController`)_ -
-  A controller for the modal instance, either a controller name as a string, or an inline controller function, optionally wrapped in array notation for dependency injection. Allows the controller-as syntax. Has a special `$uibModalInstance` injectable to access the modal instance.
+  A controller for the modal clusterInstance, either a controller name as a string, or an inline controller function, optionally wrapped in array notation for dependency injection. Allows the controller-as syntax. Has a special `$uibModalInstance` injectable to access the modal clusterInstance.
 
 * `controllerAs`
   _(Type: `string`, Example: `ctrl`)_ -
@@ -71,7 +71,7 @@ The `$uibModal` service has only one method: `open(options)`.
 
 * `scope`
   _(Type: `$scope`)_ -
-  The parent scope instance to be used for the modal's content. Defaults to `$rootScope`.
+  The parent scope clusterInstance to be used for the modal's content. Defaults to `$rootScope`.
 
 * `size`
   _(Type: `string`, Example: `lg`)_ -
@@ -101,7 +101,7 @@ Global defaults may be set for `$uibModal` via `$uibModalProvider.options`.
 
 #### return
 
-The `open` method returns a modal instance, an object with the following properties:
+The `open` method returns a modal clusterInstance, an object with the following properties:
 
 * `close(result)`
   _(Type: `function`)_ -

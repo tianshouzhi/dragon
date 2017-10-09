@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-clusterInstance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+
+    <bean id="master"></bean>
+    <bean id="slave1"></bean>
+    <bean id="slave2"></bean>
     <!--定义DragonHADatasource-->
     <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource">
-        <constructor-arg type="java.lang.String" value="ha/dragon-ha-config.xml"/>
+
     </bean>
 
     <!--=====================================Mybatis Spring整合配置=================================-->

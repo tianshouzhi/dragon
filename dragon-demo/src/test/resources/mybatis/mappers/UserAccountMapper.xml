@@ -7,14 +7,14 @@
     <!--查询结果集映射-->
     <resultMap id="userAccountMap" type="UserAccount">
         <!--主键-->
-        <id property="userId" column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <id property="devUserId" column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>
         <!--普通属性-->
         <result  property="accountNo" column="account_no" javaType="java.lang.String" jdbcType="VARCHAR"/>
         <result  property="money" column="money" javaType="java.lang.Double" jdbcType="DOUBLE"/>
     </resultMap>
 
     <insert id="insert" parameterType="UserAccount">
-        INSERT INTO user_account (user_id,account_no,money) VALUES (#{userId},#{accountNo},#{money}));
+        INSERT INTO user_account (user_id,account_no,money) VALUES (#{devUserId},#{accountNo},#{money}));
     </insert>
 
     <insert id="batchInsert" parameterType="java.util.List">
@@ -25,7 +25,7 @@
     </insert>
 
     <select id="selectById" parameterType="int" resultMap="userAccountMap">
-        SELECT user_id,account_no,money FROM user_account WHERE user_id=#{userId};
+        SELECT user_id,account_no,money FROM user_account WHERE user_id=#{devUserId};
     </select>
 
     <select id="selectAll" resultMap="userAccountMap">
@@ -44,11 +44,11 @@
     </select>
 
     <update id="updateById" parameterType="UserAccount">
-        UPDATE user_account SET money=#{money} where user_id=#{userId};
+        UPDATE user_account SET money=#{money} where user_id=#{devUserId};
     </update>
 
     <delete id="deleteById" parameterType="int" >
-        DELETE FROM user_account WHERE user_id=#{userId};
+        DELETE FROM user_account WHERE user_id=#{devUserId};
     </delete>
 
     <delete id="deleteAll">

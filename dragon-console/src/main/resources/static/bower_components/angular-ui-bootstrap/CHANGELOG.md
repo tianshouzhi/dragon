@@ -1724,7 +1724,7 @@ _This release adds Bootstrap3 support_
 - **pagination:**
   - `total-items` & optional `items-per-page` API ([e55d9063](http://github.com/angular-ui/bootstrap/commit/e55d9063))
 - **rating:**
-  - add support for custom icons per instance ([20ab01ad](http://github.com/angular-ui/bootstrap/commit/20ab01ad))
+  - add support for custom icons per clusterInstance ([20ab01ad](http://github.com/angular-ui/bootstrap/commit/20ab01ad))
 - **timepicker:**
   - plug into `ngModel` controller ([b08e993f](http://github.com/angular-ui/bootstrap/commit/b08e993f))
 

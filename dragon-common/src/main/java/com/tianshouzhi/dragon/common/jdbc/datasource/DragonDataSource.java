@@ -1,27 +1,31 @@
 package com.tianshouzhi.dragon.common.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import javax.sql.DataSource;
-import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/11/30.
  */
 public abstract class DragonDataSource extends WrapperAdapter implements DataSource {
-	protected boolean inited = false;
 
 	protected int loginTimeout = 0;
 
 	private PrintWriter logWriter;
+
+	private String username;
+	private String password;
+	private String url;
+	private String driverClass;
+	private String maxPoolSize;
+	private String minPoolSize;
+	private String initPoolSize;
+	private boolean inited;
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
@@ -52,5 +56,8 @@ public abstract class DragonDataSource extends WrapperAdapter implements DataSou
 		throw new SQLFeatureNotSupportedException("getParentLogger");
 	}
 
+	public abstract void init() throws SQLException;
+
 	public abstract void close() throws SQLException;
+
 }

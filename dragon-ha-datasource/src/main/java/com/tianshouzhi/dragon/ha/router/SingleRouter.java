@@ -1,8 +1,10 @@
 package com.tianshouzhi.dragon.ha.router;
 
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+
+import java.util.Set;
 
 /**
  * Created by tianshouzhi on 2017/8/16.
@@ -12,22 +14,23 @@ public class SingleRouter implements Router {
 
 	public SingleRouter(String datasourceIndex) {
 		if (StringUtils.isBlank(datasourceIndex)) {
-			throw new DragonHARuntimeException("datasourceIndex can't be blank!");
+			throw new DragonHARuntimeException("index can't be blank!");
 		}
 		this.datasourceIndex = datasourceIndex;
 	}
 
 	@Override
-	public String route(String... exculdes) {
-		if (exculdes.length > 1) {
-			throw new DragonHARuntimeException("exculdes.length length must < =1");
-		}
-		if (ArrayUtils.isEmpty(exculdes)) {
+	public String route(Set<String> exculdes) {
+		if (CollectionUtils.isEmpty(exculdes)) {
 			return datasourceIndex;
 		}
 
-		if(exculdes[0].equals(datasourceIndex)){
-            throw new DragonHARuntimeException("to exclude datasourceIndex:["+exculdes[0]+"] doesn't match "+datasourceIndex);
+		if (exculdes.size() > 1) {
+			throw new DragonHARuntimeException("exculdes.length length must < =1");
+		}
+
+		if(!exculdes.contains(datasourceIndex)){
+            throw new DragonHARuntimeException("to exclude index:["+exculdes+"] doesn't match "+datasourceIndex);
         }
 		return null;
 	}

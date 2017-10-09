@@ -1,15 +1,13 @@
 package com.tianshouzhi.dragon.console.modules.mysql.entity;
 
+import com.tianshouzhi.dragon.console.base.BaseEntity;
 import com.tianshouzhi.dragon.console.modules.mysql.entity.enumeration.Environment;
 
-import java.util.Date;
-
 /**
+ * 集群
  * Created by tianshouzhi on 2017/8/18.
  */
-public class Cluster {
-
-	private Long id;
+public class Cluster extends BaseEntity{
 
 	private String name;
 
@@ -21,9 +19,6 @@ public class Cluster {
 
 	private Environment environment;
 
-	private Date gmtCreate;
-
-	private Date gmtUpdate;
 
 	public String getDescription() {
 		return description;
@@ -65,29 +60,6 @@ public class Cluster {
 		this.vip = vip;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Date getGmtCreate() {
-		return gmtCreate;
-	}
-
-	public void setGmtCreate(Date gmtCreate) {
-		this.gmtCreate = gmtCreate;
-	}
-
-	public Date getGmtUpdate() {
-		return gmtUpdate;
-	}
-
-	public void setGmtUpdate(Date gmtUpdate) {
-		this.gmtUpdate = gmtUpdate;
-	}
 
 	@Override
 	public String toString() {

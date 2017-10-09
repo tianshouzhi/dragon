@@ -1,80 +1,32 @@
 package com.tianshouzhi.dragon.console.modules.datasource_config.entity;
 
-import java.util.Date;
+import com.tianshouzhi.dragon.console.modules.datasource_config.entity.enums.DataSourceType;
 
 /**
- * Created by tianshouzhi on 2017/8/18.
+ * Created by tianshouzhi on 2017/9/5.
  */
-public class RealDataSourceConfig {
-	private Long id;
+public class RealDataSourceConfig extends BaseDataSourceConfig {
+	private Long instanceId;
+	private Long databaseId;
 
-	private Long haId;
-
-	private Long shardId;
-
-	private String config;
-
-	private Date gmtCreate;
-
-	private Date gmtUpdate;
-
-	public Long getId() {
-		return id;
+	@Override
+	public DataSourceType getConfigType() {
+		return DataSourceType.REAL;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public Long getInstanceId() {
+		return instanceId;
 	}
 
-	public Long getHaId() {
-		return haId;
+	public void setInstanceId(Long instanceId) {
+		this.instanceId = instanceId;
 	}
 
-	public void setHaId(Long haId) {
-		this.haId = haId;
+	public Long getDatabaseId() {
+		return databaseId;
 	}
 
-	public Long getShardId() {
-		return shardId;
+	public void setDatabaseId(Long databaseId) {
+		this.databaseId = databaseId;
 	}
-
-	public void setShardId(Long shardId) {
-		this.shardId = shardId;
-	}
-
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-    }
-
-    public Date getGmtCreate() {
-		return gmtCreate;
-	}
-
-	public void setGmtCreate(Date gmtCreate) {
-		this.gmtCreate = gmtCreate;
-	}
-
-	public Date getGmtUpdate() {
-		return gmtUpdate;
-	}
-
-	public void setGmtUpdate(Date gmtUpdate) {
-		this.gmtUpdate = gmtUpdate;
-	}
-
-    @Override
-    public String toString() {
-        return "RealDataSourceConfig{" +
-                "id=" + id +
-                ", haId=" + haId +
-                ", shardId=" + shardId +
-                ", config='" + config + '\'' +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtUpdate=" + gmtUpdate +
-                '}';
-    }
 }

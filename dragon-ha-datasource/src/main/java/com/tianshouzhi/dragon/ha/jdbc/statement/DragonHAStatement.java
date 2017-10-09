@@ -1,6 +1,8 @@
 package com.tianshouzhi.dragon.ha.jdbc.statement;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
@@ -15,6 +17,8 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.Execu
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
 public class DragonHAStatement extends DragonStatement implements Statement {
+
+	private static final Log LOG= LoggerFactory.getLogger(DragonHAStatement.class);
 
 	protected DragonHAConnection dragonHAConnection;
 
@@ -90,7 +94,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	}
 
 	/**
-	 * 判断是否要使用sqlTypeCache，默认不使用cache，因为缓存的key是sql，对于Statament而言，sql的参数是直接是写在语句中的，无法命中的可能性大 Preparement应该对此进行覆盖，因为preparent对参数进行了剥离
+	 * 判断是否要使用sqlTypeCache，Statament为false，PrepareStatement覆写了此方法，返回true
 	 * 
 	 * @return
 	 */
@@ -131,6 +135,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	}
 
 	protected boolean doExecuteByType() throws SQLException {
+		LOG.debug("datasourceIndex:【"+dragonHAConnection.getDataSourceIndex()+"】,sql:"+sql);
 		boolean isResultSet = false;
 		switch (executeType) {
 		case EXECUTE_QUERY:

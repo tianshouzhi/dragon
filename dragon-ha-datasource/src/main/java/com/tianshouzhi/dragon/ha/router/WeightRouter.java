@@ -1,14 +1,12 @@
 package com.tianshouzhi.dragon.ha.router;
 
-import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.tianshouzhi.dragon.common.util.ArrayUtils;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
+import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
 
 /**
  * Created by tianshouzhi on 2017/8/16.
@@ -55,8 +53,8 @@ public class WeightRouter implements Router {
 	}
 
 	@Override
-	public String route(String... exculdes) {
-		if (ArrayUtils.isEmpty(exculdes)) {
+	public String route(Set<String> exculdes) {
+		if (CollectionUtils.isEmpty(exculdes)) {
 			return selectByRandom(this.weightIndexMap, this.totalWeight);
 		}
 
@@ -65,7 +63,7 @@ public class WeightRouter implements Router {
 		for (Map.Entry<WeightRange, String> entry : this.weightIndexMap.entrySet()) {
 			String datasourceIndex = entry.getValue();
 			WeightRange weightRange = entry.getKey();
-			if (!ArrayUtils.contains(exculdes, datasourceIndex)) {
+			if (!exculdes.contains(datasourceIndex)) {
 				afterExcludeMap.put(weightRange, datasourceIndex);
 				totalWeight += (weightRange.end - weightRange.start);
 			}

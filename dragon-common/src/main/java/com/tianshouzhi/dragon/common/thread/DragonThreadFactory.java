@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.common.thread;
 
-import org.apache.commons.lang3.StringUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 public class SqlTypeUtil {
 	private static final Log LOGGER = LoggerFactory.getLogger(SqlTypeUtil.class);
 
-	private static DragonCache<String, Boolean> sqlTypeCache = DragonCacheBuilder.build(100, 2000, 50, 10, TimeUnit.MINUTES);;
+	private static DragonCache<String, Boolean> sqlTypeCache = DragonCacheBuilder.build(100, 2000, 50, 10,
+	      TimeUnit.MINUTES);
 
 	public static boolean isQuery(String sql, boolean useCache) throws SQLException {
 		Boolean isQuery = null;
@@ -29,7 +30,7 @@ public class SqlTypeUtil {
 
 		SqlType sqlType = parseSqlType(sql);
 		// if can't decide sql type, default go write
-		isQuery = (sqlType == null) ? false : sqlType.isQuery();
+		isQuery = (sqlType != null);
 
 		if (useCache) {
 			sqlTypeCache.put(sql, isQuery);

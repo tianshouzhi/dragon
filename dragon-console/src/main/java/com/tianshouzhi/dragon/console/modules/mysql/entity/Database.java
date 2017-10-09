@@ -1,12 +1,11 @@
 package com.tianshouzhi.dragon.console.modules.mysql.entity;
 
-import java.util.Date;
+import com.tianshouzhi.dragon.console.base.BaseEntity;
 
 /**
  * Created by tianshouzhi on 2017/8/18.
  */
-public class Database {
-	private Long id;
+public class Database extends BaseEntity {
 
 	private Long clusterId;
 
@@ -14,9 +13,9 @@ public class Database {
 
 	private String charset;
 
-	private Date gmtCreate;
+	private Long dbaUserId;
 
-	private Date gmtUpdate;
+	private String description;
 
 	public Long getClusterId() {
 		return clusterId;
@@ -42,27 +41,19 @@ public class Database {
 		this.charset = charset;
 	}
 
-	public Long getId() {
-		return id;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public Date getGmtCreate() {
-		return gmtCreate;
+	public Long getDbaUserId() {
+		return dbaUserId;
 	}
 
-	public void setGmtCreate(Date gmtCreate) {
-		this.gmtCreate = gmtCreate;
-	}
-
-	public Date getGmtUpdate() {
-		return gmtUpdate;
-	}
-
-	public void setGmtUpdate(Date gmtUpdate) {
-		this.gmtUpdate = gmtUpdate;
+	public void setDbaUserId(Long dbaUserId) {
+		this.dbaUserId = dbaUserId;
 	}
 }

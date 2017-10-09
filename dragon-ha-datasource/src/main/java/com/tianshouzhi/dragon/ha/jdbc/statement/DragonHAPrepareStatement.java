@@ -1,6 +1,8 @@
 package com.tianshouzhi.dragon.ha.jdbc.statement;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.io.InputStream;
@@ -20,6 +22,9 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatemen
  * Created by TIANSHOUZHI336 on 2016/12/4.
  */
 public class DragonHAPrepareStatement extends DragonHAStatement implements DragonPrepareStatement {
+
+	private static final Log LOG= LoggerFactory.getLogger(DragonHAPrepareStatement.class);
+
 	protected Map<Integer, DragonPrepareStatement.ParamSetting> params = new LinkedHashMap<Integer, DragonPrepareStatement.ParamSetting>();
 
 	protected DragonPrepareStatement.PrepareExecuteType prepareExecuteType;
@@ -116,14 +121,12 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
 	@Override
 	protected boolean useSqlTypeCache() {
-		if (params.size() > 0) {
-			return true;
-		}
-		return super.useSqlTypeCache();
+		return true;
 	}
 
 	@Override
 	protected boolean doExecuteByType() throws SQLException {
+		LOG.debug("datasourceIndex:【"+dragonHAConnection.getDataSourceIndex()+"】,sql:"+sql+",params:"+params);
 		boolean isResultSet = false;
 		if (prepareExecuteType != null) {
 			switch (prepareExecuteType) {
@@ -216,6 +219,11 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
 		params.put(parameterIndex, new DragonPrepareStatement.ParamSetting(setNull, new Object[] { sqlType }));
+	}
+
+	@Override
+	public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
+		params.put(parameterIndex, new DragonPrepareStatement.ParamSetting(setNull2, new Object[] { sqlType, typeName }));
 	}
 
 	@Override
@@ -348,11 +356,6 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 	@Override
 	public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
 		params.put(parameterIndex, new DragonPrepareStatement.ParamSetting(setTimestamp, new Object[] { x, cal }));
-	}
-
-	@Override
-	public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
-		params.put(parameterIndex, new DragonPrepareStatement.ParamSetting(setNull2, new Object[] { sqlType, typeName }));
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -29,6 +30,11 @@ public interface DragonPrepareStatement extends PreparedStatement {
 		public ParamSetting(ParamType paramType, Object[] values) {
 			this.paramType = paramType;
 			this.values = values;
+		}
+
+		@Override
+		public String toString() {
+			return Arrays.toString(values);
 		}
 	}
 

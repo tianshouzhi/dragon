@@ -71,7 +71,7 @@
 - Entire code source rewriting focused on cleanliness and performance
 - Initialization options can be passed as JavaScript object or written as data-*
 - Plugin constructor publicly available from $.fn.bootstrapSwitch.Constructor
-- Plugin instance publicly available calling .data('bootstrap-switch')
+- Plugin clusterInstance publicly available calling .data('bootstrap-switch')
 - Global overridable defaults options
 - Improved flexibility with baseClass and wrapperClass options
 - New onInit event

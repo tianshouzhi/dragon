@@ -243,7 +243,7 @@ There are four types of body renderings: trustedHtml', 'template', 'templateWith
         
     There are additional documented use cases in these [tests](test/directiveTemplateSpec.js).
     
-All four options can be configured either globally for all toasts or individually per toast.pop() call.  If the `body-output-type` option is configured on the toast, it will take precedence over the global configuration for that toast instance.
+All four options can be configured either globally for all toasts or individually per toast.pop() call.  If the `body-output-type` option is configured on the toast, it will take precedence over the global configuration for that toast clusterInstance.
 
  - Globally:
  
@@ -263,7 +263,7 @@ All four options can be configured either globally for all toasts or individuall
     ```
 
 ### On Show Callback
-An onShow callback function can be attached to each toast instance.  The callback will be invoked upon toast add.
+An onShow callback function can be attached to each toast clusterInstance.  The callback will be invoked upon toast add.
 
 ```js
 toaster.pop({
@@ -279,7 +279,7 @@ toaster.pop({
 ```
 
 ### On Hide Callback
-An onHide callback function can be attached to each toast instance.  The callback will be invoked upon toast removal.  This can be used to chain toast calls.
+An onHide callback function can be attached to each toast clusterInstance.  The callback will be invoked upon toast removal.  This can be used to chain toast calls.
 
 ```js
 toaster.pop({
@@ -296,7 +296,7 @@ toaster.pop({
 
 ### Multiple Toaster Containers
 If desired, you can include multiple `<toaster-container></toaster-container>` 
-elements in your DOM.  The library will register an event handler for every instance 
+elements in your DOM.  The library will register an event handler for every clusterInstance 
 of the container that it identifies.  By default, when there are multiple registered 
 containers, each container will receive a toast notification and display it when a toast 
 is popped.  

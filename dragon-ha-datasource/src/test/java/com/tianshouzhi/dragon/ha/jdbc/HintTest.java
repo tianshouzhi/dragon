@@ -39,7 +39,7 @@ public class HintTest extends BaseTest {
 
 	@Test
 	public void threadLocalHintTest() throws SQLException {
-		DragonHAHintUtil.setHintMaster(true);
+		DragonHAHintUtil.forceMaster(true);
 		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 		ResultSet resultSet = preparedStatement.executeQuery();
 		while (resultSet.next()) {
@@ -47,7 +47,7 @@ public class HintTest extends BaseTest {
 			String tag_name = resultSet.getString("name");
 			System.out.println("id:" + id + ",name:" + tag_name);
 		}
-		DragonHAHintUtil.clearHintMaster();
+		DragonHAHintUtil.clear();
 		resultSet.close();
 		preparedStatement.close();
 		connection.close();

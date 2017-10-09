@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/7.
@@ -58,7 +59,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	public void mixTest() throws SQLException {
 		DragonHAConnection connection = this.connection;
 		PreparedStatement preparedStatement = connection
-		      .prepareStatement("/*master*/SELECT * from user");
+		      .prepareStatement("/*master*/ SELECT * from user");
 		preparedStatement.executeQuery();
 		ResultSet resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -72,7 +73,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 		int i = preparedStatement.executeUpdate();
 		Assert.assertEquals("insert success", i, 1);
 
-		preparedStatement = connection.prepareStatement("/*master*/SELECT * from user");
+		preparedStatement = connection.prepareStatement("/*master*/ SELECT * from user");
 		preparedStatement.executeQuery();
 		resultSet = preparedStatement.getResultSet();
 		while (resultSet.next()) {
@@ -109,7 +110,7 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 		preparedStatement.addBatch();
 		preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx2')");
 		int[] ints = preparedStatement.executeBatch();
-		System.out.println(ints);
+		System.out.println(Arrays.toString(ints));
 		testQuery();
 	}
 

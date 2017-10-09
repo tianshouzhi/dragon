@@ -1,8 +1,23 @@
 package com.tianshouzhi.dragon.console.modules.datasource_config.entity;
 
+import com.tianshouzhi.dragon.console.modules.datasource_config.entity.enums.DataSourceType;
+
 /**
  * Created by tianshouzhi on 2017/8/18.
  */
-public class HADataSourceConfig {
+public class HADataSourceConfig extends BaseDataSourceConfig {
+	private Long databaseId;
 
+	@Override
+	public DataSourceType getConfigType() {
+		return DataSourceType.HA;
+	}
+
+	public Long getDatabaseId() {
+		return databaseId;
+	}
+
+	public void setDatabaseId(Long databaseId) {
+		this.databaseId = databaseId;
+	}
 }

@@ -432,7 +432,7 @@ Closes https://github.com/ui-router/core/issues/31
 * Move imperative `$resolve` service out of main bundle ([cae6d03](https://github.com/angular-ui/ui-router/commit/cae6d03))
 * remove component.json ([af736c4](https://github.com/angular-ui/ui-router/commit/af736c4))
 * Use angular 1.3+ `$templateRequest` service to fetch templates ([7e1f36e](https://github.com/angular-ui/ui-router/commit/7e1f36e)), closes [#3193](https://github.com/angular-ui/ui-router/issues/3193) [#1882](https://github.com/angular-ui/ui-router/issues/1882)
-* **$uiRouter:** expose router instance at config-time as `$uiRouterProvider.router` ([9d2661c](https://github.com/angular-ui/ui-router/commit/9d2661c))
+* **$uiRouter:** expose router clusterInstance at config-time as `$uiRouterProvider.router` ([9d2661c](https://github.com/angular-ui/ui-router/commit/9d2661c))
 * **injectables:** Expose `$uiRouterProvider`, `$uiRouterGlobals`, and `$stateRegistry` injectables ([7fa72a6](https://github.com/angular-ui/ui-router/commit/7fa72a6))
 * **ui-sref-active:** improve performance by reducing $watches ([126a4ad](https://github.com/angular-ui/ui-router/commit/126a4ad))
 * **ui-view:** Route-to-component: Wire component "&" bindings ([af95206](https://github.com/angular-ui/ui-router/commit/af95206)), closes [#3239](https://github.com/angular-ui/ui-router/issues/3239) [#3111](https://github.com/angular-ui/ui-router/issues/3111)
@@ -525,7 +525,7 @@ These are the changes in ui-router-core from 1.0.0-beta.3 to 3.1.0
 
 * (CoreServices) Move `location` and `locationConfig` from `services` to `UIRouter.locationService` and `UIRouter.locationConfig`. ([029fb00](https://github.com/ui-router/core/commit/029fb00))
 * Built-in `string` parameter type no longer encodes slashes as `~2F` nor tildes as `~~` ([72bb2d8](https://github.com/ui-router/core/commit/72bb2d8))
-* Create router.dispose() to dispose a router instance and resources. ([0690917](https://github.com/ui-router/core/commit/0690917))
+* Create router.dispose() to dispose a router clusterInstance and resources. ([0690917](https://github.com/ui-router/core/commit/0690917))
 * Hook errors are all normalized to a "Rejection" type.  To access the  detail of the error thrown (`throw "Error 123"`), use `.detail`, i.e.: ([f486ced](https://github.com/ui-router/core/commit/f486ced))
 * Move `html5Mode` and `hashPrefix` from `LocationServices` to `LocationConfig` interface ([9d316a7](https://github.com/ui-router/core/commit/9d316a7))
 * move `ViewService.viewConfigFactory` and `rootContext`  to `_pluginapi.*` ([65badf4](https://github.com/ui-router/core/commit/65badf4))
@@ -737,7 +737,7 @@ Instead, framework implementors should pass the `LocationServices` and `Location
 
 ### End Users
 
-End users who were accessing `services.location` or `services.locationConfig` should access these off the `UIRouter` instance instead.
+End users who were accessing `services.location` or `services.locationConfig` should access these off the `UIRouter` clusterInstance instead.
 
 
 
@@ -1180,7 +1180,7 @@ This is a maintenance release which fixes a few known bugs introduced in 0.2.16.
 * **$state:** 
   * statechangeCancel: Avoid infinite digest in .otherwise/redirect case. Don't clobber url if a new transition has started.  Closes #222 ([e00aa695](https://github.com/angular-ui/ui-router/commit/e00aa695e41ddc5ebd5d2b226aa0917a751b11aa), closes [#2238](https://github.com/angular-ui/ui-router/issues/2238))
   * transitionTo: Allow hash (#) value to be read as toParams['#'] in events.  Re-add the saved hash before broadcasting $stateChangeStart event.  ([8c1bf30d](https://github.com/angular-ui/ui-router/commit/8c1bf30d2a3b78ba40b330f12d854c885d6cc117))
-* **$stateParams:** Fix for testing: reset service instance between tests ([2aeb0c4b](https://github.com/angular-ui/ui-router/commit/2aeb0c4b205baf6cfa2ef25bb986bb160dc13bf9))
+* **$stateParams:** Fix for testing: reset service clusterInstance between tests ([2aeb0c4b](https://github.com/angular-ui/ui-router/commit/2aeb0c4b205baf6cfa2ef25bb986bb160dc13bf9))
 * **$urlRouter:** 
   * Sort URL rules by specificity. Potential minor BC if apps were relying on rule registration order.  ([b5c57c8e](https://github.com/angular-ui/ui-router/commit/b5c57c8ec2e14e17e75104c1424654f126ea4011))
   * Use $sniffer for pushstate compat check ([c219e801](https://github.com/angular-ui/ui-router/commit/c219e801797f340ef9c5c919ab890ef003a7a042))

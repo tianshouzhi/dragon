@@ -5,7 +5,7 @@ import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapperManager;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceManager;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 
@@ -26,11 +26,11 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	 */
 	protected Connection realConnection;
 
-	protected RealDataSourceWrapperManager dataSourceManager;
+	protected RealDataSourceManager dataSourceManager;
 
 	private String dataSourceIndex;// 当前连接是从哪一个数据源中获取的
 
-	public DragonHAConnection(String username, String password, RealDataSourceWrapperManager dataSourceManager)
+	public DragonHAConnection(String username, String password, RealDataSourceManager dataSourceManager)
 	      throws SQLException {
 		super(username, password);
 		if (dataSourceManager == null) {
@@ -162,12 +162,12 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		}
 		// 如果没有开启事务
 		// 2、判断有没有ThreadLocal hint
-		if (DragonHAHintUtil.isHintMaster()) {
+		if (DragonHAHintUtil.isForceMaster()) {
 			return buildNewWriteConnectionIfNeed();
 		}
 
 		// 3、sql中有hint
-		if (DragonHAHintUtil.isHintMaster(sql)) {
+		if (DragonHAHintUtil.isForceMaster(sql)) {
 			return buildNewWriteConnectionIfNeed();
 		}
 
@@ -179,22 +179,22 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		}
 	}
 
-	private Connection buildNewReadConnectionIfNeed(String... excludes) throws SQLException {
+	private Connection buildNewReadConnectionIfNeed() throws SQLException {
 		if (this.realConnection != null) {
 			return realConnection;
 		}
-		this.dataSourceIndex = this.dataSourceManager.selectReadIndex(excludes);
+		this.dataSourceIndex = this.dataSourceManager.selectReadIndex(null);
 		this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
 		setConnectionParams(this.realConnection);
 		return realConnection;
 	}
 
-	public Connection buildNewWriteConnectionIfNeed(String... excludes) throws SQLException {
+	public Connection buildNewWriteConnectionIfNeed() throws SQLException {
 		if (this.realConnection == null || this.realConnection.isReadOnly()) {
 			if (this.realConnection != null) {
 				this.realConnection.close();
 			}
-			this.dataSourceIndex = this.dataSourceManager.selectWriteIndex(excludes);
+			this.dataSourceIndex = this.dataSourceManager.selectWriteIndex(null);
 			this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;

@@ -229,7 +229,7 @@ UserMapper.xml
     
     datasource.datasourceClass=com.alibaba.druid.pool.DruidDataSource
     
-    #数据源属性配置 格式:datasource.<datasourceIndex>.<propertyName>
+    #数据源属性配置 格式:datasource.<index>.<propertyName>
     datasource.default.username=root
     datasource.default.password=shxx12151022
     datasource.default.driverClassName=com.mysql.jdbc.Driver
@@ -249,7 +249,7 @@ UserMapper.xml
 
     <?xml version="1.0" encoding="UTF-8"?>
     <beans xmlns="http://www.springframework.org/schema/beans"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-clusterInstance"
            xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
         <!--配置Dragon数据源-->
         <bean id="dragon-datasource" class="com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource">

@@ -42,8 +42,8 @@ public class DragonHAStatementTest extends BaseTest {
 	}
 
 	@Test
-	public void testQuery() throws SQLException {
-		DragonHAHintUtil.setHintMaster(true);
+	public void testThreadLocalHint() throws SQLException {
+		DragonHAHintUtil.forceMaster();
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
 		ResultSet resultSet = statement.executeQuery("SELECT * FROM user ");
@@ -52,17 +52,15 @@ public class DragonHAStatementTest extends BaseTest {
 			String name = resultSet.getString("name");
 			System.out.println("id:" + id + ",name:" + name);
 		}
-		DragonHAHintUtil.clearHintMaster();
+		DragonHAHintUtil.clear();
 	}
 
 	@Test
 	public void testUpdate() throws SQLException {
-		testQuery();
 		DragonHAConnection connection = this.connection;
 		Statement statement = connection.createStatement();
 		int i = statement.executeUpdate("UPDATE user SET name='tianshouzhi' where id<=10");
 		System.out.println(i);
-		testQuery();
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-clusterInstance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>dragon</name>
@@ -44,11 +44,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.tianshouzhi</groupId>
-                <artifactId>dragon-dynamic-datasource</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
@@ -60,7 +55,11 @@
                 <version>5.1.39</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.24</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>

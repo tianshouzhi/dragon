@@ -1,11 +1,12 @@
 package com.tianshouzhi.dragon.ha.router;
 
-import com.tianshouzhi.dragon.ha.config.RealDatasourceConfig;
+import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import org.apache.commons.collections.MapUtils;
+import com.tianshouzhi.dragon.real.jdbc.RealDataSource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by tianshouzhi on 2017/8/16.
@@ -15,13 +16,13 @@ public class RouterManager {
 
 	private final Router writeRouter;
 
-	private final Map<String, RealDatasourceConfig> configMap;
+	private final Map<String, RealDataSource> configMap;
 
-	private final Map<String, RealDatasourceConfig> readConfigMap;
+	private final Map<String, RealDataSource> readConfigMap;
 
-	private final Map<String, RealDatasourceConfig> writeConfigMap;
+	private final Map<String, RealDataSource> writeConfigMap;
 
-	public RouterManager(Map<String, RealDatasourceConfig> configMap) {
+	public RouterManager(Map<String, RealDataSource> configMap) {
 		if (MapUtils.isEmpty(configMap)) {
 			throw new DragonHARuntimeException("configMap can't be empty!");
 		}
@@ -32,7 +33,7 @@ public class RouterManager {
 		this.writeRouter = buildRouter(writeConfigMap, false);
 	}
 
-	private Router buildRouter(Map<String, RealDatasourceConfig> configMap, boolean isRead) {
+	private Router buildRouter(Map<String, RealDataSource> configMap, boolean isRead) {
 		RouteType routeType = getRouteType(configMap);
 		switch (routeType) {
 		case SINGLE:
@@ -44,9 +45,9 @@ public class RouterManager {
 		}
 	}
 
-	private Router buildWeightRouter(Map<String, RealDatasourceConfig> configMap, boolean isRead) {
+	private Router buildWeightRouter(Map<String, RealDataSource> configMap, boolean isRead) {
 		HashMap<String, Integer> indexWeightMap = new HashMap<String, Integer>(4);
-		for (Map.Entry<String, RealDatasourceConfig> entry : configMap.entrySet()) {
+		for (Map.Entry<String, RealDataSource> entry : configMap.entrySet()) {
 			if (isRead) {
 				indexWeightMap.put(entry.getKey(), entry.getValue().getReadWeight());
 			} else {
@@ -56,7 +57,7 @@ public class RouterManager {
 		return new WeightRouter(indexWeightMap);
 	}
 
-	private RouteType getRouteType(Map<String, RealDatasourceConfig> configMap) {
+	private RouteType getRouteType(Map<String, RealDataSource> configMap) {
 		if (MapUtils.isEmpty(configMap)) {
 			return null;
 		}
@@ -66,12 +67,12 @@ public class RouterManager {
 		return RouteType.WEIGHT;
 	}
 
-	private Map<String, RealDatasourceConfig> filterDatasourceConfig(Map<String, RealDatasourceConfig> configMap,
+	private Map<String, RealDataSource> filterDatasourceConfig(Map<String, RealDataSource> configMap,
 	      boolean isread) {
-		Map<String, RealDatasourceConfig> filterResult = new HashMap<String, RealDatasourceConfig>(4);
-		for (Map.Entry<String, RealDatasourceConfig> configEntry : configMap.entrySet()) {
+		Map<String, RealDataSource> filterResult = new HashMap<String, RealDataSource>(4);
+		for (Map.Entry<String, RealDataSource> configEntry : configMap.entrySet()) {
 			String datasourceIndex = configEntry.getKey();
-			RealDatasourceConfig config = configEntry.getValue();
+			RealDataSource config = configEntry.getValue();
 			if (isread) {
 				if (config.getReadWeight() > 0) {
 					filterResult.put(datasourceIndex, config);
@@ -85,14 +86,14 @@ public class RouterManager {
 		return filterResult;
 	}
 
-	public String routeWrite(String... excludes) {
+	public String routeWrite(Set<String> excludes) {
 		if (writeRouter == null) {
 			throw new DragonHARuntimeException("writeRouter is null");
 		}
 		return writeRouter.route(excludes);
 	}
 
-	public String routeRead(String... excludes) {
+	public String routeRead(Set<String> excludes) {
 		if (readRouter == null) {
 			throw new DragonHARuntimeException("readRouter is null");
 		}
