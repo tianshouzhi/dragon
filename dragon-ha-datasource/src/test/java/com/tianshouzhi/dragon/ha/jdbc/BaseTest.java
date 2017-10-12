@@ -9,28 +9,29 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/8.
  */
 public abstract class BaseTest {
 	DragonHADatasource dragonHADatasource;
-
 	DragonHAConnection connection;
 
 	@Before
 	public void init() throws Exception {
 		dragonHADatasource = new DragonHADatasource();
-		HashMap<String, RealDataSource> realDataSourceMap = new HashMap<>();
+		Set<RealDataSource> realDataSources = new HashSet<>(4);
 		DruidDataSource master = createRealDataSource();
-		realDataSourceMap.put("master", RealDataSourceFactory.create("master", 0, 10, master));
 		DruidDataSource slave1 = createRealDataSource();
-		realDataSourceMap.put("slave1", RealDataSourceFactory.create("slave1", 10, 0, slave1));
 		DruidDataSource slave2 = createRealDataSource();
-		realDataSourceMap.put("slave2", RealDataSourceFactory.create("slave1", 10, 0, slave2));
 
-		dragonHADatasource.setRealDataSources(realDataSourceMap);
+		realDataSources.add(RealDataSourceFactory.create("master", 0, 10, master));
+		realDataSources.add(RealDataSourceFactory.create("slave1", 10, 0, slave1));
+		realDataSources.add(RealDataSourceFactory.create("slave1", 10, 0, slave2));
+
+		dragonHADatasource.setRealDataSources(realDataSources);
 		connection = (DragonHAConnection) dragonHADatasource.getConnection();
 	}
 
