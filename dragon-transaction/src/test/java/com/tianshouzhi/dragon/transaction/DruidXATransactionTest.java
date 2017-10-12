@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.transaction;
 
 import com.alibaba.druid.pool.xa.DruidXADataSource;
+import com.mysql.jdbc.jdbc2.optional.MysqlXid;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,31 +38,31 @@ public class DruidXATransactionTest {
 		XAConnection xaConnection1 = dataSource1.getXAConnection();
 		XAConnection xaConnection2 = dataSource2.getXAConnection();
 		XAResource xaResource1 = xaConnection1.getXAResource();
-		byte[] gtrid = null;
-		byte[] bqual = null;
-		int o = 0;
-		Xid xid = new MyXid(100, new byte[] { 0x01 }, new byte[] { 0x02 });
+		XAResource xaResource2 = xaConnection2.getXAResource();
+		Xid xid = new MysqlXid(new byte[] { 0x01 }, new byte[] { 0x02 }, 100);
+
 		xaResource1.start(xid, XAResource.TMNOFLAGS);
 		PreparedStatement preparedStatement1 = xaConnection1.getConnection()
 		      .prepareStatement("INSERT INTO t VALUES" + "(5,5)");
 		preparedStatement1.executeUpdate();
 		xaResource1.end(xid, XAResource.TMSUCCESS);
-		int prepare1 = xaResource1.prepare(xid);
-		//
-		XAResource xaResource2 = xaConnection2.getXAResource();
+
 		xaResource2.start(xid, XAResource.TMNOFLAGS);
 		PreparedStatement preparedStatement2 = xaConnection1.getConnection()
-				.prepareStatement("INSERT INTO t VALUES" + "(4,4)");
+		      .prepareStatement("INSERT INTO t VALUES" + "(4,4)");
 		preparedStatement2.executeUpdate();
 		xaResource2.end(xid, XAResource.TMSUCCESS);
-		int prepare2 = xaResource2.prepare(xid);
-		
-		if (prepare1 == XAResource.XA_OK) {
-			xaResource1.commit(xid, false);
-		}
 
-		if (prepare2 == XAResource.XA_OK) {
+		int prepare1 = xaResource1.prepare(xid);
+
+		int prepare2 = xaResource2.prepare(xid);
+
+		if (prepare1 == XAResource.XA_OK && prepare2 == XAResource.XA_OK) {
+			xaResource1.commit(xid, false);
 			xaResource2.commit(xid, false);
+		} else {
+			xaResource1.rollback(xid);
+			xaResource2.rollback(xid);
 		}
 	}
 }
