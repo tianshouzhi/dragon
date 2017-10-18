@@ -30,7 +30,7 @@ public abstract class BaseTest {
 		DruidDataSource slave2 = createRealDataSource();
 		realDataSourceMap.put("slave2", RealDataSourceFactory.create("slave1", 10, 0, slave2));
 
-		dragonHADatasource.setRealDataSources(realDataSourceMap);
+//		dragonHADatasource.setRealDataSources(realDataSourceMap);
 		connection = (DragonHAConnection) dragonHADatasource.getConnection();
 	}
 

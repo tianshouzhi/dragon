@@ -1,74 +1,57 @@
 package com.tianshouzhi.dragon.real.jdbc;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.common.util.BeanPropertyUtil;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
- * Created by tianshouzhi on 2017/9/12.
+ * Created by tianshouzhi on 2017/10/14.
  */
-public abstract class RealDataSource<T extends DataSource> extends DragonDataSource {
+public class RealDataSource<T extends DataSource> extends DragonDataSourceAdapter implements DragonDataSource {
 	protected String index;
 
-	protected int readWeight = 10;
+	protected Class<T> realDsClass;
 
-	protected int writeWeight = 10;
+	protected Properties realDsProperties;
 
 	protected T dataSource;
 
-	public RealDataSource(String index, int readWeight, int writeWeight, T dataSource) {
+	public RealDataSource(String index, Class<T> realDsClass, Properties realDsProperties) throws DragonException {
 		this.index = index;
-		this.readWeight = readWeight;
-		this.writeWeight = writeWeight;
-		this.dataSource = dataSource;
+		this.realDsClass = realDsClass;
+		this.realDsProperties = realDsProperties;
+		if (realDsClass == null || realDsProperties == null) {
+			throw new DragonException("'realDsClass' and 'realDsProperties' can't be null");
+		}
 	}
+
+	@Override
+	public void init() throws Exception {
+        dataSource = realDsClass.newInstance();
+        BeanPropertyUtil.populate(dataSource, realDsProperties);
+	}
+
+    @Override
+    public void close() throws Exception {
+
+    }
+
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        if (username == null && password == null) {
+            return dataSource.getConnection();
+        }
+        return dataSource.getConnection(username, password);
+    }
 
 	// getters and setters
 	public String getIndex() {
 		return index;
-	}
-
-	public void setIndex(String index) {
-		this.index = index;
-	}
-
-	public Integer getReadWeight() {
-		return readWeight;
-	}
-
-	public void setReadWeight(Integer readWeight) {
-		this.readWeight = readWeight;
-	}
-
-	public Integer getWriteWeight() {
-		return writeWeight;
-	}
-
-	public void setWriteWeight(Integer writeWeight) {
-		this.writeWeight = writeWeight;
-	}
-
-	public T getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(T dataSource) {
-		this.dataSource = dataSource;
-	}
-
-	public boolean canRead() {
-		return readWeight > 0;
-	}
-
-	public boolean canWrite() {
-		return writeWeight > 0;
-	}
-
-	public void setReadWeight(int readWeight) {
-		this.readWeight = readWeight;
-	}
-
-	public void setWriteWeight(int writeWeight) {
-		this.writeWeight = writeWeight;
 	}
 }

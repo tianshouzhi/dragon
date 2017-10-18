@@ -68,7 +68,7 @@ public class RouterManager {
 	}
 
 	private Map<String, RealDataSource> filterDatasourceConfig(Map<String, RealDataSource> configMap,
-	      boolean isread) {
+															   boolean isread) {
 		Map<String, RealDataSource> filterResult = new HashMap<String, RealDataSource>(4);
 		for (Map.Entry<String, RealDataSource> configEntry : configMap.entrySet()) {
 			String datasourceIndex = configEntry.getKey();

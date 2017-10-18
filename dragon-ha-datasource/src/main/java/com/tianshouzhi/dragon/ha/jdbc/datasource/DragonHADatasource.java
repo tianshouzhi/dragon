@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
-public class DragonHADatasource extends DragonDataSource {
+public class DragonHADatasource extends DragonDataSourceAdapter {
 	private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
 
 	private RealDataSourceManager realDataSourceManager;
