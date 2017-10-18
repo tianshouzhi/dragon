@@ -17,14 +17,7 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 
 	private PrintWriter logWriter;
 
-	private String username;
-	private String password;
-	private String url;
-	private String driverClass;
-	private String maxPoolSize;
-	private String minPoolSize;
-	private String initPoolSize;
-	private boolean inited;
+	protected boolean init;
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
@@ -54,4 +47,17 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		throw new SQLFeatureNotSupportedException("getParentLogger");
 	}
+
+	@Override
+	public void init() throws Exception {
+		if(!init){
+			synchronized (this){
+				if(!init){
+					doInit();
+				}
+			}
+		}
+	}
+
+	protected abstract void doInit();
 }

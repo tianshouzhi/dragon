@@ -8,6 +8,8 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectGroupByClause;
 import com.alibaba.druid.sql.ast.statement.SQLSelectOrderByItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.ColumnMetaData;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonResultSetMetaData;
 import com.tianshouzhi.dragon.sharding.jdbc.resultset.DragonShardingResultSet;
@@ -15,8 +17,6 @@ import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.resultmerge.ResultMerger;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql.DragonDruidASTUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
