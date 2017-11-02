@@ -17,7 +17,7 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 
 	private PrintWriter logWriter;
 
-	protected boolean init;
+	protected volatile boolean init = false;
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
@@ -44,20 +44,33 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 		return getConnection(null, null);
 	}
 
+	@Override
+	public Connection getConnection(String username, String password) throws SQLException {
+		init();
+		return doGetConnection(username,password);
+	}
+
+	protected abstract Connection doGetConnection(String username, String password) throws SQLException;
+
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		throw new SQLFeatureNotSupportedException("getParentLogger");
 	}
 
 	@Override
-	public void init() throws Exception {
-		if(!init){
-			synchronized (this){
-				if(!init){
-					doInit();
+	public void init() throws SQLException{
+		if (!init) {
+			synchronized (this) {
+				if (!init) {
+					try {
+						doInit();
+					} catch (Exception e) {
+						throw new SQLException(e);
+					}
 				}
+				init = true;
 			}
 		}
 	}
 
-	protected abstract void doInit();
+	protected abstract void doInit() throws Exception;
 }

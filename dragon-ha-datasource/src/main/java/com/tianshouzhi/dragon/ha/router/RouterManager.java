@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.ha.router;
 
 import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import com.tianshouzhi.dragon.real.jdbc.RealDataSource;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +16,13 @@ public class RouterManager {
 
 	private final Router writeRouter;
 
-	private final Map<String, RealDataSource> configMap;
+	private final Map<String, RealDataSourceWapper> configMap;
 
-	private final Map<String, RealDataSource> readConfigMap;
+	private final Map<String, RealDataSourceWapper> readConfigMap;
 
-	private final Map<String, RealDataSource> writeConfigMap;
+	private final Map<String, RealDataSourceWapper> writeConfigMap;
 
-	public RouterManager(Map<String, RealDataSource> configMap) {
+	public RouterManager(Map<String, RealDataSourceWapper> configMap) {
 		if (MapUtils.isEmpty(configMap)) {
 			throw new DragonHARuntimeException("configMap can't be empty!");
 		}
@@ -33,7 +33,7 @@ public class RouterManager {
 		this.writeRouter = buildRouter(writeConfigMap, false);
 	}
 
-	private Router buildRouter(Map<String, RealDataSource> configMap, boolean isRead) {
+	private Router buildRouter(Map<String, RealDataSourceWapper> configMap, boolean isRead) {
 		RouteType routeType = getRouteType(configMap);
 		switch (routeType) {
 		case SINGLE:
@@ -45,9 +45,9 @@ public class RouterManager {
 		}
 	}
 
-	private Router buildWeightRouter(Map<String, RealDataSource> configMap, boolean isRead) {
+	private Router buildWeightRouter(Map<String, RealDataSourceWapper> configMap, boolean isRead) {
 		HashMap<String, Integer> indexWeightMap = new HashMap<String, Integer>(4);
-		for (Map.Entry<String, RealDataSource> entry : configMap.entrySet()) {
+		for (Map.Entry<String, RealDataSourceWapper> entry : configMap.entrySet()) {
 			if (isRead) {
 				indexWeightMap.put(entry.getKey(), entry.getValue().getReadWeight());
 			} else {
@@ -57,7 +57,7 @@ public class RouterManager {
 		return new WeightRouter(indexWeightMap);
 	}
 
-	private RouteType getRouteType(Map<String, RealDataSource> configMap) {
+	private RouteType getRouteType(Map<String, RealDataSourceWapper> configMap) {
 		if (MapUtils.isEmpty(configMap)) {
 			return null;
 		}
@@ -67,12 +67,12 @@ public class RouterManager {
 		return RouteType.WEIGHT;
 	}
 
-	private Map<String, RealDataSource> filterDatasourceConfig(Map<String, RealDataSource> configMap,
-															   boolean isread) {
-		Map<String, RealDataSource> filterResult = new HashMap<String, RealDataSource>(4);
-		for (Map.Entry<String, RealDataSource> configEntry : configMap.entrySet()) {
+	private Map<String, RealDataSourceWapper> filterDatasourceConfig(Map<String, RealDataSourceWapper> configMap,
+																	 boolean isread) {
+		Map<String, RealDataSourceWapper> filterResult = new HashMap<String, RealDataSourceWapper>(4);
+		for (Map.Entry<String, RealDataSourceWapper> configEntry : configMap.entrySet()) {
 			String datasourceIndex = configEntry.getKey();
-			RealDataSource config = configEntry.getValue();
+			RealDataSourceWapper config = configEntry.getValue();
 			if (isread) {
 				if (config.getReadWeight() > 0) {
 					filterResult.put(datasourceIndex, config);
