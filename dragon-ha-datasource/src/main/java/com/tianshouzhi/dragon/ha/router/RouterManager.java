@@ -35,7 +35,7 @@ public class RouterManager {
 
 	private Router buildRouter(Map<String, RealDataSourceWapper> configMap, boolean isRead) {
 		RouteType routeType = getRouteType(configMap);
-		switch (routeType) {
+		switch (routeType) {//fixme
 		case SINGLE:
 			return new SingleRouter(configMap.keySet().iterator().next());
 		case WEIGHT:

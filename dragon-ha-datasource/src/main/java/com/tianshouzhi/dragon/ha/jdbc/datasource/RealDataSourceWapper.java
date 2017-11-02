@@ -20,12 +20,12 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 
 	private Properties properties;
 
-	private Class<? extends DataSource> clazz;
+	private String clazz;
 
 	private DataSource dataSource;
 
 
-	public RealDataSourceWapper(String index, int readWeight, int writeWeight, Properties properties, Class<? extends DataSource> clazz) {
+	public RealDataSourceWapper(String index, int readWeight, int writeWeight, Properties properties, String clazz) {
 		this.index = index;
 		this.readWeight = readWeight;
 		this.writeWeight = writeWeight;
@@ -72,8 +72,13 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 	@Override
 	protected void doInit() throws Exception {
 		if (dataSource == null) {
-			dataSource=DatasourceUtil.createDataSource(clazz,properties);
+			synchronized (this){
+				if(dataSource==null){
+					Class<? extends DataSource> dsClass = (Class<? extends DataSource>) Class.forName(clazz);
+					dataSource=DatasourceUtil.createDataSource(dsClass,properties);
+					DatasourceUtil.init(dataSource);
+				}
+			}
 		}
-		DatasourceUtil.init(dataSource);
 	}
 }
