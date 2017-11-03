@@ -1,14 +1,5 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
@@ -16,6 +7,14 @@ import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
+
+import javax.sql.DataSource;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/3/15.
@@ -42,7 +41,8 @@ public abstract class DragonShardingConfigParser {
 			Map<String, String> mergedConfig = new HashMap<String, String>();
 			mergedConfig.putAll(defaultDatasourceConfigMap);
 			mergedConfig.putAll(datasourceConfig);// 覆盖默认配置
-			DataSource dataSource = DataSourceUtil.create(realDatasourceClass, mergedConfig);
+//			DataSource dataSource = DataSourceUtil.create(realDatasourceClass, mergedConfig);
+			DataSource dataSource = null;
 			dsNameDatasourceMap.put(datasourceName, dataSource);
 		}
 

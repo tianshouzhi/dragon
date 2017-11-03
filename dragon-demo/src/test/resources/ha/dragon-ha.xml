@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-clusterInstance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-
-    <bean id="master"></bean>
-    <bean id="slave1"></bean>
-    <bean id="slave2"></bean>
     <!--定义DragonHADatasource-->
     <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource">
-
+        <property name="localConfigFile" value="ha/dragon-ha.properties"></property>
     </bean>
 
     <!--=====================================Mybatis Spring整合配置=================================-->
@@ -29,5 +24,4 @@
         <!--指定SqlSessionFactoryBean这个bean的id属性-->
         <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />-->
     </bean>
-
 </beans>
