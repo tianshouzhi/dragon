@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 
 import javax.script.*;
 import java.util.Map;
@@ -28,7 +28,7 @@ public abstract class DragonGroovyEngine {
 			}
 			return engine.eval(script);
 		} catch (ScriptException e) {
-			throw new DragonRuntimeException("script:" + script + " eval error,params" + params.toString(), e);
+			throw new DragonShardException("script:" + script + " eval error,params" + params.toString(), e);
 		}
 	}
 }

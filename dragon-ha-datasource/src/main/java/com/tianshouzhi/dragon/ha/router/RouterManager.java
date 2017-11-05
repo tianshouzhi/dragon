@@ -1,102 +1,71 @@
 package com.tianshouzhi.dragon.ha.router;
 
 import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWapper;
+import com.tianshouzhi.dragon.ha.exception.DragonHAException;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by tianshouzhi on 2017/8/16.
  */
 public class RouterManager {
-	private final Router readRouter;
 
-	private final Router writeRouter;
+    private final Router readRouter;
+    private final Router writeRouter;
+    private String haDSName;
 
-	private final Map<String, RealDataSourceWapper> configMap;
+    public RouterManager(DragonHADatasource dragonHADatasource) {
+        this.haDSName = dragonHADatasource.getHADSName();
+        Map<String, RealDataSourceWrapper> dataSourceWrappers = dragonHADatasource.getRealDataSourceWrapperMap();
+        this.readRouter = buildRouter(dataSourceWrappers, true);
+        this.writeRouter = buildRouter(dataSourceWrappers, false);
+    }
 
-	private final Map<String, RealDataSourceWapper> readConfigMap;
+    private Router buildRouter(Map<String, RealDataSourceWrapper> realDataSourceWrapperMap, boolean isRead) {
 
-	private final Map<String, RealDataSourceWapper> writeConfigMap;
+        if (MapUtils.isEmpty(realDataSourceWrapperMap)) {
+            return null;
+        }
 
-	public RouterManager(Map<String, RealDataSourceWapper> configMap) {
-		if (MapUtils.isEmpty(configMap)) {
-			throw new DragonHARuntimeException("configMap can't be empty!");
-		}
-		this.configMap = configMap;
-		this.readConfigMap = filterDatasourceConfig(configMap, true);
-		this.writeConfigMap = filterDatasourceConfig(configMap, false);
-		this.readRouter = buildRouter(readConfigMap, true);
-		this.writeRouter = buildRouter(writeConfigMap, false);
-	}
+        if(realDataSourceWrapperMap.size()==1){
+            return buildSingleRouter(realDataSourceWrapperMap);
+        }
+        return buildWeightRouter(realDataSourceWrapperMap, isRead);
+    }
 
-	private Router buildRouter(Map<String, RealDataSourceWapper> configMap, boolean isRead) {
-		RouteType routeType = getRouteType(configMap);
-		switch (routeType) {//fixme
-		case SINGLE:
-			return new SingleRouter(configMap.keySet().iterator().next());
-		case WEIGHT:
-			return buildWeightRouter(configMap, isRead);
-		default:
-			return null;
-		}
-	}
+    private Router buildSingleRouter(Map<String, RealDataSourceWrapper> configMap) {
+        return new SingleRouter(this.haDSName, configMap.keySet().iterator().next());
+    }
 
-	private Router buildWeightRouter(Map<String, RealDataSourceWapper> configMap, boolean isRead) {
-		HashMap<String, Integer> indexWeightMap = new HashMap<String, Integer>(4);
-		for (Map.Entry<String, RealDataSourceWapper> entry : configMap.entrySet()) {
-			if (isRead) {
-				indexWeightMap.put(entry.getKey(), entry.getValue().getReadWeight());
-			} else {
-				indexWeightMap.put(entry.getKey(), entry.getValue().getWriteWeight());
-			}
-		}
-		return new WeightRouter(indexWeightMap);
-	}
+    private Router buildWeightRouter(Map<String, RealDataSourceWrapper> dataSourceWrappers, boolean isRead) {
+        HashMap<String, Integer> realDSNameWeightMap = new HashMap<String, Integer>(4);
+        for (Map.Entry<String, RealDataSourceWrapper> entry : dataSourceWrappers.entrySet()) {
+            String realDSName = entry.getKey();
+            RealDataSourceWrapper realDataSourceWrapper = entry.getValue();
+            if (isRead && realDataSourceWrapper.getReadWeight() > 0) {
+                realDSNameWeightMap.put(realDSName, realDataSourceWrapper.getReadWeight());
+            }
+            if (!isRead && realDataSourceWrapper.getWriteWeight() > 0) {
+                realDSNameWeightMap.put(realDSName, realDataSourceWrapper.getWriteWeight());
+            }
+        }
+        return new WeightRouter(this.haDSName, realDSNameWeightMap);
+    }
 
-	private RouteType getRouteType(Map<String, RealDataSourceWapper> configMap) {
-		if (MapUtils.isEmpty(configMap)) {
-			return null;
-		}
-		if (configMap.size() == 1) {
-			return RouteType.SINGLE;
-		}
-		return RouteType.WEIGHT;
-	}
+    public String routeWrite() {
+        if (writeRouter == null) {
+            throw new DragonHAException("writeRouter is null");
+        }
+        return writeRouter.route();
+    }
 
-	private Map<String, RealDataSourceWapper> filterDatasourceConfig(Map<String, RealDataSourceWapper> configMap,
-																	 boolean isread) {
-		Map<String, RealDataSourceWapper> filterResult = new HashMap<String, RealDataSourceWapper>(4);
-		for (Map.Entry<String, RealDataSourceWapper> configEntry : configMap.entrySet()) {
-			String datasourceIndex = configEntry.getKey();
-			RealDataSourceWapper config = configEntry.getValue();
-			if (isread) {
-				if (config.getReadWeight() > 0) {
-					filterResult.put(datasourceIndex, config);
-				}
-			} else {
-				if (config.getWriteWeight() > 0) {
-					filterResult.put(datasourceIndex, config);
-				}
-			}
-		}
-		return filterResult;
-	}
-
-	public String routeWrite(Set<String> excludes) {
-		if (writeRouter == null) {
-			throw new DragonHARuntimeException("writeRouter is null");
-		}
-		return writeRouter.route(excludes);
-	}
-
-	public String routeRead(Set<String> excludes) {
-		if (readRouter == null) {
-			throw new DragonHARuntimeException("readRouter is null");
-		}
-		return readRouter.route(excludes);
-	}
+    public String routeRead() {
+        if (readRouter == null) {
+            throw new DragonHAException("readRouter is null");
+        }
+        return readRouter.route();
+    }
 }

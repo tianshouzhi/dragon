@@ -38,7 +38,6 @@
         <module>dragon-common</module>
         <module>dragon-console</module>
         <module>dragon-demo</module>
-        <module>dragon-real-datasource</module>
         <module>dragon-benchmark</module>
         <module>dragon-transaction</module>
     </modules>

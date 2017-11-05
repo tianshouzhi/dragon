@@ -3,7 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
-import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
+import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.sql.Connection;
@@ -135,7 +135,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	}
 
 	protected boolean doExecuteByType() throws SQLException {
-		LOG.debug("datasourceIndex:【"+dragonHAConnection.getDataSourceIndex()+"】,sql:"+sql);
+		LOG.debug("datasourceIndex:【"+dragonHAConnection.getRealDSName()+"】,sql:"+sql);
 		boolean isResultSet = false;
 		switch (executeType) {
 		case EXECUTE_QUERY:
@@ -170,7 +170,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 			batchExecuteResult = realStatement.executeBatch();
 			break;
 		default:
-			throw new DragonHARuntimeException("unkown excute type " + executeType + ",sql :" + sql);
+			throw new DragonHAException("unkown excute type " + executeType + ",sql :" + sql);
 		}
 		return isResultSet;
 	}

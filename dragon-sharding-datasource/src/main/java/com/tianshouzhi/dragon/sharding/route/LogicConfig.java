@@ -1,8 +1,7 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import com.tianshouzhi.dragon.common.exception.DragonConfigException;
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.util.StringUtils;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -19,9 +18,9 @@ public abstract class LogicConfig {
 
 	protected MessageFormat messageFormat;// eg table_{00}
 
-	public LogicConfig(String namePattern) throws DragonConfigException {
+	public LogicConfig(String namePattern) throws DragonShardException {
 		if (StringUtils.isBlank(namePattern)) {
-			throw new DragonConfigException("namePattern can't be blank!!!");
+			throw new DragonShardException("namePattern can't be blank!!!");
 		}
 		this.namePattern = namePattern;
 		this.messageFormat = new MessageFormat(namePattern);
@@ -46,7 +45,7 @@ public abstract class LogicConfig {
 			}
 
 		} catch (ParseException e) {
-			throw new DragonRuntimeException(realName, e);
+			throw new DragonShardException(realName, e);
 		}
 	}
 }

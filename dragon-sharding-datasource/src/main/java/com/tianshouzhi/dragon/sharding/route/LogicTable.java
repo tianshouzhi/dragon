@@ -1,10 +1,9 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
 import com.tianshouzhi.dragon.common.util.StringUtils;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -133,7 +132,7 @@ public class LogicTable extends LogicConfig {
 			}
 		}
 		if (selectedRouteRule == null) {
-			throw new DragonRuntimeException("no matched route rule found !!!");
+			throw new DragonShardException("no matched route rule found !!!");
 		}
 
 		Object eval = DragonGroovyEngine.eval(selectedRouteRule.getReplacedRouteRuleStr(), params);
@@ -147,7 +146,7 @@ public class LogicTable extends LogicConfig {
 
 		private List<String> shardColumns;
 
-		public RouteRule(String originRouteRuleStr) throws DragonConfigException {
+		public RouteRule(String originRouteRuleStr) throws DragonShardException {
 			if (StringUtils.isBlank(originRouteRuleStr)) {
 				throw new IllegalArgumentException("'originRouteRuleStr' can't be blank");
 			}
@@ -163,7 +162,7 @@ public class LogicTable extends LogicConfig {
 				matcher.appendReplacement(sb, column);
 			}
 			if (CollectionUtils.isEmpty(shardColumns)) {
-				throw new DragonConfigException("logic table '" + logicTableName + "' route rule '" + originRouteRuleStr
+				throw new DragonShardException("logic table '" + logicTableName + "' route rule '" + originRouteRuleStr
 				      + "' must contains shard column!!!");
 			}
 			matcher.appendTail(sb);

@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.execution;
 
-import com.tianshouzhi.dragon.common.exception.DragonShardException;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;

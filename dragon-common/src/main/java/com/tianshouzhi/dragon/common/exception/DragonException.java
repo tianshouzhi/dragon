@@ -3,19 +3,19 @@ package com.tianshouzhi.dragon.common.exception;
 /**
  * Created by tianshouzhi on 2017/8/3.
  */
-public class DragonRuntimeException extends RuntimeException{
-    public DragonRuntimeException() {
+public class DragonException extends RuntimeException{
+    public DragonException() {
     }
 
-    public DragonRuntimeException(String message) {
+    public DragonException(String message) {
         super(message);
     }
 
-    public DragonRuntimeException(String message, Throwable cause) {
+    public DragonException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public DragonRuntimeException(Throwable cause) {
+    public DragonException(Throwable cause) {
         super(cause);
     }
 }

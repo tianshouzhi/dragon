@@ -2,12 +2,11 @@ package com.tianshouzhi.dragon.ha.jdbc.connection;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
-import com.tianshouzhi.dragon.common.log.Log;
-import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
+import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import java.sql.*;
 import java.util.Properties;
@@ -16,7 +15,6 @@ import java.util.Properties;
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
 public class DragonHAConnection extends DragonConnection implements Connection {
-	private static final Log LOGGER = LoggerFactory.getLogger(DragonHAConnection.class);
 
 	/**
 	 * 在没有使用读写分离的情况下，用户可能在一个Connection即执行读，也执行写。 在使用读写分离的时候，读需要使用读连接(ReadDBSelector)，写需要使用写连接(WriteDBSelector)。
@@ -28,7 +26,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 
 	protected DragonHADatasource dragonHADatasource;
 
-	private String dataSourceIndex;// 当前连接是从哪一个数据源中获取的
+	private String realDSName;// 当前连接是从哪一个数据源中获取的
 
 	public DragonHAConnection(String username, String password, DragonHADatasource dragonHADatasource)
 	      throws SQLException {
@@ -183,19 +181,17 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		if (this.realConnection != null) {
 			return realConnection;
 		}
-		this.dataSourceIndex = this.dragonHADatasource.getRouterManager().routeRead(null);
-		this.realConnection = this.dragonHADatasource.getConnectionByDbIndex(dataSourceIndex);
+		this.realDSName = this.dragonHADatasource.getRouterManager().routeRead();
+		this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 		setConnectionParams(this.realConnection);
 		return realConnection;
 	}
 
 	public Connection buildNewWriteConnectionIfNeed() throws SQLException {
 		if (this.realConnection == null || this.realConnection.isReadOnly()) {
-			if (this.realConnection != null) {
-				this.realConnection.close();
-			}
-			this.dataSourceIndex = this.dragonHADatasource.getRouterManager().routeWrite(null);
-			this.realConnection = this.dragonHADatasource.getConnectionByDbIndex(dataSourceIndex);
+			DatasourceUtil.close(dragonHADatasource.getHADSName(), getRealDSName(),realConnection);
+			this.realDSName = this.dragonHADatasource.getRouterManager().routeWrite();
+			this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;
 		}
@@ -385,8 +381,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		return realConnection.createSQLXML();
 	}
 
-	public String getDataSourceIndex() {
-		return dataSourceIndex;
+	public String getRealDSName() {
+		return realDSName;
 	}
 
 	@Override

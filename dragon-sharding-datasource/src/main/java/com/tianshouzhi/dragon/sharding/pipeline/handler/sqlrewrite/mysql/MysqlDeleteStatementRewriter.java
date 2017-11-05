@@ -4,7 +4,7 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 
 import java.sql.SQLException;
@@ -38,7 +38,7 @@ public class MysqlDeleteStatementRewriter extends AbstractMysqlSqlRewriter {
         MySqlDeleteStatement deleteAst= (MySqlDeleteStatement) context.getParsedSqlStatement();
         SQLTableSource tableSource= deleteAst.getTableSource();
         if(!(tableSource instanceof SQLExprTableSource)){
-            throw new DragonRuntimeException("don't support Multiple-table delete syntax!!!sql:" + originSql);
+            throw new DragonShardException("don't support Multiple-table delete syntax!!!sql:" + originSql);
         }
         SQLExpr where = deleteAst.getWhere();
        /* if(where==null){

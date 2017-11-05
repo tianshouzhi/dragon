@@ -1,17 +1,17 @@
 package com.tianshouzhi.dragon.ha.router;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.tianshouzhi.dragon.common.util.ArrayUtils;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
 import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.ha.exception.DragonHARuntimeException;
+import com.tianshouzhi.dragon.ha.exception.DragonHAException;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by tianshouzhi on 2017/8/16.
  */
-public class WeightRouter implements Router {
+public class WeightRouter extends BaseRouter{
 	protected Map<WeightRange, String> weightIndexMap = new ConcurrentHashMap<WeightRange, String>();
 
 	protected int totalWeight = 0;
@@ -23,12 +23,13 @@ public class WeightRouter implements Router {
 		}
 	};
 
-	public WeightRouter(Map<String, Integer> indexWeightMap) {
-		if (MapUtils.isEmpty(indexWeightMap) || indexWeightMap.size() == 1) {
-			throw new DragonHARuntimeException("indexWeightMap can't be null! and size must > 1");
+	public WeightRouter(String haDSName,Map<String, Integer> realDSNameWeightMap) {
+		super(haDSName);
+		if (MapUtils.isEmpty(realDSNameWeightMap) || realDSNameWeightMap.size() == 1) {
+			throw new DragonHAException("realDSNameWeightMap can't be null! and size must > 1");
 		}
-		this.totalWeight = calculateTotalWeight(indexWeightMap.values());
-		this.weightIndexMap = makeWeightRangeIndexMap(indexWeightMap);
+		this.totalWeight = calculateTotalWeight(realDSNameWeightMap.values());
+		this.weightIndexMap = makeWeightRangeIndexMap(realDSNameWeightMap);
 	}
 
 	private int calculateTotalWeight(Collection<Integer> weights) {
@@ -53,9 +54,13 @@ public class WeightRouter implements Router {
 	}
 
 	@Override
-	public String route(Set<String> exculdes) {
-		if (CollectionUtils.isEmpty(exculdes)) {
+	public String doRoute(Set<String> excludes) {
+		if (CollectionUtils.isEmpty(excludes)) {
 			return selectByRandom(this.weightIndexMap, this.totalWeight);
+		}
+
+		if(weightIndexMap.values().equals(excludes)){
+			throw new DragonException("all datasource"+excludes+" are not avaliable!!!");
 		}
 
 		HashMap<WeightRange, String> afterExcludeMap = new HashMap<WeightRange, String>();
@@ -63,14 +68,10 @@ public class WeightRouter implements Router {
 		for (Map.Entry<WeightRange, String> entry : this.weightIndexMap.entrySet()) {
 			String datasourceIndex = entry.getValue();
 			WeightRange weightRange = entry.getKey();
-			if (!exculdes.contains(datasourceIndex)) {
+			if (!excludes.contains(datasourceIndex)) {
 				afterExcludeMap.put(weightRange, datasourceIndex);
 				totalWeight += (weightRange.end - weightRange.start);
 			}
-		}
-
-		if (MapUtils.isEmpty(afterExcludeMap)) {
-			return null;
 		}
 
 		return selectByRandom(afterExcludeMap, totalWeight);

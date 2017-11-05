@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.config;
 
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import java.util.Enumeration;
@@ -20,7 +20,7 @@ public class HADataSourceConfig {
 		this.properties = properties;
 		String dsNames = properties.getProperty("dragon.ha.datasources");
 		if (StringUtils.isBlank(dsNames)) {
-			throw new DragonRuntimeException("dragon.ha.datasources can't be null");
+			throw new DragonException("dragon.ha.datasources can't be null");
 		}
 		for (String dsName : dsNames.split(",")) {
 			String _dsName = dsName.trim();

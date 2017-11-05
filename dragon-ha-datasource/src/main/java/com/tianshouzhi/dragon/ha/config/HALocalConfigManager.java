@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.ha.config;
 
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class HALocalConfigManager implements HAConfigManager {
 		try {
 			properties.load(in);
 		} catch (IOException e) {
-			throw new DragonRuntimeException("load config from classpath:" + configFile + " error!");
+			throw new DragonException("load config from classpath:" + configFile + " error!");
 		}
 		return new HADataSourceConfig(properties);
 	}

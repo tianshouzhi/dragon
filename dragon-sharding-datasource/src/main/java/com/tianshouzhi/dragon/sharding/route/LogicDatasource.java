@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.sharding.route;
 
-import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.common.util.StringUtils;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class LogicDatasource extends LogicConfig {
 	private Map<String, DataSource> dsNameDatasourceMap = new TreeMap<String, DataSource>();
 
 	public LogicDatasource(String dbNameFormat, Map<String, DataSource> dsNameDatasourceMap, String defaultDSName)
-	      throws DragonConfigException {
+	      throws DragonShardException {
 		super(dbNameFormat);
 		if (MapUtils.isEmpty(dsNameDatasourceMap)) {
 			throw new IllegalArgumentException("dsNameDatasourceMap can't be null or empty!!!");

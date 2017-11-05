@@ -43,7 +43,7 @@ public class DragonShardingDataSource extends DragonDataSourceAdapter {
 	}
 
 	@Override
-	public Connection getConnection(String username, String password) throws SQLException {
+	public Connection doGetConnection(String username, String password) throws SQLException {
 		return new DragonShardingConnection(username, password, dragonShardingConfig);
 	}
 

@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.common.util;
 
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.common.exception.DragonException;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -39,7 +39,7 @@ public abstract class VersionUtil {
                 return properties.getProperty("version",UNKNOWN_VERSION);
             }
         }catch (Throwable e){
-            throw new DragonRuntimeException("get version by groupId:"+groupId+",artifactId:"+artifactId+"error!",e);
+            throw new DragonException("get version by groupId:"+groupId+",artifactId:"+artifactId+"error!",e);
         }
         return UNKNOWN_VERSION;
     }

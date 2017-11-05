@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.sharding.pipeline;
 
-import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.execution.ExecutionHandler;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.hint.HintParseHandler;
@@ -41,7 +41,7 @@ public class Pipeline {
 			}
 		} catch (Exception e) {
 			handlerContext.setThrowable(e);
-			throw new DragonRuntimeException(
+			throw new DragonShardException(
 			      "execute handler chain fail,current handler:" + currentHandler.getClass().getSimpleName(), e);
 		} finally {
 			// 不管成功还是失败，最终都走要StaticsHandler

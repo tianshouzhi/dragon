@@ -1,21 +1,20 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
+import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
+import com.tianshouzhi.dragon.sharding.route.LogicTable;
+
+import javax.sql.DataSource;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
-import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
-import com.tianshouzhi.dragon.common.util.CollectionUtils;
-import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.common.util.StringUtils;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
-import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/3/15.
@@ -42,7 +41,8 @@ public abstract class DragonShardingConfigParser {
 			Map<String, String> mergedConfig = new HashMap<String, String>();
 			mergedConfig.putAll(defaultDatasourceConfigMap);
 			mergedConfig.putAll(datasourceConfig);// 覆盖默认配置
-			DataSource dataSource = DataSourceUtil.create(realDatasourceClass, mergedConfig);
+//			DataSource dataSource = DataSourceUtil.create(realDatasourceClass, mergedConfig);
+			DataSource dataSource = null;
 			dsNameDatasourceMap.put(datasourceName, dataSource);
 		}
 
@@ -91,11 +91,11 @@ public abstract class DragonShardingConfigParser {
 	}
 
 	public static Map<String, LogicTable> parseLogicTableMap(LogicDatasource logicDatasource, Properties properties)
-	      throws DragonException {
+	      throws DragonShardException {
 		Map<String, LogicTable> result = new HashMap<String, LogicTable>();
 		String logicTableNames = properties.getProperty("logicTable.list");
 		if (StringUtils.isBlank(logicTableNames)) {
-			throw new DragonException("logicTable.list can't be null");
+			throw new DragonShardException("logicTable.list can't be null");
 		}
 
 		LogicTableConfig defaultLogicTableConfig = parseLogicTableConfig("default", logicDatasource, properties);
@@ -141,7 +141,7 @@ public abstract class DragonShardingConfigParser {
 	}
 
 	private static LogicTable makeLogicTable(String logicTbName, LogicTableConfig defaultLogicTableConfig,
-	      LogicTableConfig logicTableConfig, LogicDatasource logicDatasource) throws DragonException {
+	      LogicTableConfig logicTableConfig, LogicDatasource logicDatasource) throws DragonShardException {
 		List<String> defaultDbRouteRules = defaultLogicTableConfig.dbRouteRules;
 		Map<String, String> defaultRealDbTbMapping = defaultLogicTableConfig.realDbTbMapping;
 		String defaultTbNameFormat = defaultLogicTableConfig.tbNamePattern;
@@ -159,7 +159,7 @@ public abstract class DragonShardingConfigParser {
 			dbRouteRules.addAll(defaultDbRouteRules);
 		}
 		if (dbRouteRules == null) {
-			throw new DragonException("no default dbRouteRules config ,'" + logicTbName + "'must config dbRouteRules");
+			throw new DragonShardException("no default dbRouteRules config ,'" + logicTbName + "'must config dbRouteRules");
 		}
 
 		Set<String> tbRouteRules = new HashSet<String>();
@@ -169,7 +169,7 @@ public abstract class DragonShardingConfigParser {
 			tbRouteRules.addAll(defaultTbRouteRules);
 		}
 		if (tbRouteRules == null) {
-			throw new DragonException("no default tbRouteRules config ,'" + logicTbName + "'must config tbRouteRules");
+			throw new DragonShardException("no default tbRouteRules config ,'" + logicTbName + "'must config tbRouteRules");
 		}
 
 		Map<String, List<String>> realDbTbMapping = null;

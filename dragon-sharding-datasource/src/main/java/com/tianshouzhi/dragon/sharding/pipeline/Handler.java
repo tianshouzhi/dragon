@@ -1,8 +1,5 @@
 package com.tianshouzhi.dragon.sharding.pipeline;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.exception.DragonShardException;
-
 import java.sql.SQLException;
 
 /**

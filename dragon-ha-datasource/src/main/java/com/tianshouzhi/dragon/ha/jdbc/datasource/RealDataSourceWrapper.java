@@ -2,6 +2,7 @@ package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -11,8 +12,9 @@ import java.util.Properties;
 /**
  * Created by tianshouzhi on 2017/11/1.
  */
-public class RealDataSourceWapper extends DragonDataSourceAdapter implements DragonDataSource {
-	private String index;
+public class RealDataSourceWrapper extends DragonDataSourceAdapter implements DragonDataSource {
+	private String haDSName;
+	private String realDSName;
 
 	private int readWeight;
 
@@ -24,10 +26,11 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 
 	private DataSource dataSource;
 
-	private boolean avliable=true;
+	private boolean available=true;
 
-	public RealDataSourceWapper(String index, int readWeight, int writeWeight, Properties properties, String clazz) {
-		this.index = index;
+	public RealDataSourceWrapper(String haDSName,String realDSName, int readWeight, int writeWeight, Properties properties, String clazz) {
+		this.haDSName = haDSName;
+		this.realDSName = realDSName;
 		this.readWeight = readWeight;
 		this.writeWeight = writeWeight;
 		this.properties = properties;
@@ -35,15 +38,15 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 	}
 
 
-	public RealDataSourceWapper(String index, int readWeight, int writeWeight, DataSource dataSource) {
-		this.index = index;
+	public RealDataSourceWrapper(String realDSName, int readWeight, int writeWeight, DataSource dataSource) {
+		this.realDSName = realDSName;
 		this.readWeight = readWeight;
 		this.writeWeight = writeWeight;
 		this.dataSource = dataSource;
 	}
 
-	public String getIndex() {
-		return index;
+	public String getRealDSName() {
+		return realDSName;
 	}
 
 	public int getReadWeight() {
@@ -61,7 +64,7 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 	@Override
 	public void close() throws Exception {
 		if (dataSource != null) {
-			DatasourceUtil.close(dataSource);
+			DatasourceUtil.close(haDSName,realDSName,dataSource);
 		}
 	}
 
@@ -81,5 +84,16 @@ public class RealDataSourceWapper extends DragonDataSourceAdapter implements Dra
 				}
 			}
 		}
+	}
+
+	public void disable(){
+		this.available=false;
+	}
+	public void enable(){
+		this.available=true;
+	}
+
+	public boolean isAvailable() {
+		return available;
 	}
 }
