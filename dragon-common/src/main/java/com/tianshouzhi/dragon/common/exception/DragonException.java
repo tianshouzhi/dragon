@@ -1,18 +1,21 @@
 package com.tianshouzhi.dragon.common.exception;
 
 /**
- * Created by TIANSHOUZHI336 on 2016/12/6.
+ * Created by tianshouzhi on 2017/8/3.
  */
-public class DragonException extends Exception {
-	public DragonException(String reason) {
-		super(reason);
-	}
+public class DragonRuntimeException extends RuntimeException{
+    public DragonRuntimeException() {
+    }
 
-	public DragonException(Throwable e) {
-		super(e);
-	}
+    public DragonRuntimeException(String message) {
+        super(message);
+    }
 
-	public DragonException(String message, Throwable e) {
-		super(message, e);
-	}
+    public DragonRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DragonRuntimeException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -1,21 +1,21 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.initailzer.DataSourceUtil;
-import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
-import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
-import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.sql.DataSource;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
+
+import com.tianshouzhi.dragon.common.exception.DragonException;
+import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
+import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
+import com.tianshouzhi.dragon.sharding.route.LogicTable;
 
 /**
  * Created by TIANSHOUZHI336 on 2017/3/15.

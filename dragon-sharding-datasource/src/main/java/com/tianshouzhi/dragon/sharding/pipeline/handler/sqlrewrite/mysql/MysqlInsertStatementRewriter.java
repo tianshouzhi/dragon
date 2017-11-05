@@ -4,13 +4,13 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.*;

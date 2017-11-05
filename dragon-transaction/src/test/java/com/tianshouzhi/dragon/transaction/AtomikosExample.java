@@ -27,7 +27,7 @@ public class AtomikosExample {
         return ds;
     }
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
         UserTransaction userTransaction=new UserTransactionImp();
         AtomikosDataSourceBean ds1 = createAtomikosDataSourceBean("db1");
         AtomikosDataSourceBean ds2 = createAtomikosDataSourceBean("db2");
@@ -41,15 +41,12 @@ public class AtomikosExample {
             conn1 = ds1.getConnection();
             ps1= conn1.prepareStatement("INSERT into user(name,age) VALUES ('tianshouzhi',23)");
             ps1.executeUpdate();
-
-            // int i=1/0; //模拟异常 ，直接进入catch代码块，2个都不会提交
-
+// int i=1/0; //模拟异常 ，直接进入catch代码块，2个都不会提交
             conn2 = ds2.getConnection();
             ps2 = conn2.prepareStatement("INSERT into user(name,age) VALUES ('tianshouzhi',23)");
             ps2.executeUpdate();
 
-            // int i=1/0; //模拟异常 ，commit方法没有执行，2个依然都不会提交
-
+// int i=1/0; //模拟异常 ，commit方法没有执行，2个依然都不会提交
             userTransaction.commit();
         }catch (Exception e){
             try {

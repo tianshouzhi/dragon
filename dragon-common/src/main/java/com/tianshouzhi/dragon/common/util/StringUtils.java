@@ -10,4 +10,20 @@ public class StringUtils {
 		}
 		return false;
 	}
+
+	public static boolean isNotBlank(String str) {
+		return !StringUtils.isBlank(str);
+	}
+
+	public static boolean isAnyBlank(String... strs) {
+		if (strs == null || strs.length == 0) {
+			return true;
+		}
+		for (String str : strs) {
+			if (isBlank(str)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

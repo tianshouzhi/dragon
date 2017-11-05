@@ -1,11 +1,11 @@
-package com.tianshouzhi.dragon.common.exception;
+package com.tianshouzhi.dragon.ha.exception;
 
 import java.sql.SQLException;
 
 /**
  * Created by TIANSHOUZHI336 on 2016/12/6.
  */
-public class MySqlExceptionSorter implements ExceptionSorter {
+class MySqlExceptionSorter implements ExceptionSorter {
 
 	private static final int MAX_LOOP_TIMES = 20;
 

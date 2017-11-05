@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.sharding.route;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
 import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
-import org.apache.commons.lang3.StringUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.text.ParseException;

@@ -1,10 +1,10 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
 import com.tianshouzhi.dragon.sharding.route.LogicDatasource;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
-public class DragonShardingDataSource extends DragonDataSource {
+public class DragonShardingDataSource extends DragonDataSourceAdapter {
 	// 原始配置信息
 	private Properties configProperties;
 
@@ -51,7 +51,9 @@ public class DragonShardingDataSource extends DragonDataSource {
 	public void close() throws SQLException {
 		//TODO
 	}
-	/*
-	 * public DragonShardingConfig getDragonShardingConfig() { return dragonShardingConfig; }
-	 */
+
+	@Override
+	protected void doInit() {
+
+	}
 }

@@ -13,4 +13,8 @@ public abstract class MapUtils {
 		}
 		return result;
 	}
+
+	public static boolean isNotEmpty(Map<?, ?> map) {
+		return !MapUtils.isEmpty(map);
+	}
 }

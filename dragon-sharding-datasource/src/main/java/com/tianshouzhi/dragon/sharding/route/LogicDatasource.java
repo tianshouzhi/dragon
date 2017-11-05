@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.sharding.route;
 
 import com.tianshouzhi.dragon.common.exception.DragonConfigException;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.Map;

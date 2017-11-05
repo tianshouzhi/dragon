@@ -7,6 +7,9 @@ import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.tianshouzhi.dragon.common.exception.DragonRuntimeException;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.common.util.CollectionUtils;
+import com.tianshouzhi.dragon.common.util.MapUtils;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
@@ -14,9 +17,6 @@ import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRewriter;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteParams;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -102,10 +102,10 @@ public abstract class AbstractMysqlSqlRewriter implements SqlRewriter {
             String rightAlias=right.getAlias();
             parsedLogicTableList.add(leftLogicTable);
             parsedLogicTableList.add(rightLogicTable);
-            if(StringUtils.isNoneBlank(leftAlias)){
+            if(StringUtils.isNotBlank(leftAlias)){
                 aliasTableNameMap.put(leftAlias,leftLogicTableName);
             }
-            if(StringUtils.isNoneBlank(leftAlias)){
+            if(StringUtils.isNotBlank(leftAlias)){
                 aliasTableNameMap.put(rightAlias,rightLogicTableName);
             }
             return ;

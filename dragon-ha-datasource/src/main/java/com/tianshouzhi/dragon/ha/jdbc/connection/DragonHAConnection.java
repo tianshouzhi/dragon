@@ -5,7 +5,7 @@ import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceManager;
+import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 
@@ -26,17 +26,17 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	 */
 	protected Connection realConnection;
 
-	protected RealDataSourceManager dataSourceManager;
+	protected DragonHADatasource dragonHADatasource;
 
 	private String dataSourceIndex;// 当前连接是从哪一个数据源中获取的
 
-	public DragonHAConnection(String username, String password, RealDataSourceManager dataSourceManager)
+	public DragonHAConnection(String username, String password, DragonHADatasource dragonHADatasource)
 	      throws SQLException {
 		super(username, password);
-		if (dataSourceManager == null) {
-			throw new SQLException("parameter 'dataSourceManager' can't be null");
+		if (dragonHADatasource == null) {
+			throw new SQLException("parameter 'dragonHADatasource' can't be null");
 		}
-		this.dataSourceManager = dataSourceManager;
+		this.dragonHADatasource = dragonHADatasource;
 	}
 
 	// ==================================================创建Statement部分=========================================================
@@ -183,8 +183,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		if (this.realConnection != null) {
 			return realConnection;
 		}
-		this.dataSourceIndex = this.dataSourceManager.selectReadIndex(null);
-		this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
+		this.dataSourceIndex = this.dragonHADatasource.getRouterManager().routeRead(null);
+		this.realConnection = this.dragonHADatasource.getConnectionByDbIndex(dataSourceIndex);
 		setConnectionParams(this.realConnection);
 		return realConnection;
 	}
@@ -194,8 +194,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 			if (this.realConnection != null) {
 				this.realConnection.close();
 			}
-			this.dataSourceIndex = this.dataSourceManager.selectWriteIndex(null);
-			this.realConnection = this.dataSourceManager.getConnectionByDbIndex(dataSourceIndex);
+			this.dataSourceIndex = this.dragonHADatasource.getRouterManager().routeWrite(null);
+			this.realConnection = this.dragonHADatasource.getConnectionByDbIndex(dataSourceIndex);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;
 		}

@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.route.LogicTable;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Statement;
 import java.util.HashMap;

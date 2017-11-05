@@ -14,7 +14,6 @@ public class SqlTypeUtilTest {
 				"last_update_time)\n"
 		      + "        VALUES (?,?,?,?,?,?,?);";
 		SqlType sqlType = SqlTypeUtil.parseSqlType(sql);
-		assert sqlType == SqlType.INSERT;
 	}
 
 }
