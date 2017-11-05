@@ -15,20 +15,20 @@ public class RwSplitTest extends BaseTest {
 		DragonHAConnection connection = (DragonHAConnection) dragonHADatasource.getConnection();
 		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 		preparedStatement.executeQuery();
-		assert !"master".equals(connection.getDataSourceIndex());
+		assert !"master".equals(connection.getRealDSName());
 
 		preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 		preparedStatement.executeQuery();
-		assert !"master".equals(connection.getDataSourceIndex());
+		assert !"master".equals(connection.getRealDSName());
 
 		PreparedStatement insert = connection.prepareStatement("INSERT into user(id,name) VALUES (1012," +
 				"'wangxiaoxiao')");
 		insert.executeUpdate();
-		assert "master".equals(connection.getDataSourceIndex());
+		assert "master".equals(connection.getRealDSName());
 
 		preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 		preparedStatement.executeQuery();
-		assert "master".equals(connection.getDataSourceIndex());
+		assert "master".equals(connection.getRealDSName());
 
 	}
 }

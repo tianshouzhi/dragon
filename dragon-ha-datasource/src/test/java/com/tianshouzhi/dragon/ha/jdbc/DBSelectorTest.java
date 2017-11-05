@@ -23,7 +23,7 @@ public class DBSelectorTest extends BaseTest {
 				DragonHAConnection connection = (DragonHAConnection) dragonHADatasource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
 				ResultSet resultSet = preparedStatement.executeQuery();
-                String dataSourceIndex = connection.getDataSourceIndex();
+                String dataSourceIndex = connection.getRealDSName();
                 AtomicInteger atomicInteger = map.get(dataSourceIndex);
                 if (atomicInteger == null) {
                     atomicInteger = new AtomicInteger();

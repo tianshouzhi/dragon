@@ -126,7 +126,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
 	@Override
 	protected boolean doExecuteByType() throws SQLException {
-		LOG.debug("datasourceIndex:【"+dragonHAConnection.getRealDSName()+"】,sql:"+sql+",params:"+params);
+		LOG.debug("selected datasource:【"+dragonHAConnection.getRealDSName()+"】,sql:"+sql+",params:"+params);
 		boolean isResultSet = false;
 		if (prepareExecuteType != null) {
 			switch (prepareExecuteType) {
