@@ -385,6 +385,10 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		return realDSName;
 	}
 
+	public String getFullName(){
+		return dragonHADatasource.getHADSName()+"."+realDSName;
+	}
+
 	@Override
 	public String nativeSQL(String sql) throws SQLException {
 		checkClosed();

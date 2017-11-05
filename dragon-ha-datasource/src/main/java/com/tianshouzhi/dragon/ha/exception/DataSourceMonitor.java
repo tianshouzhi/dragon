@@ -51,6 +51,12 @@ public abstract class DataSourceMonitor {
                 }
             }
         }, 1, 1, TimeUnit.SECONDS);
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                monitorExecutor.shutdownNow();
+            }
+        });
     }
 
     public static void monitor(SQLException e, String hADataSourceIndex, RealDataSourceWrapper realDataSourceWrapper) {

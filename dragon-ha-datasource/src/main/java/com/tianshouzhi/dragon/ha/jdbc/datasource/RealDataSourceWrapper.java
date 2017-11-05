@@ -15,7 +15,7 @@ import java.util.Properties;
 public class RealDataSourceWrapper extends DragonDataSourceAdapter implements DragonDataSource {
 	private String haDSName;
 	private String realDSName;
-
+	private String fullName;
 	private int readWeight;
 
 	private int writeWeight;
@@ -31,6 +31,7 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
 	public RealDataSourceWrapper(String haDSName,String realDSName, int readWeight, int writeWeight, Properties properties, String clazz) {
 		this.haDSName = haDSName;
 		this.realDSName = realDSName;
+		this.fullName=haDSName+"."+realDSName;
 		this.readWeight = readWeight;
 		this.writeWeight = writeWeight;
 		this.properties = properties;
@@ -84,6 +85,10 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
 				}
 			}
 		}
+	}
+
+	public String getFullName() {
+		return fullName;
 	}
 
 	public void disable(){

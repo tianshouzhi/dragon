@@ -34,6 +34,9 @@ public interface DragonPrepareStatement extends PreparedStatement {
 
 		@Override
 		public String toString() {
+			if(values.length==1){
+				return values[0].toString();
+			}
 			return Arrays.toString(values);
 		}
 	}

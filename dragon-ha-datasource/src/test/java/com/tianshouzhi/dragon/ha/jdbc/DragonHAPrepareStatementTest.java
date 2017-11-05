@@ -16,8 +16,9 @@ public class DragonHAPrepareStatementTest extends BaseTest {
 	@Test
 	public void testInsert() throws SQLException {
 		DragonHAConnection connection = this.connection;
-		PreparedStatement preparedStatement = connection.prepareStatement("INSERT  INTO  user(name) VALUES (?)");
-		preparedStatement.setString(1, "tianshouzhi");
+		PreparedStatement preparedStatement = connection.prepareStatement("INSERT  INTO  user(id,name) VALUES (?,?)");
+		preparedStatement.setLong(1, 123456);
+		preparedStatement.setString(2, "tianshouzhi");
 		int i = preparedStatement.executeUpdate();
 		Assert.assertEquals("insert success", i, 1);
 	}

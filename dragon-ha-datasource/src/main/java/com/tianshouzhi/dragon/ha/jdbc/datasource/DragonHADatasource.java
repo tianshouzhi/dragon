@@ -38,7 +38,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 	private volatile RouterManager routerManager;
 
 	public DragonHADatasource() {
-		this.haDSName=DatasourceUtil.generateDataSourceName("program");
+		this.haDSName=DatasourceUtil.generateDataSourceName("DragonHADatasource");
 	}
 
 	@Override
@@ -59,7 +59,11 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 		}
 		if (!lazyInit) {
 			for (RealDataSourceWrapper realDataSourceWrapper : realDSWrapperMap.values()) {
-				realDataSourceWrapper.init();
+				try{
+					realDataSourceWrapper.init();
+				}catch (Exception e){
+					throw new DragonHAException("init real datasource"+realDataSourceWrapper.getFullName()+"error",e);
+				}
 			}
 		}
 		this.routerManager = new RouterManager(this);
@@ -101,7 +105,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 			throw new DragonHAException("not valid datasource found with realDSName:" + realDSName);
 		}
 		if(!DataSourceMonitor.isAvailable(haDSName,realDataSourceWrapper)){
-			throw new DragonHAException(realDataSourceWrapper.getRealDSName()+" is not available!!!");
+			throw new DragonHAException(realDataSourceWrapper.getFullName()+" is not available!!!");
 		}
 		try{
 			return realDataSourceWrapper.getConnection();
@@ -112,7 +116,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 	}
 
 	public void setLocalConfigFile(String configFile) {
-		this.haDSName = DatasourceUtil.generateDataSourceName("classpath:"+configFile);
+		this.haDSName = DatasourceUtil.generateDataSourceName("DragonHADatasource("+configFile+")");
 		this.configManager = new HALocalConfigManager(configFile);
 	}
 

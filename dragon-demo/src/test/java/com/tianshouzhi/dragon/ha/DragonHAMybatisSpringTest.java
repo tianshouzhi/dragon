@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DragonHAMybatisSpringTest {
     public static void main(String[] args) throws InterruptedException {
-        ApplicationContext context=new ClassPathXmlApplicationContext("classpath:ha/dragon-ha.xml");
+        ApplicationContext context=new ClassPathXmlApplicationContext("classpath:ha/dragon_ha.xml");
         UserMapper userMapper = context.getBean(UserMapper.class);
         User user = new User();
         user.setName("tianshozhi");

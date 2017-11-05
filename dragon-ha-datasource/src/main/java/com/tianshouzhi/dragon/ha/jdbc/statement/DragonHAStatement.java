@@ -135,7 +135,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 	}
 
 	protected boolean doExecuteByType() throws SQLException {
-		LOG.debug("selected datasource:【"+dragonHAConnection.getRealDSName()+"】,sql:"+sql);
+		LOG.debug("selected datasource:【"+dragonHAConnection.getFullName()+"】,sql:"+sql);
 		boolean isResultSet = false;
 		switch (executeType) {
 		case EXECUTE_QUERY:

@@ -25,6 +25,15 @@ public class DatasourceUtil {
     public static Set<String> datasourceNames =new ConcurrentSkipListSet<String>();
     public static ExecutorService executor=Executors.newSingleThreadExecutor(new DragonThreadFactory("DRAONG_ASYNC_CLOSE_THREAD"));
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                executor.shutdownNow();
+            }
+        });
+    }
+
     public static synchronized String generateDataSourceName(String name){
         if(!datasourceNames.contains(name)){
             datasourceNames.add(name);

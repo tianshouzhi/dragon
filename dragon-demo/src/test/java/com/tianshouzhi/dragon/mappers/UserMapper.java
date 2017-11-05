@@ -1,12 +1,11 @@
 package com.tianshouzhi.dragon.mappers;
 
 import com.tianshouzhi.dragon.domain.User;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.session.RowBounds;
-import sun.jvm.hotspot.debugger.Page;
 
 public interface UserMapper {
     public int insert(User user);
