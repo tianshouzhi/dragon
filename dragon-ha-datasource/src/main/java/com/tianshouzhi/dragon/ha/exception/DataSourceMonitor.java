@@ -22,7 +22,7 @@ public abstract class DataSourceMonitor {
     private static final Log LOG = LoggerFactory.getLogger(DataSourceMonitor.class);
     public static Map<String, Map<String, RealDataSourceWrapper>> unavailableDataSources = new ConcurrentHashMap<String, Map<String, RealDataSourceWrapper>>();
 
-    private static ScheduledExecutorService monitorExecutor = new ScheduledThreadPoolExecutor(1, new DragonThreadFactory("DRAGON_FATAL_EXCEPTION_DATASOURCE_CHECKER"));
+    private static ScheduledExecutorService monitorExecutor = new ScheduledThreadPoolExecutor(1, new DragonThreadFactory("DRAGON_FATAL_EXCEPTION_DATASOURCE_CHECKER",true));
 
     static {
         monitorExecutor.scheduleWithFixedDelay(new Runnable() {
@@ -51,12 +51,6 @@ public abstract class DataSourceMonitor {
                 }
             }
         }, 1, 1, TimeUnit.SECONDS);
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                monitorExecutor.shutdownNow();
-            }
-        });
     }
 
     public static void monitor(SQLException e, String hADataSourceIndex, RealDataSourceWrapper realDataSourceWrapper) {

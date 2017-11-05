@@ -23,16 +23,7 @@ public class DatasourceUtil {
     private static final Log LOG= LoggerFactory.getLogger(DatasourceUtil.class);
 
     public static Set<String> datasourceNames =new ConcurrentSkipListSet<String>();
-    public static ExecutorService executor=Executors.newSingleThreadExecutor(new DragonThreadFactory("DRAONG_ASYNC_CLOSE_THREAD"));
-
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                executor.shutdownNow();
-            }
-        });
-    }
+    public static ExecutorService executor=Executors.newSingleThreadExecutor(new DragonThreadFactory("DRAONG_ASYNC_CLOSE_THREAD",true));
 
     public static synchronized String generateDataSourceName(String name){
         if(!datasourceNames.contains(name)){
