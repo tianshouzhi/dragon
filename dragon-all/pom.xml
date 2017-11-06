@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>dragon</artifactId>
+        <groupId>com.tianshouzhi</groupId>
+        <version>0.0.3</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dragon-all</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <generatedSourceDir>${project.build.directory}/src</generatedSourceDir>
+    </properties>
+
+    <dependencies>
+        <!-- All release modules -->
+        <dependency>
+            <groupId>com.tianshouzhi</groupId>
+            <artifactId>dragon-common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.tianshouzhi</groupId>
+            <artifactId>dragon-sharding-datasource</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.tianshouzhi</groupId>
+            <artifactId>dragon-ha-datasource</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tianshouzhi</groupId>
+            <artifactId>dragon-transaction</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- Populate the properties whose key is groupId:artifactId:type
+                                             and whose value is the path to the artifact -->
+                    <execution>
+                        <id>locate-dependencies</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Unpack all source files -->
+                    <execution>
+                        <id>unpack-sources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <includes>com/tianshouzhi/dragon/**</includes>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <outputDirectory>${generatedSourceDir}</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <!-- Unpack all class files -->
+                    <execution>
+                        <id>unpack-jars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includes>com/tianshouzhi/dragon/**</includes>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>all-in-one-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <index>true</index>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

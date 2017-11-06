@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-clusterInstance"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>dragon</artifactId>
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>com.tianshouzhi</groupId>
             <artifactId>dragon-sharding-datasource</artifactId>
-            <version>0.0.3</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tianshouzhi</groupId>
             <artifactId>dragon-ha-datasource</artifactId>
-            <version>0.0.3</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
