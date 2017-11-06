@@ -1,8 +1,6 @@
 package com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.mysql.visitor;
 
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
-import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
-import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
 
 /**
  * Created by tianshouzhi on 2017/6/11.
