@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dragon</artifactId>
         <groupId>com.tianshouzhi</groupId>
-        <version>0.0.3</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>dragon-console</name>
@@ -22,12 +22,7 @@
         </dependency>
         <dependency>
             <groupId>com.tianshouzhi</groupId>
-            <artifactId>dragon-sharding-datasource</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tianshouzhi</groupId>
-            <artifactId>dragon-ha-datasource</artifactId>
+            <artifactId>dragon-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
