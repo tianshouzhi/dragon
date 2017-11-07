@@ -216,6 +216,10 @@ public class DragonHADataSourceApiTest {
         }
     }
 
+    public void testCallableStatement(){
+
+    }
+
     @Test
     public void testRWSplit() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
