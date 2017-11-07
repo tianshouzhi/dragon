@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
@@ -63,7 +64,7 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws DragonException {
 		if (dataSource != null) {
 			DatasourceUtil.close(haDSName,realDSName,dataSource);
 		}

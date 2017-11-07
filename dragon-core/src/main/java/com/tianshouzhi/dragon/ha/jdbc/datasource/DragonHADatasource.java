@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.ha.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
@@ -75,7 +76,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws DragonException {
 		LOGGER.info("close dragon ha datasource start ...");
 		for (RealDataSourceWrapper realDataSourceWrapper : this.realDSWrapperMap.values()) {
 			LOGGER.info("close real datasource[" + realDataSourceWrapper.getRealDSName() + "]...");

@@ -49,7 +49,7 @@ public final class LoggerFactory {
     // disable construction
   }
 
-  private static void tryImplementation(Class<? extends Log> implClass) {
+  private synchronized static void tryImplementation(Class<? extends Log> implClass) {
     if (logConstructor == null) {
       try {
           Constructor<? extends Log> candidate = implClass.getConstructor(String.class);

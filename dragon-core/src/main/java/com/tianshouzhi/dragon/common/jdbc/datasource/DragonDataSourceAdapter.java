@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.common.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
 import java.io.PrintWriter;
@@ -57,14 +58,14 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 	}
 
 	@Override
-	public void init() throws SQLException{
+	public void init() throws DragonException{
 		if (!init) {
 			synchronized (this) {
 				if (!init) {
 					try {
 						doInit();
 					} catch (Exception e) {
-						throw new SQLException(e);
+						throw new DragonException(e);
 					}
 				}
 				init = true;
