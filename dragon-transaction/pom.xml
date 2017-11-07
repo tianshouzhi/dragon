@@ -29,11 +29,13 @@
             <groupId>org.ow2.jotm</groupId>
             <artifactId>jotm-core</artifactId>
             <version>2.3.1-M1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.atomikos</groupId>
             <artifactId>transactions-jdbc</artifactId>
             <version>4.0.0M4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>

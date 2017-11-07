@@ -4,14 +4,14 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.alibaba.druid.util.JdbcConstants;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.sharding.exception.DragonShardException;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
  * 解析出sql中的参数和参数值(主要是找出分区字段和分区字段的值)
  */
 public class SqlParseHandler implements Handler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SqlParseHandler.class);
+	private static final Log LOGGER = LoggerFactory.getLogger(SqlParseHandler.class);
 
 	@Override
 	public void invoke(HandlerContext context) throws SQLException {
@@ -40,7 +40,7 @@ public class SqlParseHandler implements Handler {
 			} else {// 对于statement类型不做cache，因为每次构造的语法树都是不同的，cache效率低
 				hitCache = false;
 				sqlStatement = parseSqlAST(context, sql);
-				LOGGER.warn("sql:'{}' is not prepared,will not cache the parsed ast", sql);
+				LOGGER.warn("sql:'{"+sql+"}' is not prepared,will not cache the parsed ast");
 			}
 			context.setHitSqlParserCache(hitCache);
 			context.setParsedSqlStatement(sqlStatement);

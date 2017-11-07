@@ -2,14 +2,14 @@ package com.tianshouzhi.dragon.sharding.pipeline.handler.statics;
 
 import com.alibaba.fastjson.JSON;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingPrepareStatement;
 import com.tianshouzhi.dragon.sharding.jdbc.statement.DragonShardingStatement;
 import com.tianshouzhi.dragon.sharding.pipeline.Handler;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.handler.sqlrewrite.SqlRouteInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,7 +20,7 @@ import java.util.*;
  * 统计sql执行信息
  */
 public class StaticsHandler implements Handler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StaticsHandler.class);
+	private static final Log LOGGER = LoggerFactory.getLogger(StaticsHandler.class);
 
 	@Override
 	public void invoke(HandlerContext context) throws SQLException {
@@ -134,9 +134,9 @@ public class StaticsHandler implements Handler {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(
 			      "\n================================dragon sql execute details begin============================:\n"
-			            + "{}\n"
-			            + "================================dragon sql execute details end============================",
-			      JSON.toJSONString(sqlExecutionStatics, true));
+			            + "{"+ JSON.toJSONString(sqlExecutionStatics, true)+"}\n"
+			            + "================================dragon sql execute details end============================"
+			      );
 		}
 	}
 }

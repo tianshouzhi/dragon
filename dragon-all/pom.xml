@@ -30,7 +30,6 @@
             <artifactId>dragon-sharding-datasource</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.tianshouzhi</groupId>
