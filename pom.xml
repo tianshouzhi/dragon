@@ -33,14 +33,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>
-        <module>dragon-sharding-datasource</module>
-        <module>dragon-ha-datasource</module>
-        <module>dragon-common</module>
         <module>dragon-console</module>
         <module>dragon-demo</module>
         <module>dragon-benchmark</module>
-        <module>dragon-transaction</module>
-        <module>dragon-all</module>
+        <module>dragon-core</module>
     </modules>
     <dependencyManagement>
         <dependencies>

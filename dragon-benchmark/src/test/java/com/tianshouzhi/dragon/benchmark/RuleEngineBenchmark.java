@@ -6,7 +6,6 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.tianshouzhi.dragon.sharding.route.DragonGroovyEngine;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.FileReader;
