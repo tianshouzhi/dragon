@@ -1,11 +1,11 @@
 package com.tianshouzhi.dragon.sharding.jdbc.statement;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
+import com.tianshouzhi.dragon.common.log.Log;
+import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
 import com.tianshouzhi.dragon.sharding.pipeline.HandlerContext;
 import com.tianshouzhi.dragon.sharding.pipeline.Pipeline;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -16,7 +16,7 @@ import java.util.List;
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
 public class DragonShardingStatement extends DragonStatement {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DragonShardingStatement.class);
+	private static final Log LOGGER = LoggerFactory.getLogger(DragonShardingStatement.class);
 
 	private DragonShardingConnection dragonShardingConnection;
 

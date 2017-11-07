@@ -1,6 +1,6 @@
 package com.tianshouzhi.dragon.shard.scalable;
 
-import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
+//import com.tianshouzhi.dragon.sharding.jdbc.datasource.DragonShardingDataSource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class ScalableShardAPITest {
     private static DataSource dataSource;
     @BeforeClass
     public static void before() throws Exception {
-        dataSource=new DragonShardingDataSource("shard/scalable/scalable-sharding.properties");
+//        dataSource=new DragonShardingDataSource("shard/scalable/scalable-sharding.properties");
     }
     @Test
     public void testBatchInsert() throws SQLException {
