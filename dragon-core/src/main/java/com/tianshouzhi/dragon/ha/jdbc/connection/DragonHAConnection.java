@@ -189,7 +189,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 
 	public Connection buildNewWriteConnectionIfNeed() throws SQLException {
 		if (this.realConnection == null || this.realConnection.isReadOnly()) {
-			DatasourceUtil.close(dragonHADatasource.getHADSName(), getRealDSName(),realConnection);
+			DatasourceUtil.close(dragonHADatasource.getDsName(), getRealDSName(),realConnection);
 			this.realDSName = this.dragonHADatasource.getRouterManager().routeWrite();
 			this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 			setConnectionParams(this.realConnection);
@@ -386,7 +386,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	}
 
 	public String getFullName(){
-		return dragonHADatasource.getHADSName()+"."+realDSName;
+		return dragonHADatasource.getDsName()+"."+realDSName;
 	}
 
 	@Override

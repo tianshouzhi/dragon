@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 表示主维度表的路由参数:<br/>
  * 所谓主维度表，指一条sql中存在多个表，用于确定路由规则的那个表，其他表不能指定分区维度。例如:<br/>
- * SELECT user.id,user.name,user_account.account_no FROM user,user_account WHERE user.id=user_account.user_id AND user.id in
+ * SELECT user.id,user.dsName,user_account.account_no FROM user,user_account WHERE user.id=user_account.user_id AND user.id in
  * (?,?,?,?);<br/>
  * 上例中假设user.id是分区维度，那么user_account则不能指定分区条件，但是可以指定分区之外的其他条件，例如加上条件:<br/>
  * user_account.money>0<br/>

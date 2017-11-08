@@ -8,7 +8,7 @@
     </bean>
     <!--配置Mybatis-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dragon-datasource"></property>
-        <property name="configLocation" value="mybatis/mybatis-config.xml"></property>
+        <property dsName="dataSource" ref="dragon-datasource"></property>
+        <property dsName="configLocation" value="mybatis/mybatis-config.xml"></property>
     </bean>
 </beans>

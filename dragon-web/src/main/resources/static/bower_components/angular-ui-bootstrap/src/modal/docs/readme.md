@@ -51,7 +51,7 @@ The `$uibModal` service has only one method: `open(options)`.
 
 * `controller`
   _(Type: `function|string|array`, Example: `MyModalController`)_ -
-  A controller for the modal clusterInstance, either a controller name as a string, or an inline controller function, optionally wrapped in array notation for dependency injection. Allows the controller-as syntax. Has a special `$uibModalInstance` injectable to access the modal clusterInstance.
+  A controller for the modal clusterInstance, either a controller dsName as a string, or an inline controller function, optionally wrapped in array notation for dependency injection. Allows the controller-as syntax. Has a special `$uibModalInstance` injectable to access the modal clusterInstance.
 
 * `controllerAs`
   _(Type: `string`, Example: `ctrl`)_ -

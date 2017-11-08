@@ -31,13 +31,13 @@ Include the dependencies: jQuery, Bootstrap and Bootstrap Switch CSS + Javascrip
 Add your checkbox:
 
 ```html
-<input type="checkbox" name="my-checkbox" checked>
+<input type="checkbox" dsName="my-checkbox" checked>
 ```
 
 Initialize Bootstrap Switch on it:
 
 ```javascript
-$("[name='my-checkbox']").bootstrapSwitch();
+$("[dsName='my-checkbox']").bootstrapSwitch();
 ```
 
 Enjoy.

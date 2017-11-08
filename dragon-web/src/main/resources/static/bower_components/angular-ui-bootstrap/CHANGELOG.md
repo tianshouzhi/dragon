@@ -1,4 +1,4 @@
-<a name="2.5.0"></a>
+<a dsName="2.5.0"></a>
 # [2.5.0](https://github.com/angular-ui/bootstrap/compare/2.4.0...v2.5.0) (2017-01-28)
 
 
@@ -17,7 +17,7 @@
 
 
 
-<a name="2.4.0"></a>
+<a dsName="2.4.0"></a>
 # [2.4.0](https://github.com/angular-ui/bootstrap/compare/2.3.2...v2.4.0) (2016-12-30)
 
 
@@ -27,7 +27,7 @@
 
 
 
-<a name="2.3.2"></a>
+<a dsName="2.3.2"></a>
 ## [2.3.2](https://github.com/angular-ui/bootstrap/compare/2.3.1...v2.3.2) (2016-12-27)
 
 
@@ -37,7 +37,7 @@
 
 
 
-<a name="2.3.1"></a>
+<a dsName="2.3.1"></a>
 ## [2.3.1](https://github.com/angular-ui/bootstrap/compare/2.3.0...v2.3.1) (2016-12-10)
 
 
@@ -49,7 +49,7 @@
 
 * **modal:** revert focus behavior on open([8a4f625](https://github.com/angular-ui/bootstrap/commit/8a4f625)), closes [#6295](https://github.com/angular-ui/bootstrap/issues/6295)
 
-<a name="2.3.0"></a>
+<a dsName="2.3.0"></a>
 # [2.3.0](https://github.com/angular-ui/bootstrap/compare/2.2.0...2.3.0) (2016-11-26)
 
 
@@ -59,7 +59,7 @@
 
 
 
-<a name="2.2.0"></a>
+<a dsName="2.2.0"></a>
 # [2.2.0](https://github.com/angular-ui/bootstrap/compare/2.1.4...2.2.0) (2016-10-10)
 
 
@@ -76,7 +76,7 @@
 
 
 
-<a name="2.1.4"></a>
+<a dsName="2.1.4"></a>
 ## [2.1.4](https://github.com/angular-ui/bootstrap/compare/2.1.3...2.1.4) (2016-09-24)
 
 
@@ -87,7 +87,7 @@
 
 
 
-<a name="2.1.3"></a>
+<a dsName="2.1.3"></a>
 ## [2.1.3](https://github.com/angular-ui/bootstrap/compare/2.1.2...2.1.3) (2016-08-25)
 
 
@@ -97,7 +97,7 @@
 
 
 
-<a name="2.1.2"></a>
+<a dsName="2.1.2"></a>
 ## [2.1.2](https://github.com/angular-ui/bootstrap/compare/2.1.1...2.1.2) (2016-08-22)
 
 
@@ -109,7 +109,7 @@
 
 
 
-<a name="2.1.1"></a>
+<a dsName="2.1.1"></a>
 ## [2.1.1](https://github.com/angular-ui/bootstrap/compare/2.1.0...2.1.1) (2016-08-21)
 
 
@@ -120,7 +120,7 @@
 
 
 
-<a name="2.1.0"></a>
+<a dsName="2.1.0"></a>
 # [2.1.0](https://github.com/angular-ui/bootstrap/compare/2.0.2...2.1.0) (2016-08-19)
 
 
@@ -138,7 +138,7 @@
 
 
 
-<a name="2.0.2"></a>
+<a dsName="2.0.2"></a>
 ## [2.0.2](https://github.com/angular-ui/bootstrap/compare/2.0.1...2.0.2) (2016-08-15)
 
 
@@ -149,7 +149,7 @@
 
 
 
-<a name="2.0.1"></a>
+<a dsName="2.0.1"></a>
 ## [2.0.1](https://github.com/angular-ui/bootstrap/compare/2.0.0...2.0.1) (2016-08-02)
 
 
@@ -159,7 +159,7 @@
 
 
 
-<a name="2.0.0"></a>
+<a dsName="2.0.0"></a>
 # [2.0.0](https://github.com/angular-ui/bootstrap/compare/1.3.3...2.0.0) (2016-07-20)
 
 
@@ -239,7 +239,7 @@ This could affect selectors if they are being used.
 
 
 
-<a name="1.3.3"></a>
+<a dsName="1.3.3"></a>
 ## [1.3.3](https://github.com/angular-ui/bootstrap/compare/1.3.2...1.3.3) (2016-05-23)
 
 
@@ -265,7 +265,7 @@ This could affect selectors if they are being used.
 
 
 
-<a name="1.3.2"></a>
+<a dsName="1.3.2"></a>
 ## [1.3.2](https://github.com/angular-ui/bootstrap/compare/1.3.1...1.3.2) (2016-04-14)
 
 
@@ -291,7 +291,7 @@ This could affect selectors if they are being used.
 
 
 
-<a name="1.3.1"></a>
+<a dsName="1.3.1"></a>
 ## [1.3.1](https://github.com/angular-ui/bootstrap/compare/1.3.0...1.3.1) (2016-04-05)
 
 
@@ -302,7 +302,7 @@ This could affect selectors if they are being used.
 
 
 
-<a name="1.3.0"></a>
+<a dsName="1.3.0"></a>
 # [1.3.0](https://github.com/angular-ui/bootstrap/compare/1.2.5...1.3.0) (2016-04-05)
 
 
@@ -345,7 +345,7 @@ attribute pass-throughs in the popup
 
 
 
-<a name="1.2.5"></a>
+<a dsName="1.2.5"></a>
 ## [1.2.5](https://github.com/angular-ui/bootstrap/compare/1.2.4...1.2.5) (2016-03-20)
 
 
@@ -368,13 +368,13 @@ attribute pass-throughs in the popup
 
 
 
-<a name="1.2.4"></a>
+<a dsName="1.2.4"></a>
 ## [1.2.4](https://github.com/angular-ui/bootstrap/compare/1.2.3...1.2.4) (2016-03-06)
 
 
 
 
-<a name="1.2.3"></a>
+<a dsName="1.2.3"></a>
 ## [1.2.3](https://github.com/angular-ui/bootstrap/compare/1.2.2...1.2.3) (2016-03-06)
 
 
@@ -393,7 +393,7 @@ attribute pass-throughs in the popup
 
 
 
-<a name="1.2.2"></a>
+<a dsName="1.2.2"></a>
 ## [1.2.2](https://github.com/angular-ui/bootstrap/compare/1.2.1...1.2.2) (2016-03-03)
 
 
@@ -410,7 +410,7 @@ attribute pass-throughs in the popup
 
 
 
-<a name="1.2.1"></a>
+<a dsName="1.2.1"></a>
 ## [1.2.1](https://github.com/angular-ui/bootstrap/compare/1.2.0...1.2.1) (2016-02-27)
 
 
@@ -420,7 +420,7 @@ attribute pass-throughs in the popup
 
 
 
-<a name="1.2.0"></a>
+<a dsName="1.2.0"></a>
 # [1.2.0](https://github.com/angular-ui/bootstrap/compare/1.1.2...1.2.0) (2016-02-26)
 
 
@@ -480,7 +480,7 @@ template
 
 
 
-<a name="1.1.2"></a>
+<a dsName="1.1.2"></a>
 ## [1.1.2](https://github.com/angular-ui/bootstrap/compare/1.1.1...1.1.2) (2016-02-01)
 
 
@@ -498,7 +498,7 @@ template
 
 
 
-<a name="1.1.1"></a>
+<a dsName="1.1.1"></a>
 ## [1.1.1](https://github.com/angular-ui/bootstrap/compare/1.1.0...1.1.1) (2016-01-25)
 
 
@@ -509,7 +509,7 @@ template
 
 
 
-<a name="1.1.0"></a>
+<a dsName="1.1.0"></a>
 # [1.1.0](https://github.com/angular-ui/bootstrap/compare/v1.0.3...v1.1.0) (2016-01-18)
 
 
@@ -548,7 +548,7 @@ template in one's app and provide the necessary CSS
 
 
 
-<a name="1.0.3"></a>
+<a dsName="1.0.3"></a>
 # [1.0.3](https://github.com/angular-ui/bootstrap/compare/1.0.2...1.0.3) (2016-01-12)
 
 
@@ -558,7 +558,7 @@ template in one's app and provide the necessary CSS
 
 
 
-<a name="1.0.2"></a>
+<a dsName="1.0.2"></a>
 # [1.0.2](https://github.com/angular-ui/bootstrap/compare/1.0.1...1.0.2) (2016-01-12)
 
 
@@ -568,7 +568,7 @@ template in one's app and provide the necessary CSS
 
 
 
-<a name="1.0.1"></a>
+<a dsName="1.0.1"></a>
 # [1.0.1](https://github.com/angular-ui/bootstrap/compare/1.0.0...1.0.1) (2016-01-12)
 
 
@@ -589,7 +589,7 @@ template in one's app and provide the necessary CSS
 
 
 
-<a name="1.0.0"></a>
+<a dsName="1.0.0"></a>
 # [1.0.0](https://github.com/angular-ui/bootstrap/compare/0.14.3...1.0.0) (2016-01-08)
 
 
@@ -734,7 +734,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
 
 
 
-<a name="0.14.3"></a>
+<a dsName="0.14.3"></a>
 # [0.14.3](https://github.com/angular-ui/bootstrap/compare/0.14.2...0.14.3) (2015-10-23)
 
 
@@ -759,7 +759,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
 
 
 
-<a name="0.14.2"></a>
+<a dsName="0.14.2"></a>
 # [0.14.2](https://github.com/angular-ui/bootstrap/compare/0.14.1...0.14.2) (2015-10-14)
 
 
@@ -771,7 +771,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
 
 
 
-<a name="0.14.1"></a>
+<a dsName="0.14.1"></a>
 # [0.14.1](https://github.com/angular-ui/bootstrap/compare/0.14.0...0.14.1) (2015-10-11)
 
 
@@ -795,7 +795,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
 
 
 
-<a name="0.14.0"></a>
+<a dsName="0.14.0"></a>
 # [0.14.0](https://github.com/angular-ui/bootstrap/compare/0.13.4...0.14.0) (2015-10-09)
 
 
@@ -870,7 +870,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
 * Removes focus on datepicker on selection of a date via keyboard for accessibility reasons
 
 
-<a name="0.13.4"></a>
+<a dsName="0.13.4"></a>
 # [0.13.4](https://github.com/angular-ui/bootstrap/compare/0.13.3...0.13.4) (2015-09-03)
 
 
@@ -954,7 +954,7 @@ $scope.typeaheadContainer = angular.element(document.querySelector('#typeaheadCo
    ([bb9fa1a](https://github.com/angular-ui/bootstrap/commit/bb9fa1a))
 
 
-<a name"0.13.3"></a>
+<a dsName"0.13.3"></a>
 # [0.13.3](https://github.com/angular-ui/bootstrap/compare/0.13.2...0.13.3) (2015-08-09)
 
 
@@ -1041,7 +1041,7 @@ Closes #4080
  ([5245ccad](https://github.com/angular-ui/bootstrap/commit/5245ccad))
 
 
-<a name"0.13.2"></a>
+<a dsName"0.13.2"></a>
 # [0.13.2](https://github.com/angular-ui/bootstrap/compare/0.13.1...0.13.2) (2015-08-02)
 
 
@@ -1087,7 +1087,7 @@ Closes #4080
   * add `typeaheadSelectOnExact` support ([277b30ca](https://github.com/angular-ui/bootstrap/commit/277b30ca), closes [#3365](https://github.com/angular-ui/bootstrap/issues/3365), [#3310](https://github.com/angular-ui/bootstrap/issues/3310))
 
 
-<a name"0.13.1"></a>
+<a dsName"0.13.1"></a>
 # [0.13.1](https://github.com/angular-ui/bootstrap/compare/0.13.0...0.13.1) (2015-07-23)
 
 
@@ -1148,7 +1148,7 @@ Closes #4080
   * handles min-length of 0 ([a5a25141](https://github.com/angular-ui/bootstrap/commit/a5a25141), closes [#3600](https://github.com/angular-ui/bootstrap/issues/3600))
 
 
-<a name="0.13.0"></a>
+<a dsName="0.13.0"></a>
 # [0.13.0](https://github.com/angular-ui/bootstrap/compare/0.12.1...0.13.0) (2015-05-02)
 
 
@@ -1248,7 +1248,7 @@ Closes #4080
 * **transition:** deprecate transition module ([8a552443](https://github.com/angular-ui/bootstrap/commit/8a552443741d1e5b4b29d9da9c7e9990fa37886c), closes [#3497](https://github.com/angular-ui/bootstrap/issues/3497))
 
 
-<a name="0.12.1"></a>
+<a dsName="0.12.1"></a>
 # [0.12.1](https://github.com/angular-ui/bootstrap/compare/0.12.0...0.12.1) (2015-02-20)
 
 ## Bug Fixes
@@ -1256,7 +1256,7 @@ Closes #4080
 - **tooltip:**
   - incorrect position when text wraps ([5726e3ef](http://github.com/angular-ui/bootstrap/commit/5726e3ef))
 
-<a name="0.12.0"></a>
+<a dsName="0.12.0"></a>
 # [0.12.0](https://github.com/angular-ui/bootstrap/compare/0.11.2...0.12.0) (2014-11-16)
 
 
@@ -1310,12 +1310,12 @@ once* and can no longer be changed after initialization.
     ```
 
 
-<a name="0.11.2"></a>
+<a dsName="0.11.2"></a>
 # [0.11.2](https://github.com/angular-ui/bootstrap/compare/0.11.1...0.11.2) (2014-09-26)
 
 Revert breaking change in **dropdown** ([1a998c4](http://github.com/angular-ui/bootstrap/commit/1a998c4))
 
-<a name="0.11.1"></a>
+<a dsName="0.11.1"></a>
 # [0.11.1](https://github.com/angular-ui/bootstrap/compare/0.11.0...0.11.1) (2014-09-26)
 
 ## Features
@@ -1350,7 +1350,7 @@ Revert breaking change in **dropdown** ([1a998c4](http://github.com/angular-ui/b
   - allow multiple line expression ([c7db0df4](http://github.com/angular-ui/bootstrap/commit/c7db0df4))
   - replace ng-if with ng-show in matches popup ([a0be450d](http://github.com/angular-ui/bootstrap/commit/a0be450d))
 
-<a name="0.11.0"></a>
+<a dsName="0.11.0"></a>
 # [0.11.0](https://github.com/angular-ui/bootstrap/compare/0.10.0...0.11.0) (2014-05-01)
 
 ## Features
@@ -1529,7 +1529,7 @@ Revert breaking change in **dropdown** ([1a998c4](http://github.com/angular-ui/b
   <tabset type="{{navtype}}" ...></tabset>
   ```
 
-<a name="0.10.0"></a>
+<a dsName="0.10.0"></a>
 # [0.10.0](https://github.com/angular-ui/bootstrap/compare/0.9.0...0.10.0) (2014-01-13)
 
 _This release adds AngularJS 1.2 support_
@@ -1551,7 +1551,7 @@ _This release adds AngularJS 1.2 support_
 - **tooltip:**
   - performance and scope fixes ([c0df3201](http://github.com/angular-ui/bootstrap/commit/c0df3201))
 
-<a name="0.9.0"></a>
+<a dsName="0.9.0"></a>
 # [0.9.0](https://github.com/angular-ui/bootstrap/compare/0.8.0...0.9.0) (2013-12-28)
 
 _This release adds Bootstrap3 support_
@@ -1595,7 +1595,7 @@ _This release adds Bootstrap3 support_
 - **tooltip:**
   - re-position tooltip after draw ([a99b3608](http://github.com/angular-ui/bootstrap/commit/a99b3608))
 
-<a name="0.8.0"></a>
+<a dsName="0.8.0"></a>
 # [0.8.0](https://github.com/angular-ui/bootstrap/compare/0.7.0...0.8.0) (2013-12-28)
 
 ## Features
@@ -1663,7 +1663,7 @@ _This release adds Bootstrap3 support_
   <progress><bar ng-repeat="obj in objs" value="obj.var" type="{{obj.type}}"></bar></progress>
 ```
 
-<a name="0.7.0"></a>
+<a dsName="0.7.0"></a>
 # [0.7.0](https://github.com/angular-ui/bootstrap/compare/0.6.0...0.7.0) (2013-11-22)
 
 ## Features
@@ -1712,7 +1712,7 @@ _This release adds Bootstrap3 support_
   - evaluate matches source against a correct scope ([fd21214d](http://github.com/angular-ui/bootstrap/commit/fd21214d))
   - support IE8 ([0e9f9980](http://github.com/angular-ui/bootstrap/commit/0e9f9980))
 
-<a name="0.6.0"></a>
+<a dsName="0.6.0"></a>
 # [0.6.0](https://github.com/angular-ui/bootstrap/compare/0.6.0...0.7.0) (2013-09-08)
 
 ## Features
@@ -1792,7 +1792,7 @@ Check the documentation for the `$modal` service to migrate from `$dialog`
 
 The placment='mouse' is gone with no equivalent
 
-<a name="0.5.0"></a>
+<a dsName="0.5.0"></a>
 # [0.5.0](https://github.com/angular-ui/bootstrap/compare/0.4.0...0.5.0) (2013-08-04)
 
 ## Features
@@ -1876,7 +1876,7 @@ The placment='mouse' is gone with no equivalent
   <pagination first-text="{{var1}}" ...></pagination>
 ```
 
-<a name="0.4.0"></a>
+<a dsName="0.4.0"></a>
 # [0.4.0](https://github.com/angular-ui/bootstrap/compare/0.3.0...0.4.0) (2013-06-24)
 
 ## Features
@@ -1891,7 +1891,7 @@ The placment='mouse' is gone with no equivalent
   - option for different mode when maxSize ([a023d082](http://github.com/angular-ui/bootstrap/commit/a023d082))
   - add pager directive ([d9526475](http://github.com/angular-ui/bootstrap/commit/d9526475))
 - **tabs:**
-  - Change directive name, add features ([c5326595](http://github.com/angular-ui/bootstrap/commit/c5326595))
+  - Change directive dsName, add features ([c5326595](http://github.com/angular-ui/bootstrap/commit/c5326595))
   - support disabled state ([2b78dd16](http://github.com/angular-ui/bootstrap/commit/2b78dd16))
   - add support for vertical option ([88d17a75](http://github.com/angular-ui/bootstrap/commit/88d17a75))
   - add support for other navigation types, like 'pills' ([53e0a39f](http://github.com/angular-ui/bootstrap/commit/53e0a39f))
@@ -1995,7 +1995,7 @@ The placment='mouse' is gone with no equivalent
     </tabset>
     ```
 
-<a name="0.3.0"></a>
+<a dsName="0.3.0"></a>
 # [0.3.0](https://github.com/angular-ui/bootstrap/compare/0.2.0...0.3.0) (2013-04-30)
 
 ## Features
@@ -2037,7 +2037,7 @@ The placment='mouse' is gone with no equivalent
   - correctly higlight matches if query contains regexp-special chars ([467afcd6](https://github.com/angular-ui/bootstrap/commit/467afcd6))
   - fix matches pop-up positioning issues ([74beecdb](https://github.com/angular-ui/bootstrap/commit/74beecdb))
 
-<a name="0.2.0"></a>
+<a dsName="0.2.0"></a>
 # [0.2.0](https://github.com/angular-ui/bootstrap/compare/0.1.0...0.2.0) (2013-03-03)
 
 ## Features
@@ -2072,7 +2072,7 @@ The placment='mouse' is gone with no equivalent
 - **typeahead:**
   -  update inputs value on mapping where label is not derived from the model ([a5f64de](https://github.com/angular-ui/bootstrap/commit/a5f64de))
 
-<a name="0.1.0"></a>
+<a dsName="0.1.0"></a>
 # 0.1.0 (2013-02-02)
 
 _Very first, initial release_.

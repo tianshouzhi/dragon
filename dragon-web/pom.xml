@@ -8,7 +8,7 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>dragon-console</name>
+    <dsName>dragon-console</dsName>
     <artifactId>dragon-console</artifactId>
 
     <dependencies>

@@ -49,17 +49,18 @@ public class RuleEngineBenchmark extends AbstractBenchmark{
     }
 
     private static GroovyObject getGroovyEngine(String path) {
-        try {
-            FileReader fileReader = new FileReader(path);
-            String script = IOUtils.toString( fileReader);
-            ClassLoader parent = ClassLoader.getSystemClassLoader();
-            GroovyClassLoader loader = new GroovyClassLoader(parent );
-            Class<?> clazz = loader .parseClass(script);
-            loader.close();
-            return (GroovyObject) clazz .newInstance();
-        } catch (Exception e ) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            FileReader fileReader = new FileReader(path);
+//            String script = IOUtils.toString( fileReader);
+//            ClassLoader parent = ClassLoader.getSystemClassLoader();
+//            GroovyClassLoader loader = new GroovyClassLoader(parent );
+//            Class<?> clazz = loader .parseClass(script);
+//            loader.close();
+//            return (GroovyObject) clazz .newInstance();
+//        } catch (Exception e ) {
+//            throw new RuntimeException(e);
+//        }
+        return null;
     }
 
 }

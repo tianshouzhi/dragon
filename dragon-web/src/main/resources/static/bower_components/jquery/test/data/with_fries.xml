@@ -8,11 +8,11 @@
 				<meta>
 					<component id="seite1" class="component">
 						<properties xmlns:cd="http://example.com/ns3">
-							<property name="prop1">
+							<property dsName="prop1">
 								<thing />
 								<value>1</value>
 							</property>
-							<property name="prop2">
+							<property dsName="prop2">
 								<thing att="something" />
 							</property>
 							<foo_bar>foo</foo_bar>

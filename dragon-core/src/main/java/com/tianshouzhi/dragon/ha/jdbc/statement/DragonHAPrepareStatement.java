@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
+import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.io.InputStream;
@@ -126,9 +127,15 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 
 	@Override
 	protected boolean doExecuteByType() throws SQLException {
-		LOG.debug("selected datasource:【"+dragonHAConnection.getFullName()+"】,sql:"+sql+",params:"+params.values());
 		boolean isResultSet = false;
 		if (prepareExecuteType != null) {
+			if (LOG.isDebugEnabled()) {
+				String log = "selected datasource:【" + dragonHAConnection.getFullName() + "】,sql:" + sql;
+				if(MapUtils.isNotEmpty(params)){
+					log += ",params:" + params.values();
+				}
+				LOG.debug(log);
+			}
 			switch (prepareExecuteType) {
 			case PREPARE_EXECUTE:
 				isResultSet = ((PreparedStatement) realStatement).execute();

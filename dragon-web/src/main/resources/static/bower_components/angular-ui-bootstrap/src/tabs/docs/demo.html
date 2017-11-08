@@ -54,13 +54,13 @@
   <hr />
 
   Tabs using nested forms:
-  <form name="outerForm" class="tab-form-demo">
+  <form dsName="outerForm" class="tab-form-demo">
     <uib-tabset active="activeForm">
       <uib-tab index="0" heading="Form Tab">
-        <ng-form name="nestedForm">
+        <ng-form dsName="nestedForm">
           <div class="form-group">
             <label>Name</label>
-            <input type="text" class="form-control" required ng-model="model.name"/>
+            <input type="text" class="form-control" required ng-model="model.dsName"/>
           </div>
         </ng-form>
       </uib-tab>

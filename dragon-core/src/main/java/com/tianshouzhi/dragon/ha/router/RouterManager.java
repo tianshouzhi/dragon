@@ -4,6 +4,8 @@ import com.tianshouzhi.dragon.common.util.MapUtils;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapper;
+import com.tianshouzhi.dragon.ha.router.impl.SingleRouter;
+import com.tianshouzhi.dragon.ha.router.impl.WeightRouter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +20,8 @@ public class RouterManager {
     private String haDSName;
 
     public RouterManager(DragonHADatasource dragonHADatasource) {
-        this.haDSName = dragonHADatasource.getHADSName();
-        Map<String, RealDataSourceWrapper> dataSourceWrappers = dragonHADatasource.getRealDataSourceWrapperMap();
+        this.haDSName = dragonHADatasource.getDsName();
+        Map<String, RealDataSourceWrapper> dataSourceWrappers = dragonHADatasource.getRealDSMap();
         this.readRouter = buildRouter(dataSourceWrappers, true);
         this.writeRouter = buildRouter(dataSourceWrappers, false);
     }

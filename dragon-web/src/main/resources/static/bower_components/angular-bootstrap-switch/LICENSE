@@ -39,7 +39,7 @@ is based on (or derived from) the Work and for which the editorial revisions,
 annotations, elaborations, or other modifications represent, as a whole, an
 original work of authorship. For the purposes of this License, Derivative Works
 shall not include works that remain separable from, or merely link (or bind by
-name) to the interfaces of, the Work and Derivative Works thereof.
+dsName) to the interfaces of, the Work and Derivative Works thereof.
 
 "Contribution" shall mean any work of authorship, including the original version
 of the Work and any modifications or additions to that Work or Derivative Works
@@ -172,11 +172,11 @@ To apply the Apache License to your work, attach the following boilerplate
 notice, with the fields enclosed by brackets "[]" replaced with your own
 identifying information. (Don't include the brackets!) The text should be
 enclosed in the appropriate comment syntax for the file format. We also
-recommend that a file or class name and description of purpose be included on
+recommend that a file or class dsName and description of purpose be included on
 the same "printed page" as the copyright notice for easier identification within
 third-party archives.
 
-   Copyright [yyyy] [name of copyright owner]
+   Copyright [yyyy] [dsName of copyright owner]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

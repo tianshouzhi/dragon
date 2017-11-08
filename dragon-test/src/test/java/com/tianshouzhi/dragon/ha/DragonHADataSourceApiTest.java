@@ -1,10 +1,8 @@
 package com.tianshouzhi.dragon.ha;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
-import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
 import org.junit.*;
 
 import javax.sql.DataSource;
@@ -23,13 +21,9 @@ public class DragonHADataSourceApiTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        DragonHADatasource dragonHADatasource = new DragonHADatasource();
-        DruidDataSource master = createRealDataSource();
-        DruidDataSource slave1 = createRealDataSource();
-        DruidDataSource slave2 = createRealDataSource();
-        dragonHADatasource.addRealDatasource("master", 0, 10, master);
-        dragonHADatasource.addRealDatasource("slave1", 10, 0, slave1);
-        dragonHADatasource.addRealDatasource("slave2", 10, 0, slave2);
+        DragonHADatasource dragonHADatasource=new DragonHADatasource();
+        dragonHADatasource.setConfigFile("ha/dragon-ha.properties");
+        dragonHADatasource.setLazyInit(false);
         dragonHADatasource.init();
         datasource = dragonHADatasource;
     }
@@ -37,14 +31,6 @@ public class DragonHADataSourceApiTest {
     @Before
     public void before() throws SQLException {
         connection = datasource.getConnection();
-    }
-
-    private static DruidDataSource createRealDataSource() {
-        DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
-        druidDataSource.setUrl("jdbc:mysql://localhost:3306/test");
-        return druidDataSource;
     }
 
     @After
@@ -57,19 +43,6 @@ public class DragonHADataSourceApiTest {
     public static void afterClass() throws Exception {
         if (datasource != null)
             ((DragonHADatasource) datasource).close();
-    }
-
-    @Test
-    public void testBuildFromLocalConfig() throws SQLException {
-        DragonHADatasource datasource=new DragonHADatasource();
-        datasource.setLocalConfigFile("dragon-ha.properties");
-        datasource.init();
-        Connection connection = datasource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT  into USER (name) VALUES ('tianshouzhi')");
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        connection.close();
-        datasource.close();
     }
 
     @Test
@@ -93,8 +66,8 @@ public class DragonHADataSourceApiTest {
 
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
-            String name = resultSet.getString("name");
-            System.out.println("id:" + id + ",name:" + name);
+            String name = resultSet.getString("dsName");
+            System.out.println("id:" + id + ",dsName:" + name);
         }
         resultSet.close();
         statement.close();
@@ -178,9 +151,11 @@ public class DragonHADataSourceApiTest {
         preparedStatement.addBatch();
         preparedStatement.addBatch("INSERT INTO USER(name) VALUES ('xxxxxxx2')");
         int[] ints = preparedStatement.executeBatch();
-        assert ints.length == 2;
-        assert ints[0] == 3;
+        assert ints.length == 4;
+        assert ints[0] == 1;
         assert ints[1] == 1;
+        assert ints[2] == 1;
+        assert ints[3] == 1;
     }
 
     @Test

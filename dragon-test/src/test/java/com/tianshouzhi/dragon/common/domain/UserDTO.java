@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  */
 public class UserDTO {
 //    private int id;
-//    private String name;
+//    private String dsName;
 
     public void setId(int id) {
     }

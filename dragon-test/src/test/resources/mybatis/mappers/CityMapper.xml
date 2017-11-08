@@ -6,18 +6,18 @@
 <mapper namespace="com.tianshouzhi.dragon.common.domain.City">
 
     <insert id="insert" parameterType="City">
-        INSERT INTO city (id,name) VALUES (#{id},#{name});
+        INSERT INTO city (id,dsName) VALUES (#{id},#{dsName});
     </insert>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO city (id,name) VALUES
+        INSERT INTO city (id,dsName) VALUES
         <foreach collection="list"  item="city" index="index" separator="," >
-            (#{city.id},#{city.name})
+            (#{city.id},#{city.dsName})
         </foreach>  ;
     </insert>
 
     <select id="selectById" parameterType="int" resultType="City">
-        SELECT id,name FROM city WHERE id=#{id};
+        SELECT id,dsName FROM city WHERE id=#{id};
     </select>
 
     <select id="selectAll" resultType="City">
@@ -25,20 +25,20 @@
     </select>
 
     <select id="selectOrderByLimit" resultType="City" parameterType="java.util.HashMap">
-        SELECT id,name FROM city ORDER BY id limit #{offset},#{rows};
+        SELECT id,dsName FROM city ORDER BY id limit #{offset},#{rows};
     </select>
 
     <select id="selectAggrGroupBy" resultType="java.util.HashMap">
-        SELECT count(*),name FROM city GROUP BY name;
+        SELECT count(*),dsName FROM city GROUP BY dsName;
     </select>
 
     <select id="selectWhereIdIn" parameterType="integer[]" resultType="City">
-        SELECT id,name FROM city WHERE id IN
+        SELECT id,dsName FROM city WHERE id IN
         <foreach collection="array" item = "id" open="(" separator="," close=")">#{id}</foreach>;
     </select>
 
     <update id="updateById" parameterType="City">
-        UPDATE city SET name=#{name} where id=#{id};
+        UPDATE city SET dsName=#{dsName} where id=#{id};
     </update>
 
     <delete id="deleteById" parameterType="int" >

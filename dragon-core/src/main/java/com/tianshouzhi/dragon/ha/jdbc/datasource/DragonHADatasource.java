@@ -4,6 +4,7 @@ import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.ha.config.HAConfigManager;
 import com.tianshouzhi.dragon.ha.config.HADataSourceConfig;
 import com.tianshouzhi.dragon.ha.config.HALocalConfigManager;
@@ -12,6 +13,7 @@ import com.tianshouzhi.dragon.ha.exception.DataSourceMonitor;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.router.RouterManager;
+import com.tianshouzhi.dragon.ha.router.RouterStrategy;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import javax.sql.DataSource;
@@ -19,6 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,106 +29,130 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DragonHADatasource extends DragonDataSourceAdapter {
 
-	private String haDSName;
+    private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
 
-	private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
+    private boolean lazyInit = true;
 
-	private Map<String, RealDataSourceWrapper> realDSWrapperMap = new ConcurrentHashMap<String, RealDataSourceWrapper>(4);
+    private String configFile;
 
-	private HAConfigManager configManager;
+    private Map<String, RealDataSourceWrapper> realDSMap = new ConcurrentHashMap<String, RealDataSourceWrapper>(4);
 
-	private boolean lazyInit = true;
+    private HAConfigManager configManager;
 
-	private volatile RouterManager routerManager;
+    private RouterManager routerManager;
 
-	public DragonHADatasource() {
-		this.haDSName=DatasourceUtil.generateDataSourceName("DragonHADatasource");
-	}
+    private RouterStrategy routerStrategy=RouterStrategy.ROUND_ROBIN;
 
-	@Override
-	protected void doInit() throws Exception {
-		if (realDSWrapperMap.isEmpty()) {// 没有通过编程式方式设置datasource
-			if (configManager == null) {
-				throw new DragonHAException("configManager can't be null !");
-			} else {
-				HADataSourceConfig haDataSourceConfig = configManager.getHADataSourceConfig();
-				Map<String, RealDataSourceConfig> realDataSourceConfigMap = haDataSourceConfig.getRealDataSourceConfigMap();
-				for (Map.Entry<String, RealDataSourceConfig> configEntry : realDataSourceConfigMap.entrySet()) {
-					String key = configEntry.getKey();
-					RealDataSourceConfig config = configEntry.getValue();
-					addRealDatasource(key, config.getReadWeight(), config.getWriteWeight(), config.getRealDsProperties(),
-					      config.getRealDsClass());
-				}
-			}
-		}
-		if (!lazyInit) {
-			for (RealDataSourceWrapper realDataSourceWrapper : realDSWrapperMap.values()) {
-				try{
-					realDataSourceWrapper.init();
-				}catch (Exception e){
-					throw new DragonHAException("init real datasource"+realDataSourceWrapper.getFullName()+"error",e);
-				}
-			}
-		}
-		this.routerManager = new RouterManager(this);
-	}
+    @Override
+    protected void doInit() throws Exception {
+        initDsName();
+        LOGGER.info("init dragon ha datasource(" + dsName + ")");
+        initConfigManager();
+        initRealDSMap();
+        initRouterManager();
+    }
 
-	@Override
-	protected DragonHAConnection doGetConnection(String username, String password) throws SQLException {
-		return new DragonHAConnection(username, password, this);
-	}
+    private void initDsName() {
+        if (StringUtils.isNotBlank(dsName)) {
+            return;
+        }else{
+            this.dsName = DatasourceUtil.generateDataSourceName("DragonHADatasource");
+        }
+    }
 
-	@Override
-	public void close() throws DragonException {
-		LOGGER.info("close dragon ha datasource start ...");
-		for (RealDataSourceWrapper realDataSourceWrapper : this.realDSWrapperMap.values()) {
-			LOGGER.info("close real datasource[" + realDataSourceWrapper.getRealDSName() + "]...");
-			realDataSourceWrapper.close();
-			LOGGER.info("close real datasource[" + realDataSourceWrapper.getRealDSName() + "] success...");
-		}
-		LOGGER.info("close dragon ha datasource ...");
-	}
+    private void initConfigManager() {
+        if (StringUtils.isNotBlank(configFile)) {
+            this.configManager = new HALocalConfigManager(configFile);
+        }
+    }
 
-	public void addRealDatasource(String index, int readWeight, int writeWeight, DataSource dataSource) {
-		realDSWrapperMap.put(index, new RealDataSourceWrapper(index, readWeight, writeWeight, dataSource));
-	}
+    private void initRealDSMap() {
+        if (realDSMap.isEmpty()) {// 没有通过编程式方式设置datasource
+            if (configManager == null) {
+                throw new DragonHAException("configManager can't be null !");
+            } else {
+                HADataSourceConfig haDataSourceConfig = configManager.getHADataSourceConfig();
+                Map<String, RealDataSourceConfig> realDataSourceConfigMap = haDataSourceConfig.getRealDataSourceConfigMap();
+                for (Map.Entry<String, RealDataSourceConfig> configEntry : realDataSourceConfigMap.entrySet()) {
+                    String realDsName = configEntry.getKey();
+                    RealDataSourceConfig config = configEntry.getValue();
+                    addRealDatasource(this.dsName,realDsName, config.getReadWeight(), config.getWriteWeight(), config.getRealDsProperties(), config.getRealDsClass());
+                }
+            }
+        }
 
-	public void addRealDatasource(String index, int readWeight, int writeWeight, Properties properties, String dsClass) {
-		RealDataSourceWrapper realDataSourceWrapper = new RealDataSourceWrapper(haDSName,index, readWeight, writeWeight,
-				properties, dsClass);
-		realDSWrapperMap.put(index, realDataSourceWrapper);
-	}
+        //check lazyInit
+        if (!lazyInit) {
+            for (RealDataSourceWrapper realDataSourceWrapper : realDSMap.values()) {
+                try {
+                    realDataSourceWrapper.init();
+                } catch (Exception e) {
+                    throw new DragonHAException("init real datasource" + realDataSourceWrapper.getFullName() + "error", e);
+                }
+            }
+        }
+    }
 
-	public RouterManager getRouterManager() {
-		return routerManager;
-	}
+    private void initRouterManager() {
+        this.routerManager = new RouterManager(this);
+    }
 
-	public Connection getConnectionByRealDSName(String realDSName) throws SQLException {
-		RealDataSourceWrapper realDataSourceWrapper = this.realDSWrapperMap.get(realDSName);
-		if (realDataSourceWrapper == null) {
-			throw new DragonHAException("not valid datasource found with realDSName:" + realDSName);
-		}
-		if(!DataSourceMonitor.isAvailable(haDSName,realDataSourceWrapper)){
-			throw new DragonHAException(realDataSourceWrapper.getFullName()+" is not available!!!");
-		}
-		try{
-			return realDataSourceWrapper.getConnection();
-		}catch (SQLException e){
-			DataSourceMonitor.monitor(e, haDSName,realDataSourceWrapper);
-			throw e;
-		}
-	}
+    public void addRealDatasource(String index, int readWeight, int writeWeight, DataSource dataSource) {
+        realDSMap.put(index, new RealDataSourceWrapper(index, readWeight, writeWeight, dataSource));
+    }
 
-	public void setLocalConfigFile(String configFile) {
-		this.haDSName = DatasourceUtil.generateDataSourceName("DragonHADatasource("+configFile+")");
-		this.configManager = new HALocalConfigManager(configFile);
-	}
+    public void addRealDatasource(String haDSName,String realDSName, int readWeight, int writeWeight, Properties properties, String dsClass) {
+        RealDataSourceWrapper realDataSourceWrapper = new RealDataSourceWrapper(haDSName, realDSName, readWeight, writeWeight,
+                properties, dsClass);
+        realDSMap.put(realDSName, realDataSourceWrapper);
+    }
 
-	public Map<String,RealDataSourceWrapper> getRealDataSourceWrapperMap(){
-		return realDSWrapperMap;
-	}
+    @Override
+    protected DragonHAConnection doGetConnection(String username, String password) throws SQLException {
+        return new DragonHAConnection(username, password, this);
+    }
 
-	public String getHADSName() {
-		return haDSName;
-	}
+    public Connection getConnectionByRealDSName(String realDSName) throws SQLException {
+        RealDataSourceWrapper realDataSourceWrapper = this.realDSMap.get(realDSName);
+        if (realDataSourceWrapper == null) {
+            throw new DragonHAException("not valid datasource found with realDSName:" + realDSName);
+        }
+        if (!DataSourceMonitor.isAvailable(dsName, realDataSourceWrapper)) {
+            throw new DragonHAException(realDataSourceWrapper.getFullName() + " is not available!!!");
+        }
+        try {
+            return realDataSourceWrapper.getConnection();
+        } catch (SQLException e) {
+            DataSourceMonitor.monitor(e, dsName, realDataSourceWrapper);
+            throw e;
+        }
+    }
+
+    @Override
+    public void close() throws DragonException {
+        LOGGER.info(" close dragon ha datasource(" + getDsName() + ")...");
+        for (RealDataSourceWrapper realDataSourceWrapper : this.realDSMap.values()) {
+            realDataSourceWrapper.close();
+        }
+    }
+
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
+    }
+
+    public Map<String, RealDataSourceWrapper> getRealDSMap() {
+        return realDSMap;
+    }
+
+    public boolean isLazyInit() {
+        return lazyInit;
+    }
+
+    public void setLazyInit(boolean lazyInit) {
+        this.lazyInit = lazyInit;
+    }
+
+    public RouterManager getRouterManager() {
+        return routerManager;
+    }
 }

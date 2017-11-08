@@ -8,14 +8,14 @@
 	<script src="../dist/jquery.js"></script>
 	<script>
 		jQuery(function ready() {
-			var node = $("#child"), name;
+			var node = $("#child"), dsName;
 
 			jQuery.each([".zoo", "#zoo", "[data-foo=zoo]", "#nonexistant"], function(i, item) {
 	setTimeout(function(){
-					name = "find '" + item + "'";
-		jQuery("#results").append("<li>rooted " + name + "<ul>" +
-						"<li>new: " + benchmarkString("$('body').find('" + item + "')", 250, name) + "</li>" +
-						"<li>old: " + benchmarkString("old('body').find('" + item + "')", 250, name) + "</li>" +
+					dsName = "find '" + item + "'";
+		jQuery("#results").append("<li>rooted " + dsName + "<ul>" +
+						"<li>new: " + benchmarkString("$('body').find('" + item + "')", 250, dsName) + "</li>" +
+						"<li>old: " + benchmarkString("old('body').find('" + item + "')", 250, dsName) + "</li>" +
 			"</ul></li>");
 	}, 100);
 			});

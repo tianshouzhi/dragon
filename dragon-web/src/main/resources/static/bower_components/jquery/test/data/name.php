@@ -11,14 +11,14 @@ if($xml) {
 	echo "<math><calculation>$xml</calculation><result>$result</result></math>";
 	die();
 }
-$name = $_REQUEST['name'];
-if($name == 'foo') {
+$dsName = $_REQUEST['dsName'];
+if($dsName == 'foo') {
 	echo "bar";
 	die();
-} else if($name == 'peter') {
+} else if($dsName == 'peter') {
 	echo "pan";
 	die();
 }
 
-echo 'ERROR <script type="text/javascript">ok( true, "name.php executed" );</script>';
+echo 'ERROR <script type="text/javascript">ok( true, "dsName.php executed" );</script>';
 ?>

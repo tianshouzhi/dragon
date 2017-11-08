@@ -1,5 +1,6 @@
 package com.tianshouzhi.dragon.sharding.jdbc.datasource;
 
+import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
 import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.sharding.jdbc.connection.DragonShardingConnection;
@@ -48,7 +49,7 @@ public class DragonShardingDataSource extends DragonDataSourceAdapter {
 	}
 
 	@Override
-	public void close() throws SQLException {
+	public void close() throws DragonException {
 		//TODO
 	}
 

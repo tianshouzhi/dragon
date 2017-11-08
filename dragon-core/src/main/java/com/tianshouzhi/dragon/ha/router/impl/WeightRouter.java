@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.router;
+package com.tianshouzhi.dragon.ha.router.impl;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by tianshouzhi on 2017/8/16.
  */
-public class WeightRouter extends BaseRouter{
+public class WeightRouter extends BaseRouter {
 	protected Map<WeightRange, String> weightIndexMap = new ConcurrentHashMap<WeightRange, String>();
 
 	protected int totalWeight = 0;

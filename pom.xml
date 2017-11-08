@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>dragon</name>
+    <dsName>dragon</dsName>
     <groupId>com.tianshouzhi</groupId>
     <artifactId>dragon</artifactId>
     <packaging>pom</packaging>
@@ -12,7 +12,7 @@
     <description>A dataSource support r/w split and sharding.</description>
     <developers>
         <developer>
-            <name>tianshouzhi</name>
+            <dsName>tianshouzhi</dsName>
             <email>tianshouzhi@126.com</email>
             <!--<organization></organization>-->
         </developer>
@@ -24,7 +24,7 @@
     </scm>
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
+            <dsName>The Apache Software License, Version 2.0</dsName>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>

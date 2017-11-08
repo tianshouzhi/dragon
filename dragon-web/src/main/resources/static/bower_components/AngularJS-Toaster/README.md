@@ -198,12 +198,12 @@ There are four types of body renderings: trustedHtml', 'template', 'templateWith
 	 - Assigns any data associated with the template to the toast.
 
  - directive 
-	 - Will use the `toast.body` argument to represent the name of a directive that you want to render as the toast's body, else it will fallback to the template bound to the `'body-template': 'toasterBodyTmpl.html'` configuration option.
-    The directive name being passed to the `body` argument should appear as it exists in the markup, 
-     not camelCased as it would appear in the directive declaration (`cool-directive-name` instead of `coolDirectiveName`). The directive must be usable as an attribute.
+	 - Will use the `toast.body` argument to represent the dsName of a directive that you want to render as the toast's body, else it will fallback to the template bound to the `'body-template': 'toasterBodyTmpl.html'` configuration option.
+    The directive dsName being passed to the `body` argument should appear as it exists in the markup, 
+     not camelCased as it would appear in the directive declaration (`cool-directive-dsName` instead of `coolDirectiveName`). The directive must be usable as an attribute.
     
       ```js
-    // The toast pop call, passing in a directive name to be rendered
+    // The toast pop call, passing in a directive dsName to be rendered
     toaster.pop({
 		    type: 'info',
 		    body: 'bind-unsafe-html',
@@ -223,12 +223,12 @@ There are four types of body renderings: trustedHtml', 'template', 'templateWith
      throw an exception if isolateScope is detected.  All data must be passed via the directiveData argument.
     
         ```js
-      // The toast pop call, passing in a directive name to be rendered
+      // The toast pop call, passing in a directive dsName to be rendered
       toaster.pop({
               type: 'info',
-              body: 'bind-name',
+              body: 'bind-dsName',
               bodyOutputType: 'directive',
-              directiveData: { name: 'Bob' }
+              directiveData: { dsName: 'Bob' }
       });
         ```
         
@@ -236,7 +236,7 @@ There are four types of body renderings: trustedHtml', 'template', 'templateWith
       // The directive that will be dynamically rendered
       .directive('bindName', [function () {
             return {
-                template: "<span style='color:orange'>Hi {{directiveData.name}}!</span>"
+                template: "<span style='color:orange'>Hi {{directiveData.dsName}}!</span>"
             };
       }])
         ```

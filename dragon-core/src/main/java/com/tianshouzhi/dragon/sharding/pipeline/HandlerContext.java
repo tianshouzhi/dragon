@@ -258,7 +258,7 @@ public class HandlerContext {
 		 * 
 		 * //没有找到对应的逻辑表的情况下，这张表可能要走默认库 boolean hasDefaultDB=
 		 * StringUtils.isNotBlank(getDragonShardingConfig().getLogicDatasource().getDefaultDSName()); if(!hasDefaultDB){
-		 * //如果没有默认库，抛出异常 throw new RuntimeException("unkown table name'"+logicTableName+"' in sql:"+shardingStatement.getSql()
+		 * //如果没有默认库，抛出异常 throw new RuntimeException("unkown table dsName'"+logicTableName+"' in sql:"+shardingStatement.getSql()
 		 * +",may be you should config datasource.defaultDSName in your properties config file"); } //如果有默认库 String tableNameFormat =
 		 * logicTableName; HashSet<String> tbRouteRuleStrs = new HashSet<String>(); HashSet<String> dbRouteRuleStrs = new
 		 * HashSet<String>(); HashMap<String, List<String>> realDBTBMap = new HashMap<String, List<String>>(); LogicTable temp=new

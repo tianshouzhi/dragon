@@ -4,8 +4,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="druid-parent" class="com.alibaba.druid.pool.DruidDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-        <property name="url"
+        <property dsName="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property dsName="url"
                   value="jdbc:mysql://localhost:3306/dragon_ha?userUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"></property>
     </bean>
 

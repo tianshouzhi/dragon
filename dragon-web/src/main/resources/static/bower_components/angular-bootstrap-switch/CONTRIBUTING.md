@@ -1,7 +1,7 @@
 Contributing
 ============
 
-## <a name="report-issue"></a> Report an Issue
+## <a dsName="report-issue"></a> Report an Issue
 
 If you have found an issue with `angular-bootstrap-switch` and want to report it, **please make a live demo** first 
 so that the misbehaviour can be reproduced. If you don't know how to do it, simply fork and edit 
@@ -17,7 +17,7 @@ Also, make sure to:
   files in the `src` directory)
   - clearly describe how the plugin should be changed to address your request
 
-## <a name="submit-pr"></a> Submit a Pull Request
+## <a dsName="submit-pr"></a> Submit a Pull Request
 
 If you want to submit a Pull Request, please follow the same rules as in [Report an Issue](#report-issue), plus all the
 **[submission guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#submitting-a-pull-request)**,

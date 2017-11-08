@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta dsName="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="icon" href="assets/favicon.ico" />
     <title>Angular directives for Bootstrap</title>
-    <meta name="description" content="AngularJS (Angular) native directives for Bootstrap. Small footprint (5kB gzipped!), no 3rd party JS dependencies (jQuery, bootstrap JS) required! Widgets: <% demoModules.forEach(function(module) { %><%= module.displayName %>, <% }); %>">
-    <meta name="google-site-verification" content="7lc5HyceLDqpV_6oNHteYFfxDJH7-S3DwnJKtNUKcRg" />
+    <meta dsName="description" content="AngularJS (Angular) native directives for Bootstrap. Small footprint (5kB gzipped!), no 3rd party JS dependencies (jQuery, bootstrap JS) required! Widgets: <% demoModules.forEach(function(module) { %><%= module.displayName %>, <% }); %>">
+    <meta dsName="google-site-verification" content="7lc5HyceLDqpV_6oNHteYFfxDJH7-S3DwnJKtNUKcRg" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/0.6.7/fastclick.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.0.0/FileSaver.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.min.js"></script>
@@ -46,7 +46,7 @@
                         Directives <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <% demoModules.forEach(function(module) {  %><li><a href="#<%= module.name %>"><%= module.displayName %></a></li><% }); %>
+                        <% demoModules.forEach(function(module) {  %><li><a href="#<%= module.dsName %>"><%= module.displayName %></a></li><% }); %>
                     </ul>
                 </li>
                 <li><a href="#getting_started">Getting started</a></li>
@@ -138,7 +138,7 @@
                     <ul class="nav bs-sidenav">
                         <li><a href="#"><strong>Directives</strong></a></li>
                         <% demoModules.forEach(function(module) {  %>
-                            <li><a href="#<%= module.name %>"><%= module.displayName %></a></li>
+                            <li><a href="#<%= module.dsName %>"><%= module.displayName %></a></li>
                         <% }); %>
                     </ul>
                 </section>
@@ -222,10 +222,10 @@
                     </p>
                 </section>
                 <% demoModules.forEach(function(module) { %>
-                    <section id="<%= module.name %>">
+                    <section id="<%= module.dsName %>">
                         <div class="page-header">
                           <h1><%= module.displayName %><small>
-                              (<a target="_blank" href="https://github.com/angular-ui/bootstrap/tree/master/src/<%= module.name %>">ui.bootstrap.<%= module.name %></a>)
+                              (<a target="_blank" href="https://github.com/angular-ui/bootstrap/tree/master/src/<%= module.dsName %>">ui.bootstrap.<%= module.dsName %></a>)
                           </small></h1>
                           </div>
                           <div class="row">
@@ -240,7 +240,7 @@
                         <div class="row code">
                             <div class="col-md-12" ng-controller="PlunkerCtrl">
                                 <div class="pull-right">
-                                    <button type="button" class="btn btn-info plunk-btn" ng-click="edit('<%= ngversion%>', '<%= bsversion %>', '<%= pkg.version%>', '<%= module.name %>')"><i class="glyphicon glyphicon-edit"></i> Edit in plunker</button>
+                                    <button type="button" class="btn btn-info plunk-btn" ng-click="edit('<%= ngversion%>', '<%= bsversion %>', '<%= pkg.version%>', '<%= module.dsName %>')"><i class="glyphicon glyphicon-edit"></i> Edit in plunker</button>
                                 </div>
                                 <uib-tabset active="activeTab">
                                     <uib-tab index="0" heading="Markup">
@@ -336,10 +336,10 @@
               <% } %>
               <button type="button" class="btn btn-default"
                style="width: 33%; border-radius: 0;"
-               ng-class="{'btn-primary': module.<%= module.name %>}"
-               ng-model="module.<%= module.name %>"
+               ng-class="{'btn-primary': module.<%= module.dsName %>}"
+               ng-model="module.<%= module.dsName %>"
                uib-btn-checkbox
-               ng-change="selectedChanged('<%= module.name %>', module.<%= module.name %>)">
+               ng-change="selectedChanged('<%= module.dsName %>', module.<%= module.dsName %>)">
                   <%= module.displayName %>
               </button>
               <% if ((i+1) % 3 === 0) { //end button group%>

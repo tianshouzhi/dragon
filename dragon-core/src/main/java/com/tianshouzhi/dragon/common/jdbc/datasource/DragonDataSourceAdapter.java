@@ -16,9 +16,21 @@ public abstract class DragonDataSourceAdapter extends WrapperAdapter implements 
 
 	protected int loginTimeout = 0;
 
-	private PrintWriter logWriter;
+	protected PrintWriter logWriter;
 
 	protected volatile boolean init = false;
+
+	protected String dsName;
+
+	@Override
+	public String getDsName() {
+		return dsName;
+	}
+
+	@Override
+	public void setDsName(String dsName) {
+		this.dsName = dsName;
+	}
 
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {

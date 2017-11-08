@@ -5,7 +5,7 @@ We are excited to have you working on the project and cordially request that you
  - [Code Style Guidelines](#rules)
  - [Commit Message Guidelines](#commit)
  
-## <a name="question"></a> Got a question or problem?
+## <a dsName="question"></a> Got a question or problem?
  
  Firstly, please go over our FAQ: https://github.com/angular-ui/ui-select/wiki/FAQs
  
@@ -18,7 +18,7 @@ We are excited to have you working on the project and cordially request that you
  
  To save your and our time we will be systematically closing all the issues that are requests for general support and redirecting people to StackOverflow.
  
-## <a name="bug"></a> You think you've found a bug?
+## <a dsName="bug"></a> You think you've found a bug?
  
  Oh, we are ashamed and want to fix it asap! But before fixing a bug we need to reproduce and confirm it. In order to reproduce bugs we will systematically ask you to provide a _minimal_ reproduce scenario using http://plnkr.co/. Having a live reproduce scenario gives us wealth of important information without going back & forth to you with additional questions like:
  * version of AngularJS used
@@ -34,7 +34,7 @@ We are excited to have you working on the project and cordially request that you
  
  Unfortunately we are not able to investigate / fix bugs without a minimal reproduce scenario using http://plnkr.co/, so if we don't hear back from you we are going to close an issue that don't have enough info to be reproduced.
  
-## <a name="rules"></a> Coding Rules
+## <a dsName="rules"></a> Coding Rules
 To ensure consistency throughout the source code, keep these rules in mind as you are working:
 
 * All features or bug fixes **must pass all tests** (run `gulp` to jshint, build and test).
@@ -44,7 +44,7 @@ To ensure consistency throughout the source code, keep these rules in mind as yo
 
 **Working on your first Pull Request?** You can learn how from this *free* series [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
 
-## <a name="commit"></a> Git Commit Guidelines
+## <a dsName="commit"></a> Git Commit Guidelines
 
 We have very precise rules over how our git commit messages can be formatted for maintenance of the changelog and semvar versioning.  This leads to **more
 readable messages** that are easy to follow when looking through the **project history**.  But also,

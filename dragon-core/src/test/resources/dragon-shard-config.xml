@@ -5,6 +5,6 @@
 
     </datasource-list>
     <logic-table-list>
-        <logic-table name="user" suffixPattern="_{0,number,#00}" mapping=""></logic-table>
+        <logic-table dsName="user" suffixPattern="_{0,number,#00}" mapping=""></logic-table>
     </logic-table-list>
 </shard-config>
