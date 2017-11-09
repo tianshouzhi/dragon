@@ -24,4 +24,7 @@
         <!--指定SqlSessionFactoryBean这个bean的id属性-->
         <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />-->
     </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dragon-ha-datasource"/>
+    </bean>
 </beans>

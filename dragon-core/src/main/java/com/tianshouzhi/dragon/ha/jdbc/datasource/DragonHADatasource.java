@@ -13,7 +13,6 @@ import com.tianshouzhi.dragon.ha.exception.DataSourceMonitor;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.router.RouterManager;
-import com.tianshouzhi.dragon.ha.router.RouterStrategy;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import javax.sql.DataSource;
@@ -21,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,12 +39,10 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 
     private RouterManager routerManager;
 
-    private RouterStrategy routerStrategy=RouterStrategy.ROUND_ROBIN;
-
     @Override
     protected void doInit() throws Exception {
         initDsName();
-        LOGGER.info("init dragon ha datasource(" + dsName + ")");
+        LOGGER.info("init DragonHADatasource(" + dsName + ")");
         initConfigManager();
         initRealDSMap();
         initRouterManager();
@@ -56,7 +52,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
         if (StringUtils.isNotBlank(dsName)) {
             return;
         }else{
-            this.dsName = DatasourceUtil.generateDataSourceName("DragonHADatasource");
+            this.dsName = DatasourceUtil.generateDataSourceName("dragon-ha");
         }
     }
 
@@ -117,20 +113,20 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
         if (realDataSourceWrapper == null) {
             throw new DragonHAException("not valid datasource found with realDSName:" + realDSName);
         }
-        if (!DataSourceMonitor.isAvailable(dsName, realDataSourceWrapper)) {
+        if (!DataSourceMonitor.isAvailable(realDataSourceWrapper)) {
             throw new DragonHAException(realDataSourceWrapper.getFullName() + " is not available!!!");
         }
         try {
             return realDataSourceWrapper.getConnection();
         } catch (SQLException e) {
-            DataSourceMonitor.monitor(e, dsName, realDataSourceWrapper);
+            DataSourceMonitor.monitor(e,realDataSourceWrapper);
             throw e;
         }
     }
 
     @Override
     public void close() throws DragonException {
-        LOGGER.info(" close dragon ha datasource(" + getDsName() + ")...");
+        LOGGER.info(" close DragonHADatasource(" + getDsName() + ")");
         for (RealDataSourceWrapper realDataSourceWrapper : this.realDSMap.values()) {
             realDataSourceWrapper.close();
         }

@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by tianshouzhi on 2017/11/7.
  */
-public class DragonHADataSourceApiTest {
+public class DragonHAApiTest {
     static DataSource datasource;
     static Connection connection;
 
@@ -66,8 +66,8 @@ public class DragonHADataSourceApiTest {
 
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
-            String name = resultSet.getString("dsName");
-            System.out.println("id:" + id + ",dsName:" + name);
+            String name = resultSet.getString("name");
+            System.out.println("id:" + id + ",name:" + name);
         }
         resultSet.close();
         statement.close();
@@ -162,20 +162,23 @@ public class DragonHADataSourceApiTest {
     public void testTransaction() throws SQLException {
         connection.setAutoCommit(false);
         try {
-            PreparedStatement insert1 = connection.prepareStatement("SELECT * FROM user");
+            PreparedStatement select = connection.prepareStatement("SELECT * FROM user");
+            select.execute();
             String realDSName = ((DragonHAConnection) connection).getRealDSName();
-            assert "master" == realDSName;
+            assert "master".equals(realDSName);
 
             PreparedStatement insert2 = connection.prepareStatement("INSERT INTO user(name) VALUES ('wangxiaoxiao')");
-            insert1.execute();
             insert2.execute();
+            realDSName = ((DragonHAConnection) connection).getRealDSName();
+            assert "master".equals(realDSName);
             connection.commit();
         } catch (Exception e) {
             connection.rollback();
+            throw e;
         }
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void testRollback() throws SQLException {
         connection.setAutoCommit(false);
         try {
@@ -186,13 +189,21 @@ public class DragonHADataSourceApiTest {
             insert2.execute();
             connection.commit();
         } catch (Exception e) {
-            e.printStackTrace();
             connection.rollback();
+            throw e;
         }
     }
 
-    public void testCallableStatement(){
+    @Test
+    public void testCallableStatement() throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call getTestData(?, ?)}");
+        String realDSName = ((DragonHAConnection) connection).getRealDSName();
+        assert "master".equals(realDSName);
+    }
 
+    @Test
+    public void testConnectionMetaData() throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
     }
 
     @Test
@@ -222,7 +233,7 @@ public class DragonHADataSourceApiTest {
         statement.executeQuery("SELECT * FROM user ");
 
         String realDSName = ((DragonHAConnection) connection).getRealDSName();
-        assert "master" == realDSName;
+        assert "master" .equals(realDSName) ;
 
         DragonHAHintUtil.clear();
     }
@@ -233,7 +244,7 @@ public class DragonHADataSourceApiTest {
         statement.executeQuery("/*master*/ SELECT * FROM user ");
 
         String realDSName = ((DragonHAConnection) connection).getRealDSName();
-        assert "master" == realDSName;
+        assert "master" .equals(realDSName) ;
     }
 
     /**

@@ -7,86 +7,122 @@ import com.tianshouzhi.dragon.ha.jdbc.datasource.RealDataSourceWrapper;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by tianshouzhi on 2017/9/22.
  */
 public abstract class DataSourceMonitor {
-    private static final Log LOG = LoggerFactory.getLogger(DataSourceMonitor.class);
-    public static Map<String, Map<String, RealDataSourceWrapper>> unavailableDataSources = new ConcurrentHashMap<String, Map<String, RealDataSourceWrapper>>();
+	private static final Log LOG = LoggerFactory.getLogger(DataSourceMonitor.class);
+    public static final String CHECK_THREAD_NAME ="DRAGON_FATAL_EXCEPTION_DATASOURCE_CHECKER";
+	public static Map<String, Set<RealDataSourceWrapper>> unavailableDataSources = new ConcurrentHashMap<String, Set<RealDataSourceWrapper>>();
 
-    private static ScheduledExecutorService monitorExecutor = new ScheduledThreadPoolExecutor(1, new DragonThreadFactory("DRAGON_FATAL_EXCEPTION_DATASOURCE_CHECKER",true));
+	private static ScheduledExecutorService monitorExecutor =Executors.newSingleThreadScheduledExecutor(
+	      new DragonThreadFactory(CHECK_THREAD_NAME, true));
 
-    static {
-        monitorExecutor.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                if (unavailableDataSources != null) {
-                    for (Map.Entry<String, Map<String, RealDataSourceWrapper>> haDatasourceEntry : unavailableDataSources.entrySet()) {
-                        String haDSName = haDatasourceEntry.getKey();
-                        for (Map.Entry<String, RealDataSourceWrapper> realDataSourceEntry : haDatasourceEntry.getValue().entrySet()) {
-                            RealDataSourceWrapper dataSourceWrapper = realDataSourceEntry.getValue();
-                            try {
-                                Connection connection = dataSourceWrapper.getConnection();
-                                String realDSName = dataSourceWrapper.getRealDSName();
+	static {
+		monitorExecutor.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if (unavailableDataSources != null) {
+					for (Map.Entry<String, Set<RealDataSourceWrapper>> haDatasourceEntry : unavailableDataSources
+					      .entrySet()) {
+						for (RealDataSourceWrapper dataSourceWrapper : haDatasourceEntry.getValue()) {
+							try {
+								if (canMarkup(dataSourceWrapper)) {
+									markup(dataSourceWrapper);
+								}
+							} catch (Exception ignore) {
+								// continue for next
+							}
+						}
+					}
+				}
+			}
+		}, 1, 1, TimeUnit.SECONDS);
+	}
 
-                                if (connection.isValid(3)) {
-                                    dataSourceWrapper.enable();
-
-
-                                    LOG.info("the real datasource " + realDSName + " managed by DragonHADatasource[" + haDSName + "] managed " + "become not available!!!");
-                                }
-                                DatasourceUtil.close(haDSName,realDSName,connection);
-                            } catch (SQLException ignore) {
-                            }
-                        }
-                    }
-                }
+	private static boolean canMarkup(RealDataSourceWrapper dataSourceWrapper)  {
+		boolean markup = false;
+        Connection connection =null;
+        try{
+            connection = dataSourceWrapper.getConnection();
+            
+            if(connection.isValid(3)){
+                markup=true;
             }
-        }, 1, 1, TimeUnit.SECONDS);
-    }
+            
+            //如果拥有show slave status执行权限，
+            PreparedStatement preparedStatement = connection.prepareStatement("show slave status");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            boolean slaveIoRunning = "Yes".equalsIgnoreCase(resultSet.getString("Slave_IO_Running"));// slave IO 线程在运行
+            boolean slaveSqlRunning = "Yes".equalsIgnoreCase(resultSet.getString("Slave_SQL_Running")); // slave SQL线程在运行
+            boolean noDelay = resultSet.getInt("Seconds_Behind_Master")==0;// 主从同步没有延迟
+			if (!(slaveIoRunning && slaveSqlRunning && noDelay)) {
+				LOG.warn("the db which "+dataSourceWrapper.getFullName() +"connected to is recovery,wait sync the " +
+						"master binlog to markup" );
+				markup = false;
+			}
+            resultSet.close();
+            preparedStatement.close();
+        }catch (Exception ignore){}
+        DatasourceUtil.close(connection);
+		return markup;
+	}
 
-    public static void monitor(SQLException e, String hADataSourceIndex, RealDataSourceWrapper realDataSourceWrapper) {
-        if (ExceptionSorterUtil.isExceptionFatal(e)) {
-            realDataSourceWrapper.disable();
-            addToMonitor(hADataSourceIndex, realDataSourceWrapper);
-            LOG.warn("the real datasource " + realDataSourceWrapper.getRealDSName() + " managed by DragonHADatasource[" + hADataSourceIndex + "] managed " + "become not available!!!");
-        }
-    }
+	private static void markup(RealDataSourceWrapper dataSourceWrapper) {
+		dataSourceWrapper.enable();
+        Set<RealDataSourceWrapper> invalidSet = unavailableDataSources.get(dataSourceWrapper.getHaDSName());
+        invalidSet.remove(dataSourceWrapper);
+        LOG.info("markup real datasource 【" + dataSourceWrapper.getFullName() + "】!!!");
+	}
 
-    private static void addToMonitor(String dataSourceHashCode, RealDataSourceWrapper realDataSourceWrapper) {
-        Map<String, RealDataSourceWrapper> unavailableDataSourceMap = unavailableDataSources.get(dataSourceHashCode);
-        if (unavailableDataSourceMap == null) {
+	public static boolean monitor(SQLException e, RealDataSourceWrapper dataSourceWrapper) {
+		boolean fatal = ExceptionSorterUtil.isExceptionFatal(e);
+		if (fatal) {
+			markdown(dataSourceWrapper);
+		}
+		return fatal;
+	}
+
+	private static void markdown(RealDataSourceWrapper dataSourceWrapper) {
+		dataSourceWrapper.disable();
+        Set<RealDataSourceWrapper> invalidSet = unavailableDataSources.get(dataSourceWrapper.getHaDSName());
+        if (invalidSet == null) {
             synchronized (DataSourceMonitor.class) {
-                if (unavailableDataSourceMap == null) {
-                    unavailableDataSourceMap = new ConcurrentHashMap<String, RealDataSourceWrapper>();
-                    unavailableDataSources.put(dataSourceHashCode, unavailableDataSourceMap);
+                if (invalidSet == null) {
+                    invalidSet = new ConcurrentSkipListSet<RealDataSourceWrapper>();
+                    unavailableDataSources.put(dataSourceWrapper.getHaDSName(), invalidSet);
                 }
             }
         }
-        unavailableDataSourceMap.put(realDataSourceWrapper.getRealDSName(), realDataSourceWrapper);
-    }
+        invalidSet.add(dataSourceWrapper);
+		LOG.warn("markdown real datasource 【" + dataSourceWrapper.getFullName() + "】!!!");
+	}
 
-    public static boolean isAvailable(String haDSName, RealDataSourceWrapper realDataSourceWrapper) {
-        Map<String, RealDataSourceWrapper> invalidDsMap = unavailableDataSources.get(haDSName);
-        if (invalidDsMap == null || !invalidDsMap.containsKey(realDataSourceWrapper.getRealDSName())) {
-            return true;
-        }
-        return false;
-    }
+	public static boolean isAvailable(RealDataSourceWrapper realDataSourceWrapper) {
+		Set<RealDataSourceWrapper> invalidSet = unavailableDataSources.get(realDataSourceWrapper.getHaDSName());
+		if (invalidSet == null || !invalidSet.contains(realDataSourceWrapper)) {
+			return true;
+		}
+		return false;
+	}
 
-    public static Set<String> getInvalidRealDs(String haDataSourceName) {
-        Map<String, RealDataSourceWrapper> invalidDsMap = unavailableDataSources.get(haDataSourceName);
-        if (invalidDsMap == null) {
-            return null;
-        }
-        return invalidDsMap.keySet();
-    }
+	public static Set<String> getInvalidRealDs(String hsDSName) {
+		Set<RealDataSourceWrapper> invalidSet = unavailableDataSources.get(hsDSName);
+		if (invalidSet == null) {
+			return null;
+		}
+		Set<String> invalidNames = new HashSet<String>(4);
+		for (RealDataSourceWrapper invalid : invalidSet) {
+			invalidNames.add(invalid.getDsName());
+		}
+		return invalidNames;
+	}
 }

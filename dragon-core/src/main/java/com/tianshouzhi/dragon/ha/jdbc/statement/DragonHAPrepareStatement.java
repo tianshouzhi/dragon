@@ -130,7 +130,7 @@ public class DragonHAPrepareStatement extends DragonHAStatement implements Drago
 		boolean isResultSet = false;
 		if (prepareExecuteType != null) {
 			if (LOG.isDebugEnabled()) {
-				String log = "selected datasource:【" + dragonHAConnection.getFullName() + "】,sql:" + sql;
+				String log = "【" + dragonHAConnection.getFullName() + "】:" + sql;
 				if(MapUtils.isNotEmpty(params)){
 					log += ",params:" + params.values();
 				}

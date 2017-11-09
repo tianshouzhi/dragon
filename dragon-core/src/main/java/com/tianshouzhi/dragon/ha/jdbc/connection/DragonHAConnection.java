@@ -2,6 +2,7 @@ package com.tianshouzhi.dragon.ha.jdbc.connection;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
+import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
 import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
@@ -23,6 +24,8 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	 * 在事务的情况下，总是需要保持对同一个连接的引用 对于不是事务的情况下，则可以每次重新通过DBSelector进行选择
 	 */
 	protected Connection realConnection;
+
+	protected Boolean isRead;
 
 	protected DragonHADatasource dragonHADatasource;
 
@@ -172,7 +175,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		// 4、没有hint且没有开启事务,如果是写sql
 		if (!SqlTypeUtil.isQuery(sql, useSqlTypeCache)) {// retry for read connection
 			return buildNewWriteConnectionIfNeed();
-		}else{
+		} else {
 			return buildNewReadConnectionIfNeed();
 		}
 	}
@@ -183,14 +186,16 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		}
 		this.realDSName = this.dragonHADatasource.getRouterManager().routeRead();
 		this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
+		this.isRead=true;
 		setConnectionParams(this.realConnection);
 		return realConnection;
 	}
 
 	public Connection buildNewWriteConnectionIfNeed() throws SQLException {
-		if (this.realConnection == null || this.realConnection.isReadOnly()) {
-			DatasourceUtil.close(dragonHADatasource.getDsName(), getRealDSName(),realConnection);
+		if (this.realConnection == null || isRead) {
 			this.realDSName = this.dragonHADatasource.getRouterManager().routeWrite();
+			this.isRead = false;
+			DatasourceUtil.close(dragonHADatasource.getDsName(), getRealDSName(), realConnection);
 			this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;
@@ -382,11 +387,15 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 	}
 
 	public String getRealDSName() {
-		return realDSName;
+		if (realDSName != null) {
+			return realDSName;
+		}
+
+		throw new DragonHAException("this method must invoke after any sql executed!!!");
 	}
 
-	public String getFullName(){
-		return dragonHADatasource.getDsName()+"."+realDSName;
+	public String getFullName() {
+		return dragonHADatasource.getDsName() + "." + realDSName;
 	}
 
 	@Override

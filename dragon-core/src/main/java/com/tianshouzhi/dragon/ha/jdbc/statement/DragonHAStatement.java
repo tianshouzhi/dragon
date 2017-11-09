@@ -3,11 +3,13 @@ package com.tianshouzhi.dragon.ha.jdbc.statement;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
-import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 
 import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.ExecuteType.EXECUTE_BATCH;
 
@@ -120,11 +122,11 @@ public class DragonHAStatement extends DragonStatement implements Statement {
 
     protected boolean doExecuteByType() throws SQLException {
         if (LOG.isDebugEnabled()) {
-            String log = "selected datasource:【" + dragonHAConnection.getFullName() + "】";
+            String log = "【" + dragonHAConnection.getFullName() + "】";
             if (batchExecuteInfoList.size() == 0) {
-                log += ",sql:" + sql;
+                log += ":" + sql;
             } else {
-                log += "batch info:";
+                log += "batch sql:";
                 if (sql != null) {
                     log += sql;
                 }

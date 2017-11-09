@@ -28,9 +28,6 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
     private DataSource dataSource;
     private boolean available = true;
 
-    public RealDataSourceWrapper() {
-    }
-
     public RealDataSourceWrapper(String haDSName, String realDSName, int readWeight, int writeWeight, Properties properties, String clazz) {
         this.haDSName = haDSName;
         this.realDSName = realDSName;
@@ -79,6 +76,15 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
         return realDSName;
     }
 
+    public String getHaDSName() {
+        return haDSName;
+    }
+
+    @Override
+    public String getDsName() {
+        return getRealDSName();
+    }
+
     public int getReadWeight() {
         return readWeight;
     }
@@ -105,5 +111,20 @@ public class RealDataSourceWrapper extends DragonDataSourceAdapter implements Dr
 
     public boolean isAvailable() {
         return available;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RealDataSourceWrapper that = (RealDataSourceWrapper) o;
+
+        return fullName != null ? fullName.equals(that.fullName) : that.fullName == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return fullName != null ? fullName.hashCode() : 0;
     }
 }
