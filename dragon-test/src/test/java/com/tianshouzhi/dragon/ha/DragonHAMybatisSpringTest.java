@@ -21,7 +21,7 @@ public class DragonHAMybatisSpringTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		ApplicationContext context = new ClassPathXmlApplicationContext("ha/dragon_ha.xml");
+		ApplicationContext context = new ClassPathXmlApplicationContext("ha/spring-dragon.xml");
 		userMapper = context.getBean(UserMapper.class);
 		transactionManager = context.getBean(DataSourceTransactionManager.class);
 	}
@@ -30,12 +30,20 @@ public class DragonHAMybatisSpringTest {
 	public void testInsert() {
 		User user = new User();
 		user.setName("tianshozhi");
+		userMapper.insert(user);
+		System.out.println(user);
+	}
+	@Test
+	public void testBatchInsert(){
+		User user = new User();
+		user.setName("tianshozhi");
 		User user1 = new User();
 		user.setName("wangxiaoxiao");
 		List<User> userList = new ArrayList<User>();
 		userList.add(user);
 		userList.add(user1);
 		userMapper.batchInsert(userList);
+		System.out.println(userList);
 	}
 
 	@Test

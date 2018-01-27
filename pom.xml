@@ -36,6 +36,7 @@
         <module>dragon-core</module>
         <module>dragon-test</module>
         <module>dragon-web</module>
+        <module>dragon-physical-ds</module>
     </modules>
     <dependencyManagement>
         <dependencies>

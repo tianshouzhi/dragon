@@ -12,15 +12,20 @@
         <!--1对1关联-->
         <association property="userAccount" javaType="UserAccount" resultMap="com.tianshouzhi.dragon.common.domain.UserAccount.userAccountMap" ></association>
     </resultMap>
-    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO user (id,name) VALUES (#{id},#{name});
+
+    <insert id="insert" parameterType="User">
+        INSERT INTO user (name) VALUES ('${name}');
     </insert>
 
-    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        <!--<selectKey keyProperty="id" resultType="int" order="AFTER">-->
+            <!--select LAST_INSERT_ID()-->
+        <!--</selectKey>-->
         INSERT INTO user (name) VALUES
         <foreach collection="list"  item="user" index="index" separator="," >
             (#{user.name})
-        </foreach>  ;
+        </foreach>;
     </insert>
 
     <select id="selectById" parameterType="int" resultMap="userWithAccountMap">
@@ -72,7 +77,7 @@
     </update>
 
     <delete id="deleteById" parameterType="int" >
-        DELETE FROM user WHERE id=#{id};
+        DELETE FROM user WHERE id=${id};
     </delete>
 
     <delete id="deleteAll">

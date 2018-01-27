@@ -195,7 +195,7 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		if (this.realConnection == null || isRead) {
 			this.realDSName = this.dragonHADatasource.getRouterManager().routeWrite();
 			this.isRead = false;
-			DatasourceUtil.close(dragonHADatasource.getDsName(), getRealDSName(), realConnection);
+			DatasourceUtil.close(realConnection);
 			this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;
