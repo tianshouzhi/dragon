@@ -3,12 +3,10 @@ package com.tianshouzhi.dragon.benchmark;
 import com.carrotsearch.junitbenchmarks.AbstractBenchmark;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
-import com.tianshouzhi.dragon.sharding.route.DragonGroovyEngine;
-import groovy.lang.GroovyClassLoader;
+import com.tianshouzhi.dragon.shard.route.DragonGroovyEngine;
 import groovy.lang.GroovyObject;
 import org.junit.Test;
 
-import java.io.FileReader;
 import java.util.HashMap;
 
 /**
