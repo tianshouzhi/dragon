@@ -17,7 +17,7 @@ public class DatabaseConfig {
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
         druidDataSource.setUrl("jdbc:mysql://localhost:3306/dragon_sharding_00");
         druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
+        druidDataSource.setPassword("");
         return druidDataSource;
     }
 }

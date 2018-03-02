@@ -25,12 +25,12 @@ public class DruidXATransactionTest {
 		dataSource1 = new DruidXADataSource();
 		dataSource1.setUrl("jdbc:mysql://localhost:3306/test");
 		dataSource1.setUsername("root");
-		dataSource1.setPassword("shxx12151022");
+		dataSource1.setPassword("");
 
 		dataSource2 = new DruidXADataSource();
 		dataSource2.setUrl("jdbc:mysql://115.28.171.77:3306/test");
 		dataSource2.setUsername("root");
-		dataSource2.setPassword("shxx12151022");
+		dataSource2.setPassword("");
 	}
 
 	@Test

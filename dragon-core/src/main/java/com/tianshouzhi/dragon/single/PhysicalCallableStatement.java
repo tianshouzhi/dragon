@@ -11,9 +11,9 @@ import java.util.Map;
 /**
  * Created by tianshouzhi on 2018/1/28.
  */
-public class SingleCallableStatement extends SinglePrepareStatement implements CallableStatement{
+public class PhysicalCallableStatement extends PhysicalPrepareStatement implements CallableStatement{
 
-    public SingleCallableStatement(CallableStatement delegate, SinglePooledConnection connection) {
+    public PhysicalCallableStatement(CallableStatement delegate, PhysicalPooledConnection connection) {
         super(delegate, connection);
     }
 

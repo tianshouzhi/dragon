@@ -10,9 +10,9 @@ import java.util.Calendar;
 /**
  * Created by tianshouzhi on 2018/1/28.
  */
-public class SinglePrepareStatement extends SingleStatement implements PreparedStatement {
+public class PhysicalPrepareStatement extends PhysicalStatement implements PreparedStatement {
 
-	public SinglePrepareStatement(PreparedStatement delegate, SinglePooledConnection connection) {
+	public PhysicalPrepareStatement(PreparedStatement delegate, PhysicalPooledConnection connection) {
 		super(delegate, connection);
 	}
 

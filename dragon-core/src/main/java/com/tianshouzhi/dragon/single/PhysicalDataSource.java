@@ -5,7 +5,7 @@ import java.sql.*;
 /**
  * Created by tianshouzhi on 2018/1/23.
  */
-public class SingleDataSource extends AbstractDataSourcePool {
+public class PhysicalDataSource extends PhysicalConnectionPool {
 
 	@Override
 	public Connection getConnection() throws SQLException {
@@ -16,5 +16,4 @@ public class SingleDataSource extends AbstractDataSourcePool {
 	public Connection getConnection(String username, String password) throws SQLException {
 		throw new SQLFeatureNotSupportedException("borrowConnection(String username, String password) is not Support!!!");
 	}
-
 }

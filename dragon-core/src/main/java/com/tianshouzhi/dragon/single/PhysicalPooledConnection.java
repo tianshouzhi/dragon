@@ -13,34 +13,35 @@ import java.util.concurrent.Executor;
 /**
  * Created by tianshouzhi on 2018/1/26.
  */
-public class SinglePooledConnection extends WrapperAdapter implements Connection,PooledConnection {
+public class PhysicalPooledConnection extends WrapperAdapter implements Connection,PooledConnection {
 	protected Connection delegate;
 
 	private long lastActiveTime = System.currentTimeMillis();
 
-	private AbstractDataSourcePool connectionPool;
+	private PhysicalConnectionPool connectionPool;
 
-	public SinglePooledConnection(Connection delegate) {
+	public PhysicalPooledConnection(Connection delegate, PhysicalConnectionPool connectionPool ) {
 
 		if (delegate == null || connectionPool == null) {
 			throw new NullPointerException("delegate and connectionPool can't be null");
 		}
 		this.delegate = delegate;
+		this.connectionPool = connectionPool;
 	}
 
 	@Override
 	public Statement createStatement() throws SQLException {
-		return new SingleStatement(delegate.createStatement(), this);
+		return new PhysicalStatement(delegate.createStatement(), this);
 	}
 
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-		return new SinglePrepareStatement(delegate.prepareStatement(sql), this);
+		return new PhysicalPrepareStatement(delegate.prepareStatement(sql), this);
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql) throws SQLException {
-		return new SingleCallableStatement(delegate.prepareCall(sql), this);
+		return new PhysicalCallableStatement(delegate.prepareCall(sql), this);
 	}
 
 	@Override
@@ -302,6 +303,11 @@ public class SinglePooledConnection extends WrapperAdapter implements Connection
 	void updateLastActiveTime() {
 		this.lastActiveTime = System.currentTimeMillis();
 	}
+	
+	long getLastActiveTime() {
+		return this.lastActiveTime;
+	}
+	
 
 	@Override
 	public void addConnectionEventListener(ConnectionEventListener listener) {

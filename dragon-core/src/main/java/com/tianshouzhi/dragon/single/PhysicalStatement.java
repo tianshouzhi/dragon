@@ -7,11 +7,11 @@ import java.sql.*;
 /**
  * Created by tianshouzhi on 2018/1/28.
  */
-public class SingleStatement extends WrapperAdapter implements Statement{
+public class PhysicalStatement extends WrapperAdapter implements Statement{
     protected Statement delegate;
-    protected SinglePooledConnection connection;
+    protected PhysicalPooledConnection connection;
 
-    public SingleStatement(Statement delegate, SinglePooledConnection connection) {
+    public PhysicalStatement(Statement delegate, PhysicalPooledConnection connection) {
         this.delegate = delegate;
         this.connection = connection;
     }

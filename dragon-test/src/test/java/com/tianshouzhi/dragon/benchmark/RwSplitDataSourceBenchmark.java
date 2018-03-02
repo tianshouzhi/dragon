@@ -45,7 +45,7 @@ public class RwSplitDataSourceBenchmark {
     public DataSource createMaster() throws SQLException {
         DruidDataSource druidDataSource=new DruidDataSource();
         druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
+        druidDataSource.setPassword("");
         druidDataSource.setUrl("jdbc:mysql://localhost:3306/dragon_ha");
         druidDataSource.init();
         return druidDataSource;
@@ -53,7 +53,7 @@ public class RwSplitDataSourceBenchmark {
     public DataSource createSlave1() throws SQLException {
         DruidDataSource druidDataSource=new DruidDataSource();
         druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
+        druidDataSource.setPassword("");
         druidDataSource.setUrl("jdbc:mysql://localhost:3306/dragon_ha");
         druidDataSource.init();
         return druidDataSource;
@@ -61,7 +61,7 @@ public class RwSplitDataSourceBenchmark {
     public DataSource createSlave2() throws SQLException {
         DruidDataSource druidDataSource=new DruidDataSource();
         druidDataSource.setUsername("root");
-        druidDataSource.setPassword("shxx12151022");
+        druidDataSource.setPassword("");
         druidDataSource.setUrl("jdbc:mysql://localhost:3306/dragon_ha");
         druidDataSource.init();
         return druidDataSource;

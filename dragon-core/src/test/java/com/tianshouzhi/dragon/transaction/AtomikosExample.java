@@ -21,7 +21,7 @@ public class AtomikosExample {
         Properties p = new Properties();
         p.setProperty("url", "jdbc:mysql://localhost:3306/"+dbName);
         p.setProperty("username", "root");
-        p.setProperty("password", "shxx12151022");
+        p.setProperty("password", "");
         ds.setXaProperties(p);
         ds.setPoolSize(5);
         return ds;

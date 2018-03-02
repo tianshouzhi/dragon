@@ -4,7 +4,7 @@
         <property name="url"
                   value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
+        <property name="password" value=""></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
         <property name="initialSize" value="10"></property>
         <property name="maxActive" value="50"></property>
@@ -18,7 +18,7 @@
     <realDataSource index="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
+        <property name="password" value=""></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
         <property name="initialSize" value="10"></property>
         <property name="maxActive" value="50"></property>
@@ -32,7 +32,7 @@
     <realDataSource index="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
-        <property name="password" value="shxx12151022"></property>
+        <property name="password" value=""></property>
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
         <property name="initialSize" value="10"></property>
         <property name="maxActive" value="50"></property>

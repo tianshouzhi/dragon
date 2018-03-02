@@ -1,6 +1,7 @@
 package com.tianshouzhi.dragon.single;
 
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
+import com.tianshouzhi.dragon.common.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * Created by tianshouzhi on 2018/1/28.
  */
-public abstract class DataSourceConfig extends WrapperAdapter implements DataSource {
+public abstract class PhysicalDataSourceConfig extends WrapperAdapter implements DataSource {
 	// 数据库连接参数
 	protected String username;
 
@@ -30,7 +31,7 @@ public abstract class DataSourceConfig extends WrapperAdapter implements DataSou
 	protected int maxPoolSize = 10;
 
 	protected long checkConnectionTimeout = 3000;// 链接超时时间,ms
-	
+
 	// 连接有效性检测
 	protected boolean testOnBorrow = false; // 每次获取链接时，检测链接有效性
 
@@ -38,9 +39,9 @@ public abstract class DataSourceConfig extends WrapperAdapter implements DataSou
 
 	protected long validationInterval = 5 * 60 * 1000; // 链接有效性检测周期，单位ms
 
-	protected int validationTimeout = 3; // 链接有效性检测超时时间，单位s。0秒表示不潮湿
+	protected int validationTimeout = 3; // 链接有效性检测超时时间，单位s。0秒表示不超时
 
-	protected int minEvictableIdleTime = 5 * 60 * 1000; // 链接最小存活时间 ,，默认5分钟
+	protected int minEvictableIdleTime = 5 * 60 * 1000; // 链接最小存活时间 ,默认5分钟
 
 	// 链接初始化时执行的sql
 	protected List<String> connectionInitSqls;
@@ -201,5 +202,20 @@ public abstract class DataSourceConfig extends WrapperAdapter implements DataSou
 	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		return null;
+	}
+
+	public void checkConfig() {
+		if (StringUtils.isAnyBlank(url, driverClassName)) {
+			throw new RuntimeException("url，driverClassName can't empty or blank!!!");
+		}
+		if (initPoolSize < 0 || minPoolSize < 0 || maxPoolSize < minPoolSize) {
+			throw new RuntimeException(
+					"initPoolSize，minPoolSize must greater than 0, and maxPoolSize must greater or equals to minPoolSize");
+		}
+
+		if (checkConnectionTimeout < 0) {
+			throw new RuntimeException("checkConnectionTimeout must greater or equals to 0");
+		}
+
 	}
 }
