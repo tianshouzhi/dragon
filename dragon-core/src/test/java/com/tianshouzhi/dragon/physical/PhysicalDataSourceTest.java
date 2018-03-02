@@ -1,6 +1,5 @@
 package com.tianshouzhi.dragon.physical;
 
-import com.tianshouzhi.dragon.single.PhysicalDataSource;
 import org.junit.Test;
 
 import java.sql.Connection;

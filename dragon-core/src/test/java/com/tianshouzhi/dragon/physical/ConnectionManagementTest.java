@@ -1,7 +1,6 @@
 package com.tianshouzhi.dragon.physical;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.tianshouzhi.dragon.single.PhysicalDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.Before;
 import org.junit.Test;

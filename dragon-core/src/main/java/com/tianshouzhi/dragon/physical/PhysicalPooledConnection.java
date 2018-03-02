@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.single;
+package com.tianshouzhi.dragon.physical;
 
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
