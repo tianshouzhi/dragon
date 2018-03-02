@@ -30,6 +30,7 @@ public class PhysicalDataSourceTest {
 		dataSource.setMinEvictableIdleTime(1000 * maxPoolSize);// 链接最大存活时间为10秒
 		dataSource.setValidationInterval(1000);// 1秒检测一次
 		dataSource.setCheckConnectionTimeout(1000);
+		dataSource.setValidationTimeout(1);
 		dataSource.init();
 
 		int busyCount = dataSource.getBusyCount();
@@ -50,6 +51,7 @@ public class PhysicalDataSourceTest {
 	}
 	
 	/*
+	测试init sql
 	 CREATE TABLE `user` ( `id` int(11) DEFAULT NULL, `name` varchar(255) DEFAULT NULL )
 	 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -62,7 +64,7 @@ public class PhysicalDataSourceTest {
         final PhysicalDataSource dataSource = new PhysicalDataSource();
 		String username = "root";
 		dataSource.setUsername(username);
-		String password = "";
+		String password = "shxx12151022";
 		dataSource.setPassword(password);
 		String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false";
 		dataSource.setUrl(url);

@@ -134,7 +134,8 @@ public abstract class PhysicalConnectionPool extends PhysicalDataSourceConfig im
 		if (checkConnectionTimeout > 0) {
 			connection = pool.poll(checkConnectionTimeout, TimeUnit.MILLISECONDS);
 			if (connection == null) {
-				throw new SQLException("check connection timeout[" + checkConnectionTimeout + "]!");
+				throw new SQLException("check connection timeout，can't get a connection in " + this
+						.checkConnectionTimeout + "ms!");
 			}
 		} else {
 			connection = pool.take();

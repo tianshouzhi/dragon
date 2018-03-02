@@ -36,6 +36,7 @@ public class ConnectionManagementTest {
 	}
 
 	//337111334
+	//http://brettwooldridge.github.io/HikariCP/
 	@Test
 	public void testHikariCP() {
 		final HikariDataSource dataSource = new HikariDataSource();
