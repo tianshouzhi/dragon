@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!--定义DragonHADatasource-->
-    <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource" init-method="init" destroy-method="close">
+    <bean id="dragon-ha-datasource" class="com.tianshouzhi.dragon.ha.jdbc.HADatasource" init-method="init" destroy-method="close">
         <property name="configFile" value="ha/dragon-ha.properties"></property>
     </bean>
 

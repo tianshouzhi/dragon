@@ -1,10 +1,9 @@
-package com.tianshouzhi.dragon.ha.jdbc.statement;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
-import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.sql.Connection;
 import java.sql.SQLException;

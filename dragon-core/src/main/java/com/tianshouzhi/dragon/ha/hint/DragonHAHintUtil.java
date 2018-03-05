@@ -23,10 +23,6 @@ public class DragonHAHintUtil {
 		hint.set(true);
 	}
 
-	public static void forceMaster(boolean forceMaster) {
-		hint.set(forceMaster);
-	}
-
 	public static boolean isForceMaster() {
 		return hint.get();
 	}

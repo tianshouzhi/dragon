@@ -1,7 +1,7 @@
-package com.tianshouzhi.dragon.ha.jdbc.datasource;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.common.util.StringUtils;
@@ -11,7 +11,6 @@ import com.tianshouzhi.dragon.ha.config.HALocalConfigManager;
 import com.tianshouzhi.dragon.ha.config.RealDataSourceConfig;
 import com.tianshouzhi.dragon.ha.exception.DataSourceMonitor;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
-import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 import com.tianshouzhi.dragon.ha.router.RouterManager;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
@@ -25,9 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/2.
  */
-public class DragonHADatasource extends DragonDataSourceAdapter {
+public class HADatasource extends DataSourceAdapter {
 
-    private static final Log LOGGER = LoggerFactory.getLogger(DragonHADatasource.class);
+    private static final Log LOGGER = LoggerFactory.getLogger(HADatasource.class);
 
     private boolean lazyInit = true;
 
@@ -42,7 +41,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
     @Override
     protected void doInit() throws Exception {
         initDsName();
-        LOGGER.info("init DragonHADatasource(" + dsName + ")");
+        LOGGER.info("init HADatasource(" + dsName + ")");
         initConfigManager();
         initRealDSMap();
         initRouterManager();
@@ -126,7 +125,7 @@ public class DragonHADatasource extends DragonDataSourceAdapter {
 
     @Override
     public void close() throws DragonException {
-        LOGGER.info(" close DragonHADatasource(" + getDsName() + ")");
+        LOGGER.info(" close HADatasource(" + getDsName() + ")");
         for (RealDataSourceWrapper realDataSourceWrapper : this.realDSMap.values()) {
             realDataSourceWrapper.close();
         }

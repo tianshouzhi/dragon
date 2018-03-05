@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.ha;
 
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
+import com.tianshouzhi.dragon.ha.jdbc.DragonHAConnection;
+import com.tianshouzhi.dragon.ha.jdbc.HADatasource;
 import org.junit.*;
 
 import javax.sql.DataSource;
@@ -21,7 +21,7 @@ public class DragonHAApiTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        DragonHADatasource dragonHADatasource=new DragonHADatasource();
+        HADatasource dragonHADatasource=new HADatasource();
         dragonHADatasource.setConfigFile("ha/dragon-ha.properties");
         dragonHADatasource.setLazyInit(false);
         dragonHADatasource.init();
@@ -42,7 +42,7 @@ public class DragonHAApiTest {
     @AfterClass
     public static void afterClass() throws Exception {
         if (datasource != null)
-            ((DragonHADatasource) datasource).close();
+            ((HADatasource) datasource).close();
     }
 
     @Test

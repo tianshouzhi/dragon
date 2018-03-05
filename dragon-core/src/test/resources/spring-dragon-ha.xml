@@ -9,7 +9,7 @@
                   value="jdbc:mysql://localhost:3306/dragon_ha?userUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"></property>
     </bean>
 
-    <bean id="dragon-ha" class="com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource" init-method="init">
+    <bean id="dragon-ha" class="com.tianshouzhi.dragon.ha.jdbc.HADatasource" init-method="init">
 
     </bean>
 </beans>

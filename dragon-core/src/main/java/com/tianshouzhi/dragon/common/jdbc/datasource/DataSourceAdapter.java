@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  * Created by TIANSHOUZHI336 on 2016/11/30.
  */
-public abstract class DragonDataSourceAdapter extends WrapperAdapter implements DragonDataSource {
+public abstract class DataSourceAdapter extends WrapperAdapter implements DragonDataSource {
 
 	protected int loginTimeout = 0;
 

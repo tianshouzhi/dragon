@@ -1,12 +1,9 @@
-package com.tianshouzhi.dragon.ha.jdbc.connection;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.datasource.DragonHADatasource;
-import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAPrepareStatement;
-import com.tianshouzhi.dragon.ha.jdbc.statement.DragonHAStatement;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import java.sql.*;
@@ -27,11 +24,11 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 
 	protected Boolean isRead;
 
-	protected DragonHADatasource dragonHADatasource;
+	protected HADatasource dragonHADatasource;
 
 	private String realDSName;// 当前连接是从哪一个数据源中获取的
 
-	public DragonHAConnection(String username, String password, DragonHADatasource dragonHADatasource)
+	public DragonHAConnection(String username, String password, HADatasource dragonHADatasource)
 	      throws SQLException {
 		super(username, password);
 		if (dragonHADatasource == null) {

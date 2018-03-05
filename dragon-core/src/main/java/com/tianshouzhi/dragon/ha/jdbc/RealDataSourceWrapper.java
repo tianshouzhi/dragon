@@ -1,8 +1,8 @@
-package com.tianshouzhi.dragon.ha.jdbc.datasource;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Created by tianshouzhi on 2017/11/1.
  */
-public class RealDataSourceWrapper extends DragonDataSourceAdapter implements DragonDataSource {
+public class RealDataSourceWrapper extends DataSourceAdapter implements DragonDataSource {
 
     private static final Log LOGGER = LoggerFactory.getLogger(RealDataSourceWrapper.class);
     private String haDSName;

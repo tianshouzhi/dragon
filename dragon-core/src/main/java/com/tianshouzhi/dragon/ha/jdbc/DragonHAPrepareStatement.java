@@ -1,10 +1,9 @@
-package com.tianshouzhi.dragon.ha.jdbc.statement;
+package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonPrepareStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.ha.jdbc.connection.DragonHAConnection;
 
 import java.io.InputStream;
 import java.io.Reader;

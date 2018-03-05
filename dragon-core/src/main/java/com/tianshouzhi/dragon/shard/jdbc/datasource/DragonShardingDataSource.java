@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.shard.jdbc.datasource;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSourceAdapter;
+import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceAdapter;
 import com.tianshouzhi.dragon.common.util.StringUtils;
 import com.tianshouzhi.dragon.shard.jdbc.connection.DragonShardingConnection;
 import com.tianshouzhi.dragon.shard.route.LogicDatasource;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by TIANSHOUZHI336 on 2016/12/11.
  */
-public class DragonShardingDataSource extends DragonDataSourceAdapter {
+public class DragonShardingDataSource extends DataSourceAdapter {
 	// 原始配置信息
 	private Properties configProperties;
 

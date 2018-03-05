@@ -1,4 +1,4 @@
-package com.tianshouzhi.dragon.ha.exception;
+package com.tianshouzhi.dragon.ha.util;
 
 import java.sql.SQLException;
 
