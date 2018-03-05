@@ -4,7 +4,6 @@ import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
 import com.tianshouzhi.dragon.ha.exception.DragonHAException;
 import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.util.DatasourceUtil;
 
 import java.sql.*;
 import java.util.Properties;
@@ -192,7 +191,6 @@ public class DragonHAConnection extends DragonConnection implements Connection {
 		if (this.realConnection == null || isRead) {
 			this.realDSName = this.dragonHADatasource.getRouterManager().routeWrite();
 			this.isRead = false;
-			DatasourceUtil.close(realConnection);
 			this.realConnection = this.dragonHADatasource.getConnectionByRealDSName(realDSName);
 			setConnectionParams(this.realConnection);
 			return this.realConnection;

@@ -131,7 +131,7 @@ public class HADatasource extends DataSourceAdapter {
         }
     }
 
-    public void setConfigFile(String configFile) {
+    public void setLocalConfigPath(String configFile) {
         this.configFile = configFile;
     }
 

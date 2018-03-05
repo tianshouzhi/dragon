@@ -22,7 +22,7 @@ public class DragonHAApiTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         HADatasource dragonHADatasource=new HADatasource();
-        dragonHADatasource.setConfigFile("ha/dragon-ha.properties");
+        dragonHADatasource.setLocalConfigPath("dragon-ha.properties");
         dragonHADatasource.setLazyInit(false);
         dragonHADatasource.init();
         datasource = dragonHADatasource;
