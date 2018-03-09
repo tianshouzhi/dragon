@@ -23,7 +23,7 @@
             <!--select LAST_INSERT_ID()-->
         <!--</selectKey>-->
         INSERT INTO user (name) VALUES
-        <foreach collection="list"  item="user" index="index" separator="," >
+        <foreach collection="list"  item="user" realDsName="realDsName" separator="," >
             (#{user.name})
         </foreach>;
     </insert>
@@ -67,7 +67,7 @@
         UPDATE user
         <trim prefix="SET" suffixOverrides=",">
             <trim prefix="name =CASE id" suffix="END,">
-                <foreach collection="list" item="user" index="index">
+                <foreach collection="list" item="user" realDsName="realDsName">
                     WHEN #{user.id} THEN #{user.name}
                 </foreach>
             </trim>

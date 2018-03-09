@@ -20,18 +20,6 @@ public abstract class DataSourceAdapter extends WrapperAdapter implements Dragon
 
 	protected volatile boolean init = false;
 
-	protected String dsName;
-
-	@Override
-	public String getDsName() {
-		return dsName;
-	}
-
-	@Override
-	public void setDsName(String dsName) {
-		this.dsName = dsName;
-	}
-
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return logWriter;

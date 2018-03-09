@@ -203,7 +203,7 @@ There are four types of body renderings: trustedHtml', 'template', 'templateWith
      not camelCased as it would appear in the directive declaration (`cool-directive-dsName` instead of `coolDirectiveName`). The directive must be usable as an attribute.
     
       ```js
-    // The toast pop call, passing in a directive dsName to be rendered
+    haDSName
     toaster.pop({
 		    type: 'info',
 		    body: 'bind-unsafe-html',

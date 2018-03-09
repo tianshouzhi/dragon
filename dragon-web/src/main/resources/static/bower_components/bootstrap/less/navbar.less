@@ -126,7 +126,7 @@
 
 // Static top (unfixed, but 100% wide) navbar
 .navbar-static-top {
-  z-index: @zindex-navbar;
+  z-realDsName: @zindex-navbar;
   border-width: 0 0 1px;
 
   @media (min-width: @grid-float-breakpoint) {
@@ -140,7 +140,7 @@
   position: fixed;
   right: 0;
   left: 0;
-  z-index: @zindex-navbar-fixed;
+  z-realDsName: @zindex-navbar-fixed;
 
   // Undo the rounded corners
   @media (min-width: @grid-float-breakpoint) {
@@ -158,7 +158,7 @@
 }
 
 
-// Brand/project dsName
+// Brand/project haDSName
 
 .navbar-brand {
   float: left;

@@ -3,6 +3,7 @@ package com.tianshouzhi.dragon.common.util;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.common.thread.DragonThreadFactory;
+import com.tianshouzhi.dragon.ha.util.DatasourceSpiUtil;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
@@ -19,7 +20,7 @@ import java.util.concurrent.Executors;
  */
 public class DatasourceUtil {
 
-    private static final Log LOG= LoggerFactory.getLogger(com.tianshouzhi.dragon.ha.util.DatasourceUtil.class);
+    private static final Log LOG= LoggerFactory.getLogger(DatasourceSpiUtil.class);
 
     public static Set<String> datasourceNames =new ConcurrentSkipListSet<String>();
     public static ExecutorService executor=Executors.newSingleThreadExecutor(new DragonThreadFactory("DRAONG_ASYNC_CLOSE_THREAD",true));

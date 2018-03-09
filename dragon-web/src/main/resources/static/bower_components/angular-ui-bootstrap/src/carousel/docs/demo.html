@@ -1,7 +1,7 @@
 <div ng-controller="CarouselDemoCtrl">
   <div style="height: 305px">
     <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
-      <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id">
+      <div uib-slide ng-repeat="slide in slides track by slide.id" realDsName="slide.id">
         <img ng-src="{{slide.image}}" style="margin:auto;">
         <div class="carousel-caption">
           <h4>Slide {{slide.id}}</h4>

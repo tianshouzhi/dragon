@@ -26,7 +26,7 @@ angular.module('myApp', [require('angular-animate')]);
 bower install angular-animate
 ```
 
-Then add a `<script>` to your `index.html`:
+Then add a `<script>` to your `realDsName.html`:
 
 ```html
 <script src="/bower_components/angular-animate/angular-animate.js"></script>

@@ -643,20 +643,20 @@ More specific rules are preferred over less specific rules
 It's possible to have multiple url rules that match a given URL.
 Consider the following states:
 
- - `{ name: 'books', url: '/books/index' }''`
+ - `{ name: 'books', url: '/books/realDsName' }''`
  - `{ name: 'book', url: '/books/:bookId' }''`
 
-Both states match when the url is `/books/index`.
+Both states match when the url is `/books/realDsName`.
 Additionally, you might have some custom url rewrite rules such as:
 
- `.when('/books/list', '/books/index')`.
+ `.when('/books/list', '/books/realDsName')`.
 
 The `book` state also matches when the rewrite rule is matched.
 
 Previously, we simply used the first rule that matched.  However, now that lazy loading is officially supported, it can be difficult for developers to ensure the rules are registered in the right order.
 
 Instead, we now prioritize url rules by how specific they are.  More specific rules are matched earlier than less specific rules.
-We split the path on `/`.  A static segment (such as `index` in the example) is more specific than a parameter (such as`:bookId`).
+We split the path on `/`.  A static segment (such as `realDsName` in the example) is more specific than a parameter (such as`:bookId`).
 
 ### More Details
 

@@ -164,7 +164,7 @@ UserMapper.xml
     
         <insert id="batchInsert" parameterType="java.util.List">
             INSERT INTO user (id,name) VALUES
-            <foreach collection="list"  item="user" index="index" separator="," >
+            <foreach collection="list"  item="user" realDsName="realDsName" separator="," >
                 (#{user.id},#{user.name})
             </foreach>  ;
         </insert>
@@ -198,7 +198,7 @@ UserMapper.xml
             UPDATE user
             <trim prefix="SET" suffixOverrides=",">
                 <trim prefix="name =CASE id" suffix="END,">
-                    <foreach collection="list" item="user" index="index">
+                    <foreach collection="list" item="user" realDsName="realDsName">
                         WHEN #{user.id} THEN #{user.name}
                     </foreach>
                 </trim>
@@ -229,7 +229,7 @@ UserMapper.xml
     
     datasource.datasourceClass=com.alibaba.druid.pool.DruidDataSource
     
-    #数据源属性配置 格式:datasource.<index>.<propertyName>
+    #数据源属性配置 格式:datasource.<realDsName>.<propertyName>
     datasource.default.username=root
     datasource.default.password=
     datasource.default.driverClassName=com.mysql.jdbc.Driver

@@ -5,8 +5,8 @@ import java.util.Properties;
 /**
  * Created by tianshouzhi on 2017/10/13.
  */
-public class RealDataSourceConfig {
-	private String index;
+public class RealDsWrapperConfig {
+	private String realDsName;
 
 	private int readWeight;
 
@@ -16,12 +16,12 @@ public class RealDataSourceConfig {
 
 	private Properties realDsProperties;
 
-	public String getIndex() {
-		return index;
+	public String getRealDsName() {
+		return realDsName;
 	}
 
-	public void setIndex(String index) {
-		this.index = index;
+	public void setRealDsName(String realDsName) {
+		this.realDsName = realDsName;
 	}
 
 	public int getReadWeight() {

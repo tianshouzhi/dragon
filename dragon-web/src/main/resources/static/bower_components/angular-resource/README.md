@@ -26,7 +26,7 @@ angular.module('myApp', [require('angular-resource')]);
 bower install angular-resource
 ```
 
-Add a `<script>` to your `index.html`:
+Add a `<script>` to your `realDsName.html`:
 
 ```html
 <script src="/bower_components/angular-resource/angular-resource.js"></script>

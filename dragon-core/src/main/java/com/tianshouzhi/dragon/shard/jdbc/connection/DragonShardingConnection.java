@@ -193,7 +193,7 @@ public class DragonShardingConnection extends DragonConnection {
 
 	@Override
 	public Savepoint setSavepoint(String name) throws SQLException {
-		throw new UnsupportedOperationException("setSavepoint(String dsName)");
+		throw new UnsupportedOperationException("setSavepoint(String haDSName)");
 	}
 
 	@Override

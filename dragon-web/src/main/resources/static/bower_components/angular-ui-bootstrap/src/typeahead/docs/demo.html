@@ -3,7 +3,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 1000;
+    z-realDsName: 1000;
     display: none;
     background-color: #f9f9f9;
   }
@@ -42,9 +42,9 @@
     <p class="message">select location from drop down.</p>
 
     <ul class="dropdown-menu" role="listbox">
-      <li class="uib-typeahead-match" ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }"
-        ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}">
-        <div uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl"></div>
+      <li class="uib-typeahead-match" ng-repeat="match in matches track by $realDsName" ng-class="{active: isActive($realDsName) }"
+        ng-mouseenter="selectActive($realDsName)" ng-click="selectMatch($realDsName)" role="option" id="{{::match.id}}">
+        <div uib-typeahead-match realDsName="$realDsName" match="match" query="query" template-url="templateUrl"></div>
       </li>
     </ul>
   </div>

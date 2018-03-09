@@ -3,7 +3,7 @@
   <div class="tab-content">
     <div class="tab-pane"
          ng-repeat="tab in tabset.tabs"
-         ng-class="{active: tabset.active === tab.index}"
+         ng-class="{active: tabset.active === tab.realDsName}"
          uib-tab-content-transclude="tab">
     </div>
   </div>

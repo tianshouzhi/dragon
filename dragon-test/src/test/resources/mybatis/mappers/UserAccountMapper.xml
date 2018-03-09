@@ -19,7 +19,7 @@
 
     <insert id="batchInsert" parameterType="java.util.List">
         INSERT INTO user_account (user_id,account_no,money) VALUES
-        <foreach collection="list"  item="userAccount" index="index" separator="," >
+        <foreach collection="list"  item="userAccount" realDsName="realDsName" separator="," >
             (#{userAccount.user_id},#{userAccount.accountNo},#{userAccount.money})
         </foreach>  ;
     </insert>

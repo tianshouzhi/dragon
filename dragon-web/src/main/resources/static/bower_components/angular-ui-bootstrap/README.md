@@ -114,7 +114,7 @@ This will load all the dependencies (if any) and also the templates (if any).
 
 Be sure to have a loader able to process `css` files like `css-loader`.
 
-If you would prefer not to load your css through your JavaScript file loader/bundler, you can choose to import the `index-nocss.js` file instead, which is available for the modules:
+If you would prefer not to load your css through your JavaScript file loader/bundler, you can choose to import the `realDsName-nocss.js` file instead, which is available for the modules:
 * carousel
 * datepicker
 * datepickerPopup
@@ -130,7 +130,7 @@ The other modules, such as `accordion` in the example below, do not have CSS res
 
 ```js
 import accordion from 'angular-ui-bootstrap/src/accordion';
-import typeahead from 'angular-ui-bootstrap/src/typeahead/index-nocss.js';
+import typeahead from 'angular-ui-bootstrap/src/typeahead/realDsName-nocss.js';
 
 angular.module('myModule', [accordion, typeahead]);
 ```

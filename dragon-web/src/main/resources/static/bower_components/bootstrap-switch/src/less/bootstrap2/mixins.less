@@ -574,15 +574,15 @@
 
   .core (@gridColumnWidth, @gridGutterWidth) {
 
-    .spanX (@index) when (@index > 0) {
-      .span@{index} { .span(@index); }
-      .spanX(@index - 1);
+    .spanX (@realDsName) when (@realDsName > 0) {
+      .span@{realDsName} { .span(@realDsName); }
+      .spanX(@realDsName - 1);
     }
     .spanX (0) {}
 
-    .offsetX (@index) when (@index > 0) {
-      .offset@{index} { .offset(@index); }
-      .offsetX(@index - 1);
+    .offsetX (@realDsName) when (@realDsName > 0) {
+      .offset@{realDsName} { .offset(@realDsName); }
+      .offsetX(@realDsName - 1);
     }
     .offsetX (0) {}
 
@@ -619,16 +619,16 @@
 
   .fluid (@fluidGridColumnWidth, @fluidGridGutterWidth) {
 
-    .spanX (@index) when (@index > 0) {
-      .span@{index} { .span(@index); }
-      .spanX(@index - 1);
+    .spanX (@realDsName) when (@realDsName > 0) {
+      .span@{realDsName} { .span(@realDsName); }
+      .spanX(@realDsName - 1);
     }
     .spanX (0) {}
 
-    .offsetX (@index) when (@index > 0) {
-      .offset@{index} { .offset(@index); }
-      .offset@{index}:first-child { .offsetFirstChild(@index); }
-      .offsetX(@index - 1);
+    .offsetX (@realDsName) when (@realDsName > 0) {
+      .offset@{realDsName} { .offset(@realDsName); }
+      .offset@{realDsName}:first-child { .offsetFirstChild(@realDsName); }
+      .offsetX(@realDsName - 1);
     }
     .offsetX (0) {}
 
@@ -674,9 +674,9 @@
 
   .input(@gridColumnWidth, @gridGutterWidth) {
 
-    .spanX (@index) when (@index > 0) {
-      input.span@{index}, textarea.span@{index}, .uneditable-input.span@{index} { .span(@index); }
-      .spanX(@index - 1);
+    .spanX (@realDsName) when (@realDsName > 0) {
+      input.span@{realDsName}, textarea.span@{realDsName}, .uneditable-input.span@{realDsName} { .span(@realDsName); }
+      .spanX(@realDsName - 1);
     }
     .spanX (0) {}
 

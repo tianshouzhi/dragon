@@ -17,9 +17,9 @@ import java.util.concurrent.Executors;
 /**
  * Created by tianshouzhi on 2017/11/1.
  */
-public class DatasourceUtil {
+public class DatasourceSpiUtil {
 
-	private static final Log LOG = LoggerFactory.getLogger(DatasourceUtil.class);
+	private static final Log LOG = LoggerFactory.getLogger(DatasourceSpiUtil.class);
 
 	public static Set<String> datasourceNames = new ConcurrentSkipListSet<String>();
 
@@ -58,14 +58,14 @@ public class DatasourceUtil {
 		}
 	}
 
-	public static void close(final String haDSName, final String realDSName, DataSource dataSource) {
+	public static void close(DataSource dataSource) {
 		try {
 			Method closeMethod = dataSource.getClass().getDeclaredMethod("close");
 			if (closeMethod != null) {
 				closeMethod.invoke(dataSource);
 			}
 		} catch (Exception e) {
-			LOG.error("close real datasource " + haDSName + "." + realDSName + " error", e);
+			LOG.error("close real datasource error", e);
 		}
 	}
 

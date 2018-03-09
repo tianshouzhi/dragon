@@ -14,7 +14,7 @@ import java.util.Properties;
 public class HADataSourceConfig {
 	private Properties properties;
 
-	private Map<String, RealDataSourceConfig> realDataSourceConfigMap = new HashMap<String, RealDataSourceConfig>(4);
+	private Map<String, RealDsWrapperConfig> realDataSourceConfigMap = new HashMap<String, RealDsWrapperConfig>(4);
 
 	public HADataSourceConfig(Properties properties) {
 		this.properties = properties;
@@ -38,8 +38,8 @@ public class HADataSourceConfig {
 					dsProperties.put(dsPropertyName, dsPropertyValue);
 				}
 			}
-			RealDataSourceConfig realDataSourceConfig = new RealDataSourceConfig();
-			realDataSourceConfig.setIndex(_dsName);
+			RealDsWrapperConfig realDataSourceConfig = new RealDsWrapperConfig();
+			realDataSourceConfig.setRealDsName(_dsName);
 			realDataSourceConfig.setRealDsClass(dsClass);
 			realDataSourceConfig.setReadWeight(Integer.parseInt(readWeight));
 			realDataSourceConfig.setWriteWeight(Integer.parseInt(writeWeight));
@@ -52,7 +52,7 @@ public class HADataSourceConfig {
 		return properties;
 	}
 
-	public Map<String, RealDataSourceConfig> getRealDataSourceConfigMap() {
+	public Map<String, RealDsWrapperConfig> getRealDataSourceConfigMap() {
 		return realDataSourceConfigMap;
 	}
 

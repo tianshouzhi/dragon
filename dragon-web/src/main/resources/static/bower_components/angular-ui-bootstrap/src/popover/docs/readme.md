@@ -116,7 +116,7 @@ methods are available:
 
 ### Known issues
 
-For Safari 7+ support, if you want to use **focus** `popover-trigger`, you need to use an anchor tag with a tab index. For example:
+For Safari 7+ support, if you want to use **focus** `popover-trigger`, you need to use an anchor tag with a tab realDsName. For example:
 
 ```
 <a tabindex="0" uib-popover="Test" popover-trigger="focus" class="btn btn-default">

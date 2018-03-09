@@ -25,8 +25,8 @@ public class ConnectionManagementTest {
 	@Test
 	public void testDruid() {
 		final DruidDataSource dataSource = new DruidDataSource(false);
-		dataSource.setUsername("root");
-		dataSource.setPassword("");
+		dataSource.setUsername("dragon_ha");
+		dataSource.setPassword("dragon_ha");
 		dataSource.setUrl("jdbc:mysql://localhost:3306/test");
 		dataSource.setInitialSize(5);
 		dataSource.setMaxActive(10);
@@ -43,8 +43,8 @@ public class ConnectionManagementTest {
 		dataSource.setConnectionTimeout(1000);
 		dataSource.setMinimumIdle(5);
 		dataSource.setMaximumPoolSize(10);
-		dataSource.setUsername("root");
-		dataSource.setPassword("");
+		dataSource.setUsername("dragon_ha");
+		dataSource.setPassword("dragon_ha");
 		dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/test");
 		doTest(dataSource);
 	}
@@ -52,8 +52,8 @@ public class ConnectionManagementTest {
 	@Test
 	public void testPhysical() {
 		final PhysicalDataSource dataSource = new PhysicalDataSource();
-		dataSource.setUsername("root");
-		dataSource.setPassword("");
+		dataSource.setUsername("dragon_ha");
+		dataSource.setPassword("dragon_ha");
 		dataSource.setUrl("jdbc:mysql://localhost:3306/test");
 		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
 		dataSource.setInitPoolSize(5);

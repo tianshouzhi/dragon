@@ -12,23 +12,28 @@ import java.util.Properties;
  */
 public class HALocalConfigManager implements HAConfigManager {
 
-	private String configFile;
+	private String localConfigPath;
 
-	public HALocalConfigManager(String configFile) {
-		if (StringUtils.isBlank(configFile)) {
-			throw new NullPointerException("configFile can't be blank!");
+	private HADataSourceConfig haConfig;
+
+	public HALocalConfigManager(String localConfigPath) {
+		if (StringUtils.isBlank(localConfigPath)) {
+			throw new NullPointerException("localConfigPath can't be blank!");
 		}
-		this.configFile = configFile;
+		this.localConfigPath = localConfigPath;
 	}
 
 	@Override
 	public HADataSourceConfig getHADataSourceConfig() {
-		InputStream in = HALocalConfigManager.class.getClassLoader().getResourceAsStream(configFile);
+		if (haConfig != null) {
+			return haConfig;
+		}
+		InputStream in = HALocalConfigManager.class.getClassLoader().getResourceAsStream(localConfigPath);
 		Properties properties = new Properties();
 		try {
 			properties.load(in);
 		} catch (IOException e) {
-			throw new DragonException("load config from classpath:" + configFile + " error!");
+			throw new DragonException("load config from classpath:" + localConfigPath + " error!");
 		}
 		return new HADataSourceConfig(properties);
 	}

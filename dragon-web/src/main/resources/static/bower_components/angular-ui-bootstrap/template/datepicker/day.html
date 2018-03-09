@@ -7,12 +7,12 @@
     </tr>
     <tr>
       <th ng-if="showWeeks" class="text-center"></th>
-      <th ng-repeat="label in ::labels track by $index" class="text-center"><small aria-label="{{::label.full}}">{{::label.abbr}}</small></th>
+      <th ng-repeat="label in ::labels track by $realDsName" class="text-center"><small aria-label="{{::label.full}}">{{::label.abbr}}</small></th>
     </tr>
   </thead>
   <tbody>
-    <tr class="uib-weeks" ng-repeat="row in rows track by $index" role="row">
-      <td ng-if="showWeeks" class="text-center h6"><em>{{ weekNumbers[$index] }}</em></td>
+    <tr class="uib-weeks" ng-repeat="row in rows track by $realDsName" role="row">
+      <td ng-if="showWeeks" class="text-center h6"><em>{{ weekNumbers[$realDsName] }}</em></td>
       <td ng-repeat="dt in row" class="uib-day text-center" role="gridcell"
         id="{{::dt.uid}}"
         ng-class="::dt.customClass">

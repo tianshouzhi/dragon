@@ -3,7 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
-import com.tianshouzhi.dragon.ha.exception.DragonHAException;
+import com.tianshouzhi.dragon.ha.exception.HAException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,26 +15,26 @@ import static com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement.Execu
 /**
  * Created by TIANSHOUZHI336 on 2016/12/3.
  */
-public class DragonHAStatement extends DragonStatement implements Statement {
+public class HAStatement extends DragonStatement implements Statement {
 
-    private static final Log LOG = LoggerFactory.getLogger(DragonHAStatement.class);
+    private static final Log LOG = LoggerFactory.getLogger(HAStatement.class);
 
-    protected DragonHAConnection dragonHAConnection;
+    protected HAConnection dragonHAConnection;
 
     protected Statement realStatement;
 
-    public DragonHAStatement(DragonHAConnection dragonConnection) {
+    public HAStatement(HAConnection dragonConnection) {
         super();
         this.dragonHAConnection = dragonConnection;
     }
 
-    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, DragonHAConnection dragonConnection) {
+    public HAStatement(Integer resultSetType, Integer resultSetConcurrency, HAConnection dragonConnection) {
         super(resultSetType, resultSetConcurrency);
         this.dragonHAConnection = dragonConnection;
     }
 
-    public DragonHAStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability,
-                             DragonHAConnection dragonConnection) {
+    public HAStatement(Integer resultSetType, Integer resultSetConcurrency, Integer resultSetHoldability,
+                       HAConnection dragonConnection) {
         super(resultSetType, resultSetConcurrency, resultSetHoldability);
         this.dragonHAConnection = dragonConnection;
     }
@@ -168,7 +168,7 @@ public class DragonHAStatement extends DragonStatement implements Statement {
                 batchExecuteResult = realStatement.executeBatch();
                 break;
             default:
-                throw new DragonHAException("unkown execute type " + executeType + ",sql :" + sql);
+                throw new HAException("unkown execute type " + executeType + ",sql :" + sql);
         }
         return isResultSet;
     }

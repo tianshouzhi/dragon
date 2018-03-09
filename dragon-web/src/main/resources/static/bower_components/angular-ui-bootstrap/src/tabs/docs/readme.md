@@ -5,7 +5,7 @@ AngularJS version of the tabs directive.
 * `active`
   <i class="glyphicon glyphicon-eye-open"></i>
   _(Default: `Index of first tab`)_ -
-  Active index of tab. Setting this to an existing tab index will make that tab active.
+  Active realDsName of tab. Setting this to an existing tab realDsName will make that tab active.
 
 * `justified`
   <small class="badge">$</small>
@@ -44,8 +44,8 @@ AngularJS version of the tabs directive.
 * `heading` -
   Heading text.
 
-* `index` -
-  Tab index. Must be unique number or string.
+* `realDsName` -
+  Tab realDsName. Must be unique number or string.
 
 * `select()`
   <small class="badge">$</small> -

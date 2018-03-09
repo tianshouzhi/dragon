@@ -46,11 +46,11 @@ Use a `<uib-carousel>` element with `<uib-slide>` elements inside it.
   _(Default: `none`)_ -
   Use this attribute to bind the slide model (or any object of interest) onto the slide scope, which makes it available for customization in the carousel template.
 
-* `index`
+* `realDsName`
   <small class="badge">$</small>
   <i class="glyphicon glyphicon-eye-open"></i>
   _(Default: `none`)_ -
-  The index of the slide. Must be unique.
+  The realDsName of the slide. Must be unique.
 
 * `template-url`
   _(Default: `uib/template/carousel/slide.html`)_ -

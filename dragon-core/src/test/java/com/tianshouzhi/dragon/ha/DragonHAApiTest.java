@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.ha;
 
-import com.tianshouzhi.dragon.ha.hint.DragonHAHintUtil;
-import com.tianshouzhi.dragon.ha.jdbc.DragonHAConnection;
+import com.tianshouzhi.dragon.ha.hint.HAHintUtil;
+import com.tianshouzhi.dragon.ha.jdbc.HAConnection;
 import com.tianshouzhi.dragon.ha.jdbc.HADatasource;
 import org.junit.*;
 
@@ -164,12 +164,12 @@ public class DragonHAApiTest {
         try {
             PreparedStatement select = connection.prepareStatement("SELECT * FROM user");
             select.execute();
-            String realDSName = ((DragonHAConnection) connection).getRealDSName();
+            String realDSName = ((HAConnection) connection).getRealDSName();
             assert "master".equals(realDSName);
 
             PreparedStatement insert2 = connection.prepareStatement("INSERT INTO user(name) VALUES ('wangxiaoxiao')");
             insert2.execute();
-            realDSName = ((DragonHAConnection) connection).getRealDSName();
+            realDSName = ((HAConnection) connection).getRealDSName();
             assert "master".equals(realDSName);
             connection.commit();
         } catch (Exception e) {
@@ -197,7 +197,7 @@ public class DragonHAApiTest {
     @Test
     public void testCallableStatement() throws SQLException {
         CallableStatement callableStatement = connection.prepareCall("{call getTestData(?, ?)}");
-        String realDSName = ((DragonHAConnection) connection).getRealDSName();
+        String realDSName = ((HAConnection) connection).getRealDSName();
         assert "master".equals(realDSName);
     }
 
@@ -210,14 +210,14 @@ public class DragonHAApiTest {
     public void testRWSplit() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
         preparedStatement.execute();
-        String realDSName = ((DragonHAConnection) connection).getRealDSName();
+        String realDSName = ((HAConnection) connection).getRealDSName();
         assert Arrays.asList("slave1", "slave2").contains(realDSName);
         preparedStatement.close();
 
         Statement statement = connection.createStatement();
         statement.execute("INSERT INTO user(name) VALUES ('huhuamin')");
 
-        realDSName = ((DragonHAConnection) connection).getRealDSName();
+        realDSName = ((HAConnection) connection).getRealDSName();
         statement.close();
 
         assert "master".equals(realDSName);
@@ -228,14 +228,14 @@ public class DragonHAApiTest {
 
     @Test
     public void testApiHint() throws SQLException {
-        DragonHAHintUtil.forceMaster();
+        HAHintUtil.forceMaster();
         Statement statement = connection.createStatement();
         statement.executeQuery("SELECT * FROM user ");
 
-        String realDSName = ((DragonHAConnection) connection).getRealDSName();
+        String realDSName = ((HAConnection) connection).getRealDSName();
         assert "master" .equals(realDSName) ;
 
-        DragonHAHintUtil.clear();
+        HAHintUtil.clear();
     }
 
     @Test
@@ -243,7 +243,7 @@ public class DragonHAApiTest {
         Statement statement = connection.createStatement();
         statement.executeQuery("/*master*/ SELECT * FROM user ");
 
-        String realDSName = ((DragonHAConnection) connection).getRealDSName();
+        String realDSName = ((HAConnection) connection).getRealDSName();
         assert "master" .equals(realDSName) ;
     }
 
@@ -256,7 +256,7 @@ public class DragonHAApiTest {
         int i = 0;
         while (i < 3000) {
             try {
-                DragonHAConnection connection = (DragonHAConnection) datasource.getConnection();
+                HAConnection connection = (HAConnection) datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user ");
                 ResultSet resultSet = preparedStatement.executeQuery();
                 String dataSourceIndex = connection.getRealDSName();

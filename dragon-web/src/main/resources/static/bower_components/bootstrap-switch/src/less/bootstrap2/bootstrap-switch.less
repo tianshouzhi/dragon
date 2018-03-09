@@ -11,7 +11,7 @@
   text-align: left;
   overflow: hidden;
   line-height: 8px;
-  z-index: 0;
+  z-realDsName: 0;
   .user-select(none);
   vertical-align: middle;
   .transition(~"border-color ease-in-out .15s, box-shadow ease-in-out .15s");
@@ -40,7 +40,7 @@
   .@{bootstrap-switch-base}-handle-on,
   .@{bootstrap-switch-base}-handle-off {
     text-align: center;
-    z-index: 1;
+    z-realDsName: 1;
 
     &.@{bootstrap-switch-base}-primary {
       .buttonBackground(@btnPrimaryBackgroundHighlight, @btnPrimaryBackground);
@@ -71,7 +71,7 @@
     text-align: center;
     margin-top: -1px;
     margin-bottom: -1px;
-    z-index: 100;
+    z-realDsName: 100;
     border-left: 1px solid @btnBorder;
     border-right: 1px solid @btnBorder;
     .buttonBackground(@btnBackground, @btnBackgroundHighlight, @grayDark);
@@ -95,7 +95,7 @@
     top: 0;
     left: 0;
     .opacity(0);
-    z-index: -1;
+    z-realDsName: -1;
     visibility: hidden;
 
     &.form-control {

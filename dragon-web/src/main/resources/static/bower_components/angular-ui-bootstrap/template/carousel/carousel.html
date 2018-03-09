@@ -8,7 +8,7 @@
   <span class="sr-only">next</span>
 </a>
 <ol class="carousel-indicators" ng-show="slides.length > 1">
-  <li ng-repeat="slide in slides | orderBy:indexOfSlide track by $index" ng-class="{ active: isActive(slide) }" ng-click="select(slide)">
-    <span class="sr-only">slide {{ $index + 1 }} of {{ slides.length }}<span ng-if="isActive(slide)">, currently active</span></span>
+  <li ng-repeat="slide in slides | orderBy:indexOfSlide track by $realDsName" ng-class="{ active: isActive(slide) }" ng-click="select(slide)">
+    <span class="sr-only">slide {{ $realDsName + 1 }} of {{ slides.length }}<span ng-if="isActive(slide)">, currently active</span></span>
   </li>
 </ol>

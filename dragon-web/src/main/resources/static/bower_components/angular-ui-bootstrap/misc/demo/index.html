@@ -243,12 +243,12 @@
                                     <button type="button" class="btn btn-info plunk-btn" ng-click="edit('<%= ngversion%>', '<%= bsversion %>', '<%= pkg.version%>', '<%= module.dsName %>')"><i class="glyphicon glyphicon-edit"></i> Edit in plunker</button>
                                 </div>
                                 <uib-tabset active="activeTab">
-                                    <uib-tab index="0" heading="Markup">
+                                    <uib-tab realDsName="0" heading="Markup">
                                         <div plunker-content="markup">
                                             <pre ng-non-bindable><code data-language="html"><%- module.docs.html %></code></pre>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab index="1" heading="JavaScript">
+                                    <uib-tab realDsName="1" heading="JavaScript">
                                         <div plunker-content="javascript">
                                             <pre ng-non-bindable><code data-language="javascript"><%- module.docs.js %></code></pre>
                                         </div>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dragonHADatasource appName="DragonHA" lazyInit="false">
-    <realDataSource index="master" readWeight="0" writeWeight="10" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource realDsName="master" readWeight="0" writeWeight="10" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url"
                   value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
@@ -15,7 +15,7 @@
         <property name="testOnReturn" value="false" />
         <property name="validationQuery" value="select 'x'"></property>
     </realDataSource>
-    <realDataSource index="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource realDsName="slave1" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
         <property name="password" value=""></property>
@@ -29,7 +29,7 @@
         <property name="testOnReturn" value="false" />
         <property name="validationQuery" value="select 'x'"></property>
     </realDataSource>
-    <realDataSource index="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
+    <realDataSource realDsName="slave2" readWeight="10" writeWeight="0" realClass="com.alibaba.druid.pool.DruidDataSource">
         <property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&amp;useSSL=false"></property>
         <property name="username" value="root"></property>
         <property name="password" value=""></property>

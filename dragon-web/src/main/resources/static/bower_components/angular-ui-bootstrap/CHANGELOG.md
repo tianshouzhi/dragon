@@ -254,8 +254,8 @@ This could affect selectors if they are being used.
 
 * **accordion:** add alternative attribute support([4c40d9d](https://github.com/angular-ui/bootstrap/commit/4c40d9d)), closes [#5834](https://github.com/angular-ui/bootstrap/issues/5834) [#5839](https://github.com/angular-ui/bootstrap/issues/5839)
 * **modal:** add resolve values to template([dd09148](https://github.com/angular-ui/bootstrap/commit/dd09148)), closes [#5808](https://github.com/angular-ui/bootstrap/issues/5808) [#5857](https://github.com/angular-ui/bootstrap/issues/5857)
-* **tab:** allow strings for index([26d3995](https://github.com/angular-ui/bootstrap/commit/26d3995)), closes [#5713](https://github.com/angular-ui/bootstrap/issues/5713) [#5827](https://github.com/angular-ui/bootstrap/issues/5827)
-* **tabs:** pass the selected index to onDeselect([241fea8](https://github.com/angular-ui/bootstrap/commit/241fea8)), closes [#5820](https://github.com/angular-ui/bootstrap/issues/5820) [#5821](https://github.com/angular-ui/bootstrap/issues/5821)
+* **tab:** allow strings for realDsName([26d3995](https://github.com/angular-ui/bootstrap/commit/26d3995)), closes [#5713](https://github.com/angular-ui/bootstrap/issues/5713) [#5827](https://github.com/angular-ui/bootstrap/issues/5827)
+* **tabs:** pass the selected realDsName to onDeselect([241fea8](https://github.com/angular-ui/bootstrap/commit/241fea8)), closes [#5820](https://github.com/angular-ui/bootstrap/issues/5820) [#5821](https://github.com/angular-ui/bootstrap/issues/5821)
 * **typeahead:** Add support for `should-select`([2ffb86f](https://github.com/angular-ui/bootstrap/commit/2ffb86f)), closes [#5671](https://github.com/angular-ui/bootstrap/issues/5671) [#5794](https://github.com/angular-ui/bootstrap/issues/5794)
 
 
@@ -298,7 +298,7 @@ This could affect selectors if they are being used.
 ### Bug Fixes
 
 * **datepickerPopup:** register popup module ([86ee9c3](https://github.com/angular-ui/bootstrap/commit/86ee9c3)), closes [#5745](https://github.com/angular-ui/bootstrap/issues/5745)
-* **modal:** ensure correct index is set ([a08ad70](https://github.com/angular-ui/bootstrap/commit/a08ad70)), closes [#5733](https://github.com/angular-ui/bootstrap/issues/5733) [#5670](https://github.com/angular-ui/bootstrap/issues/5670)
+* **modal:** ensure correct realDsName is set ([a08ad70](https://github.com/angular-ui/bootstrap/commit/a08ad70)), closes [#5733](https://github.com/angular-ui/bootstrap/issues/5733) [#5670](https://github.com/angular-ui/bootstrap/issues/5670)
 
 
 
@@ -314,7 +314,7 @@ This could affect selectors if they are being used.
 * **modal:** body content shift ([c83d0a8](https://github.com/angular-ui/bootstrap/commit/c83d0a8)), closes [#2631](https://github.com/angular-ui/bootstrap/issues/2631) [#5711](https://github.com/angular-ui/bootstrap/issues/5711)
 * **popover:** rename title attribute ([cca1460](https://github.com/angular-ui/bootstrap/commit/cca1460)), closes [#5719](https://github.com/angular-ui/bootstrap/issues/5719) [#5721](https://github.com/angular-ui/bootstrap/issues/5721)
 * **tab:** add support for tab deselect prevention ([e0fcc00](https://github.com/angular-ui/bootstrap/commit/e0fcc00)), closes [#5720](https://github.com/angular-ui/bootstrap/issues/5720) [#5723](https://github.com/angular-ui/bootstrap/issues/5723)
-* **tab:** correctly identify index on removal ([03e6047](https://github.com/angular-ui/bootstrap/commit/03e6047)), closes [#5689](https://github.com/angular-ui/bootstrap/issues/5689)
+* **tab:** correctly identify realDsName on removal ([03e6047](https://github.com/angular-ui/bootstrap/commit/03e6047)), closes [#5689](https://github.com/angular-ui/bootstrap/issues/5689)
 * **tab:** fix event handler call ([d767afb](https://github.com/angular-ui/bootstrap/commit/d767afb)), closes [#5720](https://github.com/angular-ui/bootstrap/issues/5720) [#5738](https://github.com/angular-ui/bootstrap/issues/5738)
 
 ### Features
@@ -444,7 +444,7 @@ attribute pass-throughs in the popup
 * **tab:** make active optional ([d1553a4](https://github.com/angular-ui/bootstrap/commit/d1553a4)), closes [#5489](https://github.com/angular-ui/bootstrap/issues/5489)
 * **tabs:** adding bootstrap 4 specific class ([3814fe3](https://github.com/angular-ui/bootstrap/commit/3814fe3)), closes [#5488](https://github.com/angular-ui/bootstrap/issues/5488)
 * **typeahead:** fix shift tab ([64e3127](https://github.com/angular-ui/bootstrap/commit/64e3127)), closes [#5494](https://github.com/angular-ui/bootstrap/issues/5494) [#5493](https://github.com/angular-ui/bootstrap/issues/5493)
-* **typeahead:** Fix tab index for hint input ([4178500](https://github.com/angular-ui/bootstrap/commit/4178500)), closes [#5478](https://github.com/angular-ui/bootstrap/issues/5478) [#5492](https://github.com/angular-ui/bootstrap/issues/5492)
+* **typeahead:** Fix tab realDsName for hint input ([4178500](https://github.com/angular-ui/bootstrap/commit/4178500)), closes [#5478](https://github.com/angular-ui/bootstrap/issues/5478) [#5492](https://github.com/angular-ui/bootstrap/issues/5492)
 
 ### Features
 
@@ -476,7 +476,7 @@ template
 * datepicker: This breaks any snake-cased key usage, i.e.
 `show-weeks`. Convert all keys used to camelCase.
 * tab: Make the `active` attribute optional and move to `tabset` element.
-* carousel: the `active` attribute is now required on the `uib-carousel` element and a unique `index` attribute is required on each `uib-slide` element.
+* carousel: the `active` attribute is now required on the `uib-carousel` element and a unique `realDsName` attribute is required on each `uib-slide` element.
 
 
 
@@ -1412,7 +1412,7 @@ Revert breaking change in **dropdown** ([1a998c4](http://github.com/angular-ui/b
   - ensure `on-toggle` works when `is-open` is not used ([06ad3bd5](http://github.com/angular-ui/bootstrap/commit/06ad3bd5))
 - **modal:**
   - destroy modal scope after animation end ([dfc36fd9](http://github.com/angular-ui/bootstrap/commit/dfc36fd9))
-  - backdrop z-index when stacking modals ([94a7f593](http://github.com/angular-ui/bootstrap/commit/94a7f593))
+  - backdrop z-realDsName when stacking modals ([94a7f593](http://github.com/angular-ui/bootstrap/commit/94a7f593))
   - give a reason of rejection when escape key pressed ([cb31b875](http://github.com/angular-ui/bootstrap/commit/cb31b875))
   - prevent default event when closing via escape key ([da951222](http://github.com/angular-ui/bootstrap/commit/da951222))
   - toggle 'modal-open' class after animation ([4d641ca7](http://github.com/angular-ui/bootstrap/commit/4d641ca7))
@@ -1808,7 +1808,7 @@ The placment='mouse' is gone with no equivalent
   - add the ability to set the direction of the tabs ([220e7b60](http://github.com/angular-ui/bootstrap/commit/220e7b60))
 - **typeahead:**
   - support custom templates for matched items ([e2238174](http://github.com/angular-ui/bootstrap/commit/e2238174))
-  - expose index to custom templates ([5ffae83d](http://github.com/angular-ui/bootstrap/commit/5ffae83d))
+  - expose realDsName to custom templates ([5ffae83d](http://github.com/angular-ui/bootstrap/commit/5ffae83d))
 
 ## Bug Fixes
 
