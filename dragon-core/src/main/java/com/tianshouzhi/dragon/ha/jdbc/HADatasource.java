@@ -10,7 +10,7 @@ import com.tianshouzhi.dragon.ha.config.HADataSourceConfig;
 import com.tianshouzhi.dragon.ha.config.HALocalConfigManager;
 import com.tianshouzhi.dragon.ha.config.RealDsWrapperConfig;
 import com.tianshouzhi.dragon.ha.exception.DataSourceMonitor;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 import com.tianshouzhi.dragon.ha.router.HARouterManager;
 import com.tianshouzhi.dragon.ha.util.DatasourceSpiUtil;
 
@@ -39,7 +39,7 @@ public class HADatasource extends DataSourceAdapter {
 	private HARouterManager routerManager;
 
 	@Override
-	protected void doInit() throws Exception {
+	protected void doInit() throws SQLException {
 		initDsName();
 		LOGGER.info("init HADatasource(" + haDSName + ")");
 		initConfigManager();
@@ -65,7 +65,7 @@ public class HADatasource extends DataSourceAdapter {
 	private void initRealDSMap() {
 		if (realDSWrapperMap.isEmpty()) {// 没有通过编程式方式设置datasource
 			if (configManager == null) {
-				throw new HAException("configManager can't be null !");
+				throw new HASQLException("configManager can't be null !");
 			} else {
 				HADataSourceConfig haDataSourceConfig = configManager.getHADataSourceConfig();
 				Map<String, RealDsWrapperConfig> realDataSourceConfigMap = haDataSourceConfig.getRealDataSourceConfigMap();
@@ -86,7 +86,7 @@ public class HADatasource extends DataSourceAdapter {
 				try {
 					realDataSourceWrapper.init();
 				} catch (Exception e) {
-					throw new HAException("init real datasource" + realDataSourceWrapper.getRealDSName() + "error", e);
+					throw new HASQLException("init real datasource" + realDataSourceWrapper.getRealDSName() + "error", e);
 				}
 			}
 		}
@@ -104,10 +104,10 @@ public class HADatasource extends DataSourceAdapter {
 	public Connection getConnectionByRealDSName(String realDSName) throws SQLException {
 		RealDsWrapper realDataSourceWrapper = this.realDSWrapperMap.get(realDSName);
 		if (realDataSourceWrapper == null) {
-			throw new HAException("not valid datasource found with realDSName:" + realDSName);
+			throw new HASQLException("not valid datasource found with realDSName:" + realDSName);
 		}
 		if (!DataSourceMonitor.isAvailable(realDataSourceWrapper)) {
-			throw new HAException(realDataSourceWrapper.getRealDSName() + " is not available!!!");
+			throw new HASQLException(realDataSourceWrapper.getRealDSName() + " is not available!!!");
 		}
 		try {
 			return realDataSourceWrapper.getConnection();

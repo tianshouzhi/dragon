@@ -1,5 +1,7 @@
 package com.tianshouzhi.dragon.common.domain;
 
+import java.util.Date;
+
 /**
  * Created by TIANSHOUZHI336 on 2017/3/28.
  */
@@ -9,6 +11,8 @@ public class User {
 	private String name = "tianshouzhi";
 
 	private UserAccount userAccount;
+
+	Date date=new Date();
 
 	public User() {
 	}
@@ -45,5 +49,13 @@ public class User {
 	@Override
 	public String toString() {
 		return "User{" + "id=" + id + ", dsName='" + name + '\'' + ", userAccount=" + userAccount + '}';
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 }

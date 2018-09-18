@@ -1,7 +1,7 @@
 package com.tianshouzhi.dragon.ha.router;
 
 import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 import com.tianshouzhi.dragon.ha.jdbc.HADatasource;
 import com.tianshouzhi.dragon.ha.jdbc.RealDsWrapper;
 import com.tianshouzhi.dragon.ha.router.impl.SingleRouter;
@@ -83,14 +83,14 @@ public class HARouterManager {
 
 	public String routeWrite() {
 		if (writeRouter == null) {
-			throw new HAException("writeRouter is null");
+			throw new HASQLException("writeRouter is null");
 		}
 		return writeRouter.route();
 	}
 
 	public String routeRead() {
 		if (readRouter == null) {
-			throw new HAException("readRouter is null");
+			throw new HASQLException("readRouter is null");
 		}
 		return readRouter.route();
 	}

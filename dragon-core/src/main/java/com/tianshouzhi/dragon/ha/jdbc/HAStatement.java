@@ -3,7 +3,7 @@ package com.tianshouzhi.dragon.ha.jdbc;
 import com.tianshouzhi.dragon.common.jdbc.statement.DragonStatement;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -168,7 +168,7 @@ public class HAStatement extends DragonStatement implements Statement {
                 batchExecuteResult = realStatement.executeBatch();
                 break;
             default:
-                throw new HAException("unkown execute type " + executeType + ",sql :" + sql);
+                throw new HASQLException("unkown execute type " + executeType + ",sql :" + sql);
         }
         return isResultSet;
     }

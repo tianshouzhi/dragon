@@ -1,11 +1,11 @@
 package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.exception.DragonException;
-import com.tianshouzhi.dragon.common.jdbc.datasource.DragonDataSource;
 import com.tianshouzhi.dragon.common.jdbc.datasource.DataSourceAdapter;
 import com.tianshouzhi.dragon.common.log.Log;
 import com.tianshouzhi.dragon.common.log.LoggerFactory;
 import com.tianshouzhi.dragon.ha.config.RealDsWrapperConfig;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 import com.tianshouzhi.dragon.ha.util.DatasourceSpiUtil;
 
 import javax.sql.DataSource;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * Created by tianshouzhi on 2017/11/1.
  */
-public class RealDsWrapper extends DataSourceAdapter implements DragonDataSource {
+public class RealDsWrapper extends DataSourceAdapter implements DataSource, AutoCloseable {
 
 	private static final Log LOGGER = LoggerFactory.getLogger(RealDsWrapper.class);
 
@@ -33,17 +33,20 @@ public class RealDsWrapper extends DataSourceAdapter implements DragonDataSource
 	}
 
 	@Override
-	protected void doInit() throws Exception {
-		if (realDataSource == null) {
-			synchronized (this) {
-				if (realDataSource == null) {
-					LOGGER.info(" init real datasource(" + getRealDSName() + ")...");
-					Class<? extends DataSource> dsClass = (Class<? extends DataSource>) Class
-					      .forName(realDsConfig.getRealDsClass());
-					realDataSource = DatasourceSpiUtil.createDataSource(dsClass, realDsConfig.getRealDsProperties());
-					DatasourceSpiUtil.init(realDataSource);
+	protected void doInit() throws SQLException {
+		try{
+			if (realDataSource == null) {
+				synchronized (this) {
+					if (realDataSource == null) {
+						LOGGER.info(" init real datasource(" + getRealDSName() + ")...");
+						Class<? extends DataSource> dsClass = (Class<? extends DataSource>) Class.forName(realDsConfig.getRealDsClass());
+						realDataSource = DatasourceSpiUtil.createDataSource(dsClass, realDsConfig.getRealDsProperties());
+						DatasourceSpiUtil.init(realDataSource);
+					}
 				}
 			}
+		}catch (Exception e){
+			throw new HASQLException("init physical ds ["+getRealDSName()+"] error",e);
 		}
 	}
 

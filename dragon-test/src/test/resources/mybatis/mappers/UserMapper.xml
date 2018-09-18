@@ -14,7 +14,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="User">
-        INSERT INTO user (name) VALUES ('${name}');
+        INSERT INTO t_user (name,password) VALUES ('${name}',1);
     </insert>
 
 
@@ -23,7 +23,7 @@
             <!--select LAST_INSERT_ID()-->
         <!--</selectKey>-->
         INSERT INTO user (name) VALUES
-        <foreach collection="list"  item="user" realDsName="realDsName" separator="," >
+        <foreach collection="list"  item="user" index="index" separator="," >
             (#{user.name})
         </foreach>;
     </insert>
@@ -67,7 +67,7 @@
         UPDATE user
         <trim prefix="SET" suffixOverrides=",">
             <trim prefix="name =CASE id" suffix="END,">
-                <foreach collection="list" item="user" realDsName="realDsName">
+                <foreach collection="list" item="user" index="index">
                     WHEN #{user.id} THEN #{user.name}
                 </foreach>
             </trim>

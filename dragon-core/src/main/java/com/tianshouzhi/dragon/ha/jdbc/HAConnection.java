@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.ha.jdbc;
 
 import com.tianshouzhi.dragon.common.jdbc.connection.DragonConnection;
 import com.tianshouzhi.dragon.common.jdbc.sqltype.SqlTypeUtil;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 import com.tianshouzhi.dragon.ha.hint.HAHintUtil;
 
 import java.sql.*;
@@ -386,7 +386,7 @@ public class HAConnection extends DragonConnection implements Connection {
 			return realDSName;
 		}
 
-		throw new HAException("this method must invoke after any sql executed!!!");
+		throw new HASQLException("this method must invoke after any sql executed!!!");
 	}
 
 	public String getFullName() {

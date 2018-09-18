@@ -1,8 +1,8 @@
 package com.tianshouzhi.dragon.common.jdbc.datasource;
 
-import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.jdbc.WrapperAdapter;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  * Created by TIANSHOUZHI336 on 2016/11/30.
  */
-public abstract class DataSourceAdapter extends WrapperAdapter implements DragonDataSource {
+public abstract class DataSourceAdapter extends WrapperAdapter implements DataSource, AutoCloseable {
 
 	protected int loginTimeout = 0;
 
@@ -57,21 +57,16 @@ public abstract class DataSourceAdapter extends WrapperAdapter implements Dragon
 		throw new SQLFeatureNotSupportedException("getParentLogger");
 	}
 
-	@Override
-	public void init() throws DragonException{
+	public void init() throws SQLException{
 		if (!init) {
 			synchronized (this) {
 				if (!init) {
-					try {
-						doInit();
-					} catch (Exception e) {
-						throw new DragonException(e);
-					}
+					doInit();
 				}
 				init = true;
 			}
 		}
 	}
 
-	protected abstract void doInit() throws Exception;
+	protected abstract void doInit() throws SQLException;
 }

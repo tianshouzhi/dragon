@@ -3,7 +3,7 @@ package com.tianshouzhi.dragon.ha.router.impl;
 import com.tianshouzhi.dragon.common.exception.DragonException;
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
 import com.tianshouzhi.dragon.common.util.MapUtils;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +26,7 @@ public class WeightRouter extends BaseRouter {
 	public WeightRouter(String haDSName,Map<String, Integer> realDSNameWeightMap) {
 		super(haDSName);
 		if (MapUtils.isEmpty(realDSNameWeightMap) || realDSNameWeightMap.size() == 1) {
-			throw new HAException("realDSNameWeightMap can't be null! and size must > 1");
+			throw new HASQLException("realDSNameWeightMap can't be null! and size must > 1");
 		}
 		this.totalWeight = calculateTotalWeight(realDSNameWeightMap.values());
 		this.weightIndexMap = makeWeightRangeIndexMap(realDSNameWeightMap);

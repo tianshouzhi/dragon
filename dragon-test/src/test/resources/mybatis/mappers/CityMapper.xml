@@ -11,7 +11,7 @@
 
     <insert id="batchInsert" parameterType="java.util.List">
         INSERT INTO city (id,dsName) VALUES
-        <foreach collection="list"  item="city" realDsName="realDsName" separator="," >
+        <foreach collection="list"  item="city" index="index" separator="," >
             (#{city.id},#{city.dsName})
         </foreach>  ;
     </insert>

@@ -2,7 +2,7 @@ package com.tianshouzhi.dragon.ha.router.impl;
 
 import com.tianshouzhi.dragon.common.util.CollectionUtils;
 import com.tianshouzhi.dragon.common.util.StringUtils;
-import com.tianshouzhi.dragon.ha.exception.HAException;
+import com.tianshouzhi.dragon.ha.exception.HASQLException;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class SingleRouter extends BaseRouter {
     public SingleRouter(String haDataSourceName,String realDataSourceName) {
         super(haDataSourceName);
         if (StringUtils.isBlank(realDataSourceName)) {
-            throw new HAException("index can't be blank!");
+            throw new HASQLException("index can't be blank!");
         }
         this.datasourceIndex = realDataSourceName;
     }
@@ -25,6 +25,6 @@ public class SingleRouter extends BaseRouter {
         if (CollectionUtils.isEmpty(excludes)) {
             return datasourceIndex;
         }
-        throw new HAException("real datasource "+ datasourceIndex+" is not available!!!");
+        throw new HASQLException("real datasource "+ datasourceIndex+" is not available!!!");
     }
 }

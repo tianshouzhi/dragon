@@ -1,5 +1,0 @@
-<ul class="dropdown-menu" ng-show="isOpen() && !moveInProgress" ng-style="{top: position().top+'px', left: position().left+'px'}" role="listbox" aria-hidden="{{!isOpen()}}">
-    <li class="uib-typeahead-match" ng-repeat="match in matches track by $realDsName" ng-class="{active: isActive($realDsName) }" ng-mouseenter="selectActive($realDsName)" ng-click="selectMatch($realDsName, $event)" role="option" id="{{::match.id}}">
-        <div uib-typeahead-match realDsName="$realDsName" match="match" query="query" template-url="templateUrl"></div>
-    </li>
-</ul>
